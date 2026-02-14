@@ -1,0 +1,26 @@
+## Core Velocity Macros for Utility functions
+
+#macro( assetPath $path )
+/assets/${path}
+#end
+
+#macro( metaTags $title $description )
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$!{title}</title>
+<meta name="description" content="$!{description}">
+<meta property="og:title" content="$!{title}">
+<meta property="og:description" content="$!{description}">
+#end
+
+#macro( csrfToken )
+<input type="hidden" name="_csrf" value="$!{csrf_token}" />
+#end
+
+#macro( lazyImg $src $alt $class )
+<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==" 
+     data-src="$!{src}" 
+     alt="$!{alt}" 
+     class="lazyload $!{class} transition-opacity duration-300 opacity-0 data-[loaded=true]:opacity-100"
+     loading="lazy" />
+#end

@@ -93,3 +93,11 @@ export const inviteMember = async (token: string, workspaceId: string, email: st
     });
     return res.json();
 };
+
+export const deleteSite = async (token: string, siteId: string) => {
+    const res = await fetch(`${API_URL}/sites/${siteId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+};

@@ -1,0 +1,37 @@
+#parse("src/macros/ui.vm")
+
+#set( $pageTitle = "Home - Velocity 2026" )
+#set( $pageDescription = "High-performance Velocity templates with modern tooling." )
+
+<section class="mx-auto flex max-w-[980px] flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20">
+  <span class="inline-block rounded-lg bg-muted px-3 py-1 text-sm font-medium">
+    New: Biome & Vite Support
+  </span>
+  <h1 class="text-center text-3xl font-bold leading-tight tracking-tighter md:text-6xl lg:leading-[1.1]">
+    Build faster with Velocity <br class="hidden sm:inline">
+    and Modern Tools
+  </h1>
+  <p class="max-w-[750px] text-center text-lg text-muted-foreground sm:text-xl">
+    Beautifully designed components built with Radix UI and Tailwind CSS.
+    Packaged for Apache Velocity environments.
+  </p>
+  <div class="flex w-full items-center justify-center space-x-4 py-4 md:pb-10">
+    #button( "Get Started", "default", "h-11 px-8 rounded-md" )
+    #button( "GitHub", "outline", "h-11 px-8 rounded-md" )
+  </div>
+</section>
+
+<section class="container space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24">
+  <div class="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+    
+    #set( $cardContent1 = "<p class='text-sm text-muted-foreground'>Pre-configured with defaults for optimal performance.</p>" )
+    #card( "Performance First", "", $cardContent1, "" )
+    
+    #set( $cardContent2 = "<p class='text-sm text-muted-foreground'>Styled with Tailwind CSS for rapid UI development.</p>" )
+    #card( "Tailwind Ready", "", $cardContent2, "" )
+
+    #set( $cardContent3 = "<p class='text-sm text-muted-foreground'>Replaces Prettier and ESLint for blazing fast linting.</p>" )
+    #card( "Powered by Biome", "", $cardContent3, "" )
+    
+  </div>
+</section>

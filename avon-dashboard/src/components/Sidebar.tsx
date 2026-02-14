@@ -2,56 +2,58 @@
 
 import React, { useState } from 'react';
 import {
-    Home,
-    Globe,
-    BarChart2,
+    Home, // Keep Home for now, though not used in new code, will remove if not needed
+    Globe, // Keep Globe for now
+    BarChart2, // Keep BarChart2 for now
     Settings,
     ChevronLeft,
-    ChevronRight,
-    Plus,
-    Zap
+    ChevronRight, // Keep ChevronRight for now
+    Plus, // Keep Plus for now
+    Zap, // Keep Zap for now
+    LayoutDashboard, // New import
+    Bot, // New import
+    Users, // New import
+    Activity // New import
 } from 'lucide-react';
 
-export default function Sidebar() {
+const SidebarItem = ({ icon: Icon, label, active = false, onClick }: { icon: any, label: string, active?: boolean, onClick?: () => void }) => (
+    <div
+        onClick={onClick}
+        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all rounded-lg mb-1
+    ${active ? 'bg-blue-600 text-white font-semibold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+    >
+        <Icon size={20} />
+        {label && <span className="text-sm">{label}</span>}
+    </div>
+);
+
+export default function Sidebar({ activeView, setActiveView }: { activeView: string, setActiveView: (view: any) => void }) {
     const [expanded, setExpanded] = useState(true);
 
-    const menuItems = [
-        { icon: <Home size={20} />, label: 'Dashboard', active: true },
-        { icon: <Globe size={20} />, label: 'Websites', active: false },
-        { icon: <BarChart2 size={20} />, label: 'Stats', active: false },
-        { icon: <Zap size={20} />, label: 'Optimization', active: false },
-        { icon: <Settings size={20} />, label: 'Settings', active: false },
-    ];
-
     return (
-        <div className={`h-screen bg-white border-r border-gray-100 transition-all duration-300 flex flex-col ${expanded ? 'w-64' : 'w-20'}`}>
-            <div className="p-6 flex items-center justify-between">
-                {expanded && <div className="text-primary font-bold text-xl flex items-center gap-2">
-                    <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">W</div>
-                    <span>10Web</span>
+        <div className={`h-screen bg-gray-950 border-r border-white/5 transition-all duration-300 flex flex-col ${expanded ? 'w-64' : 'w-20'}`}>
+            <div className="p-6 flex items-center justify-between border-b border-white/5 mb-4">
+                {expanded && <div className="text-white font-bold text-xl flex items-center gap-2">
+                    <img src="/velocity-logo.png" alt="Velocity" className="w-10 h-10 object-contain" />
+                    <span className="tracking-tighter italic uppercase font-black text-lg">Velocity</span>
                 </div>}
-                {!expanded && <div className="mx-auto w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">W</div>}
+                {!expanded && <img src="/velocity-logo.png" alt="V" className="mx-auto w-10 h-10 object-contain cursor-pointer" onClick={() => setExpanded(true)} />}
             </div>
 
-            <nav className="flex-1 px-4 space-y-2 mt-4">
-                {menuItems.map((item, idx) => (
-                    <div
-                        key={idx}
-                        className={`flex items-center gap-4 p-3 rounded-xl cursor-not-allowed transition-colors
-              ${item.active ? 'bg-blue-50 text-primary' : 'text-gray-500 hover:bg-gray-50'}`}
-                    >
-                        <div className={expanded ? '' : 'mx-auto'}>{item.icon}</div>
-                        {expanded && <span className="font-medium">{item.label}</span>}
-                    </div>
-                ))}
+            <nav className="flex-1 px-4 space-y-2">
+                <SidebarItem icon={LayoutDashboard} label={expanded ? "Nodes" : ""} active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
+                <SidebarItem icon={Bot} label={expanded ? "Avon AI Builder" : ""} active={activeView === 'ai-builder'} onClick={() => setActiveView('ai-builder')} />
+                <SidebarItem icon={Users} label={expanded ? "Team" : ""} active={activeView === 'team'} onClick={() => setActiveView('team')} />
+                <SidebarItem icon={Activity} label={expanded ? "CI/CD Log" : ""} active={activeView === 'activity'} onClick={() => setActiveView('activity')} />
             </nav>
 
-            <div className="p-4 border-t border-gray-50">
+            <div className="p-4 border-t border-white/5">
+                <SidebarItem icon={Settings} label={expanded ? "Settings" : ""} />
                 <button
                     onClick={() => setExpanded(!expanded)}
-                    className="w-full flex items-center justify-center p-2 text-gray-400 hover:text-primary transition-colors"
+                    className="w-full mt-4 flex items-center justify-center p-2 text-gray-500 hover:text-white transition-colors"
                 >
-                    {expanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+                    <ChevronLeft className={`transition-transform duration-300 ${!expanded ? 'rotate-180' : ''}`} />
                 </button>
             </div>
         </div>

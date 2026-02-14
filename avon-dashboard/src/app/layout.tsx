@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "10Web | Velocity Dashboard",
-    description: "High-velocity website management",
+    title: "Velocity | Industrial Dashboard",
+    description: "High-velocity industrial site factory",
 };
 
 export default function RootLayout({

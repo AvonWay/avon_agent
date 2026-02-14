@@ -1,0 +1,198 @@
+#parse("src/macros/ui.vm")
+
+#set( $pageTitle = "Profile - Velocity 2026" )
+#set( $pageDescription = "Your user profile and account settings." )
+
+<section class="py-8 md:py-12">
+  <div class="flex flex-col gap-2 mb-8">
+    <h1 class="text-3xl font-bold tracking-tight">Profile</h1>
+    <p class="text-muted-foreground">Manage your account settings and preferences.</p>
+  </div>
+
+  <div class="grid gap-8 md:grid-cols-3">
+    <!-- Profile Card -->
+    <div class="md:col-span-1">
+      <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex flex-col items-center space-y-4 p-6">
+          <div class="relative">
+            <div class="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
+              AV
+            </div>
+            <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-card"></div>
+          </div>
+          <div class="text-center">
+            <h3 class="text-lg font-semibold">Avon User</h3>
+            <p class="text-sm text-muted-foreground">admin@avonway.com</p>
+          </div>
+          <div class="flex gap-2">
+            #badge("Pro Plan", "default")
+            #badge("Admin", "secondary")
+          </div>
+        </div>
+        <div class="border-t p-6">
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Member Since</span>
+              <span class="font-medium">Feb 2026</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Sites Built</span>
+              <span class="font-medium">24</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Active Sites</span>
+              <span class="font-medium">18</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">AI Model</span>
+              <span class="font-medium">Avon:latest</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Forms -->
+    <div class="md:col-span-2 space-y-6">
+
+      <!-- Personal Information -->
+      <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-xl font-semibold leading-none tracking-tight">Personal Information</h3>
+          <p class="text-sm text-muted-foreground">Update your name and contact details.</p>
+        </div>
+        <div class="p-6 pt-0 space-y-4">
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none" for="firstName">First Name</label>
+              <input id="firstName" type="text" value="Avon" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+            </div>
+            <div class="space-y-2">
+              <label class="text-sm font-medium leading-none" for="lastName">Last Name</label>
+              <input id="lastName" type="text" value="User" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="email">Email</label>
+            <input id="email" type="email" value="admin@avonway.com" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="bio">Bio</label>
+            <textarea id="bio" rows="3" class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="Tell us about yourself...">Velocity site builder. Powered by Avon AI.</textarea>
+          </div>
+          <div class="flex justify-end">
+            #button("Save Changes", "default", "h-10 px-6", "")
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences -->
+      <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-xl font-semibold leading-none tracking-tight">Preferences</h3>
+          <p class="text-sm text-muted-foreground">Configure your build and deployment preferences.</p>
+        </div>
+        <div class="p-6 pt-0 space-y-4">
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="defaultTemplate">Default Template</label>
+            <select id="defaultTemplate" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+              <option value="ecommerce">E-Commerce Core</option>
+              <option value="realestate">Real Estate Core</option>
+              <option value="saas">SaaS Starter</option>
+              <option value="custom">Custom Build</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="defaultStack">Preferred Stack</label>
+            <select id="defaultStack" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+              <option value="nextjs">Next.js 15 + Tailwind</option>
+              <option value="vite">Vite + React</option>
+              <option value="fastapi">FastAPI + Python</option>
+              <option value="node">Node.js + Express</option>
+            </select>
+          </div>
+          <div class="flex items-center space-x-3 p-4 rounded-lg border">
+            <input type="checkbox" id="darkMode" checked class="h-4 w-4 rounded border-input" />
+            <label for="darkMode" class="text-sm font-medium">Enable Dark Mode by default</label>
+          </div>
+          <div class="flex items-center space-x-3 p-4 rounded-lg border">
+            <input type="checkbox" id="autoMock" checked class="h-4 w-4 rounded border-input" />
+            <label for="autoMock" class="text-sm font-medium">Auto-generate mock data for new sites</label>
+          </div>
+          <div class="flex items-center space-x-3 p-4 rounded-lg border">
+            <input type="checkbox" id="safeLane" checked class="h-4 w-4 rounded border-input" />
+            <label for="safeLane" class="text-sm font-medium">Enable Safe Lane guardrails</label>
+          </div>
+          <div class="flex justify-end">
+            #button("Update Preferences", "default", "h-10 px-6", "")
+          </div>
+        </div>
+      </div>
+
+      <!-- API Keys -->
+      <div class="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-xl font-semibold leading-none tracking-tight">API & Integrations</h3>
+          <p class="text-sm text-muted-foreground">Manage your API keys and connected services.</p>
+        </div>
+        <div class="p-6 pt-0 space-y-4">
+          <div class="flex items-center justify-between p-4 rounded-lg border">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded bg-muted flex items-center justify-center text-sm font-bold">GH</div>
+              <div>
+                <p class="text-sm font-medium">GitHub</p>
+                <p class="text-xs text-muted-foreground">Connected · AvonWay/avon_agent</p>
+              </div>
+            </div>
+            #badge("Connected", "default")
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-lg border">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded bg-muted flex items-center justify-center text-sm font-bold">SB</div>
+              <div>
+                <p class="text-sm font-medium">Supabase</p>
+                <p class="text-xs text-muted-foreground">Production instance linked</p>
+              </div>
+            </div>
+            #badge("Connected", "default")
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-lg border">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded bg-muted flex items-center justify-center text-sm font-bold">OL</div>
+              <div>
+                <p class="text-sm font-medium">Ollama</p>
+                <p class="text-xs text-muted-foreground">localhost:11434 · Avon:latest</p>
+              </div>
+            </div>
+            #badge("Running", "default")
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="rounded-lg border border-destructive/50 bg-card text-card-foreground shadow-sm">
+        <div class="flex flex-col space-y-1.5 p-6">
+          <h3 class="text-xl font-semibold leading-none tracking-tight text-destructive">Danger Zone</h3>
+          <p class="text-sm text-muted-foreground">Irreversible actions. Proceed with caution.</p>
+        </div>
+        <div class="p-6 pt-0 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium">Delete All Sites</p>
+              <p class="text-xs text-muted-foreground">Permanently remove all deployed sites and data.</p>
+            </div>
+            #button("Delete All", "destructive", "h-9 px-4", "")
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium">Reset Agent Memory</p>
+              <p class="text-xs text-muted-foreground">Clear all learned heuristics and knowledge store.</p>
+            </div>
+            #button("Reset Memory", "destructive", "h-9 px-4", "")
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

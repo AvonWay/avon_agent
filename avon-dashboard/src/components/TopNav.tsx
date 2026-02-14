@@ -1,7 +1,27 @@
 "use client";
 
 import React from 'react';
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, Cpu } from 'lucide-react';
+
+const AVAILABLE_MODELS = [
+    {
+        id: "avon",
+        name: "Avon (Local)",
+        provider: "ollama",
+        model: "Avon:latest",
+        locked: true
+    }
+];
+
+function ModelDropdown() {
+    return (
+        <select className="text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700">
+            {AVAILABLE_MODELS.map((m) => (
+                <option key={m.id} value={m.model}>{m.name}</option>
+            ))}
+        </select>
+    );
+}
 
 export default function TopNav() {
     return (
@@ -22,6 +42,17 @@ export default function TopNav() {
                     />
                 </div>
 
+                {/* Model Selector: only shows dropdown if multiple models exist */}
+                {AVAILABLE_MODELS.length > 1 ? (
+                    <ModelDropdown />
+                ) : (
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium">
+                        <Cpu size={14} />
+                        <span>{AVAILABLE_MODELS[0].name}</span>
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    </div>
+                )}
+
                 <button className="text-gray-400 hover:text-primary transition-colors relative">
                     <Bell size={20} />
                     <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
@@ -40,3 +71,4 @@ export default function TopNav() {
         </div>
     );
 }
+
