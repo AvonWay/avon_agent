@@ -1,0 +1,109 @@
+#parse("src/macros/ui.vm")
+
+#set( $pageTitle = "Dashboard - Velocity 2026" )
+#set( $pageDescription = "Your Velocity dashboard. Manage sites, track deployments, and monitor performance." )
+
+<section class="py-8 md:py-12">
+  <div class="flex flex-col gap-2 mb-8">
+    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+    <p class="text-muted-foreground">Welcome back. Here's an overview of your projects.</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+    
+    #set( $stat1 = "<div class='text-2xl font-bold'>24</div><p class='text-xs text-muted-foreground'>+3 from last week</p>" )
+    #card( "Total Sites", "", $stat1, "" )
+
+    #set( $stat2 = "<div class='text-2xl font-bold'>18</div><p class='text-xs text-muted-foreground'>2 pending review</p>" )
+    #card( "Active Deployments", "", $stat2, "" )
+
+    #set( $stat3 = "<div class='text-2xl font-bold'>99.8%</div><p class='text-xs text-muted-foreground'>+0.2% from last month</p>" )
+    #card( "Uptime", "", $stat3, "" )
+
+    #set( $stat4 = "<div class='text-2xl font-bold'>1.2s</div><p class='text-xs text-muted-foreground'>-0.3s improvement</p>" )
+    #card( "Avg. Load Time", "", $stat4, "" )
+
+  </div>
+
+  <!-- Recent Deployments -->
+  <div class="rounded-lg border bg-card shadow-sm mb-8">
+    <div class="flex flex-col space-y-1.5 p-6">
+      <h3 class="text-xl font-semibold leading-none tracking-tight">Recent Deployments</h3>
+      <p class="text-sm text-muted-foreground">Your latest site builds and deployments.</p>
+    </div>
+    <div class="p-6 pt-0">
+      <div class="relative w-full overflow-auto">
+        <table class="w-full caption-bottom text-sm">
+          <thead class="[&_tr]:border-b">
+            <tr class="border-b transition-colors hover:bg-muted/50">
+              <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Site</th>
+              <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
+              <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Template</th>
+              <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Deployed</th>
+              <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="[&_tr:last-child]:border-0">
+            <tr class="border-b transition-colors hover:bg-muted/50">
+              <td class="p-4 align-middle font-medium">luxurygroup.co</td>
+              <td class="p-4 align-middle">
+                #badge("Live", "default")
+              </td>
+              <td class="p-4 align-middle text-muted-foreground">E-Commerce Core</td>
+              <td class="p-4 align-middle text-muted-foreground">2 hours ago</td>
+              <td class="p-4 align-middle">
+                #button("View", "ghost", "h-8 px-3 text-xs", "")
+              </td>
+            </tr>
+            <tr class="border-b transition-colors hover:bg-muted/50">
+              <td class="p-4 align-middle font-medium">streetmoneymanagement.com</td>
+              <td class="p-4 align-middle">
+                #badge("Live", "default")
+              </td>
+              <td class="p-4 align-middle text-muted-foreground">Custom Build</td>
+              <td class="p-4 align-middle text-muted-foreground">1 day ago</td>
+              <td class="p-4 align-middle">
+                #button("View", "ghost", "h-8 px-3 text-xs", "")
+              </td>
+            </tr>
+            <tr class="border-b transition-colors hover:bg-muted/50">
+              <td class="p-4 align-middle font-medium">fishersofmen-ministry.org</td>
+              <td class="p-4 align-middle">
+                #badge("Building", "secondary")
+              </td>
+              <td class="p-4 align-middle text-muted-foreground">Real Estate Core</td>
+              <td class="p-4 align-middle text-muted-foreground">3 days ago</td>
+              <td class="p-4 align-middle">
+                #button("View", "ghost", "h-8 px-3 text-xs", "")
+              </td>
+            </tr>
+            <tr class="border-b transition-colors hover:bg-muted/50">
+              <td class="p-4 align-middle font-medium">redemption-estate.edu</td>
+              <td class="p-4 align-middle">
+                #badge("Draft", "outline")
+              </td>
+              <td class="p-4 align-middle text-muted-foreground">Custom Build</td>
+              <td class="p-4 align-middle text-muted-foreground">1 week ago</td>
+              <td class="p-4 align-middle">
+                #button("View", "ghost", "h-8 px-3 text-xs", "")
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid gap-4 md:grid-cols-3">
+    #set( $qa1Content = "<p class='text-sm text-muted-foreground mb-4'>Use a pre-built template to launch a new site in seconds.</p><a href='/new-site'>#button('New Site', 'default', 'w-full', '')</a>" )
+    #card( "🚀 Launch New Site", "", $qa1Content, "" )
+
+    #set( $qa2Content = "<p class='text-sm text-muted-foreground mb-4'>Chat with Avon to build, debug, or deploy your sites.</p><a href='/chat'>#button('Open Chat', 'outline', 'w-full', '')</a>" )
+    #card( "💬 Talk to Avon", "", $qa2Content, "" )
+
+    #set( $qa3Content = "<p class='text-sm text-muted-foreground mb-4'>Review logs, performance metrics, and error reports.</p><a href='/analytics'>#button('View Analytics', 'outline', 'w-full', '')</a>" )
+    #card( "📊 Analytics", "", $qa3Content, "" )
+  </div>
+</section>

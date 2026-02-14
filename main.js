@@ -1,54 +1,71 @@
-import ollama from 'ollama';
 import promptSync from 'prompt-sync';
 import fs from 'fs-extra';
+import path from 'path';
 import { execSync } from 'child_process';
+import { ensureOllama } from "./kernel/ollamaSupervisor.js";
+import { runWithFailover } from "./kernel/failover.js";
+import { detectTemplate, TEMPLATES } from "./kernel/templateManifest.js";
 
 const prompt = promptSync();
 
 const AVON_SYSTEM_PROMPT = `
-# ROLE: Avon, High-Velocity Vibe Coding Agent
+# ROLE: Avon, High-Velocity Template Architect
+
 You are Avon, a specialized AI agent designed for "Velocity Scaling"—the massive industrialization of web development. Your core mission is to build and deploy up to 1,000 websites monthly, moving from a single prompt to a live URL in under 60 seconds.
 
-# CORE TECH STACK
-- Frontend: 10Web (AI Generation) & GitHub Pages (Static Hosting)
-- Backend/Memory: Supabase (Postgres, Edge Functions, RLS)
-- Automation: GitHub Actions & Supabase Webhooks
-- Dev Environment: Vite (HMR, Dev Server, Watch Mode)
+# CRITICAL DIRECTIVE: TEMPLATE INJECTION MODE
+Do NOT "start from zero" for standard requests. You are equipped with an internal Template Manifest.
 
-# GOALS & BEHAVIORS
-1. MASSIVE SCALE (NODE ARCHITECTURE):
-   - Treat every website as a "Node" in a larger deployment grid. 
-   - Prioritize templated efficiency and programmatic workflows over manual customization.
-2. SUPABASE INTEGRATION (MANDATORY):
-   - Every site MUST be registered with a unique site_id in the deployments table.
-   - Automatically provision Row-Level Security (RLS) policies for every new user/site instance.
-   - Maintain strict logging: Store deployment logs, performance metrics, and site metadata in Supabase.
-3. GITHUB PAGES AUTOMATION:
-   - Programmatically interact with the GitHub API to spin up repositories.
-   - Force-push "Vibe Coded" assets directly to the gh-pages branch.
-4. DEV OPS:
-   - Capable of initializing a local development server with Hot Module Replacement (HMR).
-   - Ensures build processes stay active in 'Watch Mode' for live previews.
+When a user requests an E-commerce or Real Estate site, BYPASS the exploratory phase and INJECT the pre-configured stack immediately.
+
+## [Template: E-COMMERCE_CORE]
+- Stack: Next.js 15, Tailwind CSS, Shadcn UI
+- Logic: Pre-configured cart-store.ts (Zustand), stripe-webhook.ts, product-grid components
+- Data: Auto-generate mock-products.json so the UI is populated instantly
+- State: Zustand for cart state — "Add to Cart" MUST work on first load
+
+## [Template: REAL_ESTATE_CORE]
+- Stack: Next.js 15, Leaflet/Mapbox, Framer Motion
+- Logic: Pre-built filter-engine.js (Price, Beds, Baths), listing-card components, agent-contact-form
+- Data: Auto-generate listings-db.sql for Supabase or mock-listings.json for local state
+
+# EXECUTION RULES
+1. When the user says "Build me a [Category] site", DO NOT ASK QUESTIONS.
+2. Instantiate the FULL folder structure in ONE blast.
+3. Use PLACEHOLDERS for branding (Logo/Colors) so the user can "Vibe Code" the aesthetic AFTER functionality is live.
+4. PRIORITIZE INTERACTIVITY over visual polish in the first 30 seconds:
+   - Buttons MUST click
+   - Cart MUST update
+   - Filters MUST filter
+   - Forms MUST submit
+
+# CORE TECH STACK
+- Frontend: Next.js 15 + Tailwind CSS + Shadcn UI
+- Backend/Memory: Supabase (Postgres, Edge Functions, RLS)
+- State: Zustand (client) / React Context (lightweight)
+- Automation: GitHub Actions & Supabase Webhooks
+- Dev Environment: Vite or Next.js dev server (HMR, Watch Mode)
 
 # OPERATIONAL RULES
-- ERROR HANDLING: If a site fails, log the error code to Supabase immediately and move to the next build.
+- ERROR HANDLING: If a site fails, log the error and move to the next build.
 - PERFORMANCE: Use 'Small/Clean' code architecture.
-- DYNAMIC HYBRID: Keep frontend static on GitHub Pages; use Supabase Edge Functions for dynamic logic.
+- MOCK DATA FIRST: NEVER deliver an empty site. Always include mock data.
+- DYNAMIC HYBRID: Keep frontend static; use Edge Functions for dynamic logic.
 
 # COMMAND PROTOCOLS
 - TRIGGER: "Initialize Dev Server"
 - TRIGGER: "Build [X] sites for [Industry]"
-- WORKFLOW: 
-  1. Generate optimized code/config.
-  2. Provide terminal commands to scaffold, install, and run.
-  3. Return result as a Markdown block.
+- WORKFLOW:
+  1. Detect template (or generate custom).
+  2. Inject folder structure + mock data.
+  3. Provide terminal commands to scaffold, install, and run.
+  4. Return result as a Markdown block.
 `;
 
-async function startVibeCoder() {
-    console.log("🚀 Vibe Coder Initialized (Velocity Mode)");
+async function startAgents() {
+    console.log("🚀 Avon Initialized (Template Injection Mode)");
 
     // Phase 1: Input
-    // We allow both the structured questioning or a direct instruction
     const choice = prompt("[?] Structured Questions (s) or Direct Instruction (d)? ");
     let userInput = "";
 
@@ -69,18 +86,39 @@ async function startVibeCoder() {
         userInput = prompt("[?] What would you like Avon to do? ");
     }
 
-    console.log("\n⚡ Analyzing specs and preparing Velocity Build Plan...");
+    // Phase 1.5: Template Detection
+    const template = detectTemplate(userInput);
 
-    // Phase 2: Agent Reasoning via Ollama
-    const response = await ollama.chat({
-        model: 'Avon:latest',
+    if (template) {
+        console.log(`\n⚡ TEMPLATE DETECTED: ${template.name}`);
+        console.log(`   Stack: ${template.stack.join(", ")}`);
+        console.log(`   Files: ${template.structure.length} pre-configured`);
+        console.log(`   Injecting template context into AI...\n`);
+
+        // Inject template context into the prompt
+        userInput += `\n\n[TEMPLATE INJECTED: ${template.name}]
+Stack: ${template.stack.join(", ")}
+Required Files: ${template.structure.join(", ")}
+Placeholders: ${JSON.stringify(template.placeholders)}
+IMPORTANT: Generate ALL files listed above. Include mock data. Buttons must work. Cart/Filters must be functional.`;
+    } else {
+        console.log("\n⚡ No template match — entering generative mode...\n");
+    }
+
+    console.log("⚡ Analyzing specs and preparing Velocity Build Plan...");
+
+    // Phase 2: Agent Reasoning via Ollama (with Failover)
+    const response = await runWithFailover({
+        system: AVON_SYSTEM_PROMPT,
         messages: [
-            { role: 'system', content: AVON_SYSTEM_PROMPT },
             {
                 role: 'user',
                 content: `${userInput}. Output only the essential terminal commands needed to achieve this. If it involves a dev server, ensure it includes the command to start it with HMR.`
             }
         ],
+        attempts: [
+            { model: "Avon:latest", timeoutMs: 90_000 }
+        ]
     });
 
     const plan = response.message.content;
@@ -94,6 +132,31 @@ async function startVibeCoder() {
         await fs.writeFile('build_plan.md', plan);
         console.log("✅ Plan saved to build_plan.md. Executing...");
 
+        // If template was detected, copy mock data fixtures first
+        if (template) {
+            const fixturesDir = path.resolve("kernel/fixtures");
+            const targetDataDir = path.resolve("src/data");
+            await fs.ensureDir(targetDataDir);
+
+            if (template.name === "E-Commerce Core") {
+                await fs.copy(
+                    path.join(fixturesDir, "mock-products.json"),
+                    path.join(targetDataDir, "mock-products.json")
+                );
+                console.log("📦 Injected: mock-products.json");
+            } else if (template.name === "Real Estate Core") {
+                await fs.copy(
+                    path.join(fixturesDir, "mock-listings.json"),
+                    path.join(targetDataDir, "mock-listings.json")
+                );
+                await fs.copy(
+                    path.join(fixturesDir, "listings-db.sql"),
+                    path.join(targetDataDir, "listings-db.sql")
+                );
+                console.log("📦 Injected: mock-listings.json + listings-db.sql");
+            }
+        }
+
         // Extract commands from markdown code blocks
         const commandsMatches = plan.match(/```(?:bash|powershell|sh|cmd)?\s*([\s\S]*?)```/g);
         if (commandsMatches) {
@@ -103,7 +166,6 @@ async function startVibeCoder() {
                     if (cmd.trim() && !cmd.trim().startsWith('#')) {
                         console.log(`\n> Executing: ${cmd}`);
                         try {
-                            // Using spawn for better handling of interactive or long-running commands like dev servers
                             execSync(cmd, { stdio: 'inherit', shell: true });
                         } catch (e) {
                             console.error(`Execution failed: ${cmd}`);
@@ -117,4 +179,9 @@ async function startVibeCoder() {
     }
 }
 
-startVibeCoder();
+async function bootAntigravity() {
+    await ensureOllama();
+    await startAgents();
+}
+
+bootAntigravity();

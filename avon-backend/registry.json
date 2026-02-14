@@ -1,0 +1,107 @@
+{
+  "MOCK_SITES": {
+    "ws_01": [
+      {
+        "id": "node_1771038725975",
+        "name": "buid an deploy ",
+        "domain": "node-1771038725975.avon.dev",
+        "status": "Live",
+        "deploy_status": "success",
+        "ai_plan": "**Build and Deploy a Website on a Development Server**\n\n**Step 1: Generate Website Code**\n\nUse Velocity Factory to generate the necessary HTML, CSS, and JavaScript code for the website.\n\n```\nvelocity_factory generate --template mywebsite.html --parameters title=\"My Website\" content=\"Welcome to my website!\"\n```\n\n**Step 2: Create a Vite Project**\n\nCreate a new Vite project directory and copy the generated website code into it.\n\n```\nvite init mywebsite\n```\n\n**Step 3: Configure Supabase Integration**\n\nInstall the Supabase client library and configure the site_id.\n\n```\nnpm install supabase\n```\n\n```js\nimport { createClient } from '@supabase/supabase-js'\n\nconst supabaseUrl = '<your_supabase_url>'\nconst supabaseKey = '<your_supabase_key>'\n\nconst supabase = createClient(supabaseUrl, supabaseKey)\n```\n\n**Step 4: Implement Database Connection**\n\nUse Supabase client-side functions to connect to the database and perform CRUD operations.\n\n```js\nconst insertData = async () => {\n  const { data, error } = await supabase.from('users').insert({ name: 'John Doe' })\n  if (error) throw error\n  console.log('Data inserted successfully:', data)\n}\n```\n\n**Step 5: Deploy to GitHub Pages**\n\nConfigure GitHub Actions to automatically push the website code to the gh-pages branch.\n\n**Step 6: Run Development Server**\n\nStart the Vite development server to preview the website.\n\n```\nvite\n```\n\n**Step 7: Monitor Performance**\n\nUse developer tools to monitor the website's performance and ensure it meets the Velocity Scaling target of moving from a single prompt to a live URL in under 60 seconds."
+      },
+      {
+        "id": "node_1771038571555",
+        "name": "ok",
+        "domain": "node-1771038571558.avon.dev",
+        "status": "Live",
+        "deploy_status": "success",
+        "ai_plan": "**Node Creation Process:**\n\n**1. Site Registration:**\n- Generate a unique site_id and store it in Supabase.\n- Create a new directory for the website with the site_id as its name.\n\n**2. Code Generation:**\n- Utilize Velocity Factory to generate the necessary website code based on the prompt.\n- Use Vite to set up a development environment with Hot Module Replacement (HMR).\n\n**3. Database Initialization:**\n- Create a new database table for the website with columns such as site_id, content, and other necessary data.\n\n**4. GitHub Pages Deployment:**\n- Configure GitHub Actions to automatically push the website code to the gh-pages branch.\n- Enable Supabase Webhooks to trigger the GitHub Actions workflow when data is updated in the database.\n\n**5. Verification and Testing:**\n- Verify that the website is accessible at the generated URL.\n- Perform automated testing to ensure functionality and performance.\n\n**Automation:**\n\n- Use GitHub Actions to automate the entire node creation process.\n- Trigger the workflow when a new site_id is added to Supabase.\n\n**Performance:**\n\n- Optimize the code generation and deployment process for speed.\n- Use caching mechanisms to reduce unnecessary operations.\n\n**Monitoring:**\n\n- Monitor the website creation process for errors and bottlenecks.\n- Log website metrics such as traffic and engagement.\n\n**Additional Considerations:**\n\n- Security: Implement appropriate security measures for user data and website content.\n- Scalability: Design the system to handle a high volume of website creation requests.\n- Monitoring: Continuously monitor the performance and health of the system."
+      },
+      {
+        "id": "node_1771038474108",
+        "name": "# BlackMotion C",
+        "domain": "node-1771038474108.avon.dev",
+        "status": "Live",
+        "deploy_status": "success",
+        "ai_plan": "**BlackMotion Chrome Extension - Deployment Guide**\n\n**Folder Structure:**\n\n```\nBlackMotion/\n├── manifest.json\n├── background.js\n├── content.js\n├── inject.css\n├── popup.html\n├── popup.js\n├── icons/\n│   ├── icon16.png\n│   ├── icon48.png\n│   └── icon128.png\n└── README.md\n```\n\n**Icons:**\n\n* Create 3 icon sizes: 16x16, 48x48, 128x128\n* Use a free icon generator or Canva\n\n**Loading Extension Locally:**\n\n1. Enable developer mode in Chrome Extensions.\n2. Load the BlackMotion folder.\n3. Verify installation with the extension card and no errors in the console.\n\n**Testing:**\n\n* Check for extension loading and popup functionality.\n* Test on Amazon, Target, and Google with specific keywords.\n* Verify no console errors.\n\n**Troubleshooting:**\n\n* Check for missing files, syntax errors, and page matching.\n* Refresh the page to avoid exceeding the toast limit.\n\n**Before Submission:**\n\n* Host the privacy policy at a public URL.\n* Capture screenshots of the toast and popup.\n* Create a ZIP file with all required files.\n\n**Chrome Web Store Submission:**\n\n* Upload the ZIP file to the Chrome Web Store developer dashboard.\n* Fill in required fields and submit for review.\n\n**Success Indicators:**\n\n* Console message indicating successful initialization.\n* Toast appearing on product searches.\n* Popup displaying brand directories.\n* Stats counter updating with brand clicks.\n* No red errors in the console.\n\n**Additional Notes:**\n\n* The extension should be deployed with a version number (e.g., v1.0.0).\n* The support email should be set up and monitored.\n* The screenshots should be of high quality."
+      },
+      {
+        "id": "node_1771038172796",
+        "name": "A futuristic cy",
+        "domain": "node-1771038172796.avon.dev",
+        "status": "Live",
+        "deploy_status": "success",
+        "ai_plan": "**Website Title:** Quantum Secure\n\n**Landing Page Design:**\n\n**Hero Section:**\n- Bold headline: \"Quantum Secure: Your Future is Safe\"\n- Subheading: \"Leveraging the power of quantum computing to safeguard your data and infrastructure.\"\n- Call to action button: \"Get a Quote\"\n\n**Benefits Section:**\n- List of key benefits:\n    - Enhanced security with quantum encryption\n    - Reduced risk of cyberattacks\n    - Increased data integrity\n    - Improved scalability\n\n**Technology Section:**\n- Detailed description of quantum computing technology\n- Visual representations of quantum circuits and data encryption\n\n**Case Studies Section:**\n- Testimonials from satisfied clients\n- Statistics on the effectiveness of quantum security\n\n**Team Section:**\n- Profiles of the quantum computing security experts\n\n**Contact Section:**\n- Contact form\n- Social media links\n\n**Technical Features:**\n- Secure connection using HTTPS\n- Quantum key distribution (QKD) for enhanced encryption\n- Cloud-based infrastructure for scalability\n- 24/7 customer support\n\n**Key Technologies:**\n- Quantum computing hardware\n- Quantum software development tools\n- Cloud security platforms\n\n**Target Audience:**\n- Businesses of all sizes\n- Organizations with sensitive data\n- Individuals seeking the highest level of security\n\n**Call to Action:**\n- Encourage visitors to contact Quantum Secure for a quote or consultation.\n- Offer a free trial or demo.\n\n**Additional Features:**\n- Interactive elements, such as a quantum simulation or a data encryption calculator.\n- Educational content on quantum computing and security.\n- Case studies and testimonials from leading companies.\n\n**Note:**\n- All text and images should be SEO-optimized and comply with accessibility standards.\n- The landing page should be responsive and work seamlessly across all devices."
+      },
+      {
+        "id": "node_init_01",
+        "name": "Global Orchestrator",
+        "domain": "http://localhost:3001",
+        "status": "Live",
+        "deploy_status": "success",
+        "ai_plan": "Primary Industrial Node controlling fleet synchronization."
+      }
+    ],
+    "ws_02": []
+  },
+  "MOCK_ACTIVITY": {
+    "ws_01": [
+      {
+        "id": "a1771038725975",
+        "user": "avon_admin",
+        "action": "Scaled Node (via Avon AI)",
+        "target": "buid an deploy on de",
+        "timestamp": "2026-02-14T03:12:05.975Z"
+      },
+      {
+        "id": "a1771038571558",
+        "user": "avon_admin",
+        "action": "Scaled Node (via Avon AI)",
+        "target": "ok",
+        "timestamp": "2026-02-14T03:09:31.558Z"
+      },
+      {
+        "id": "a1771038474108",
+        "user": "avon_admin",
+        "action": "Scaled Node (via Avon AI)",
+        "target": "# BlackMotion Chrome",
+        "timestamp": "2026-02-14T03:07:54.108Z"
+      },
+      {
+        "id": "a1771038172796",
+        "user": "avon_admin",
+        "action": "Scaled Node (via Avon AI)",
+        "target": "A futuristic cyber-s",
+        "timestamp": "2026-02-14T03:02:52.796Z"
+      }
+    ],
+    "ws_02": []
+  },
+  "MOCK_MEMBERS": {
+    "ws_01": [
+      {
+        "id": "u1",
+        "username": "avon_admin",
+        "role": "Owner",
+        "email": "admin@avon.ai",
+        "avatar": "https://i.pravatar.cc/150?u=u1"
+      },
+      {
+        "id": "u2",
+        "username": "dev_user",
+        "role": "Editor",
+        "email": "dev@avon.ai",
+        "avatar": "https://i.pravatar.cc/150?u=u2"
+      }
+    ],
+    "ws_02": [
+      {
+        "id": "u1",
+        "username": "avon_admin",
+        "role": "Owner",
+        "email": "admin@avon.ai",
+        "avatar": "https://i.pravatar.cc/150?u=u1"
+      }
+    ]
+  }
+}

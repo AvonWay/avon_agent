@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  #parse("src/macros/core.vm")
+  #metaTags( $pageTitle, $pageDescription )
+  
+  <!-- Vite Integration for CSS extraction -->
+  #if( $config.environment == "development" )
+    <script type="module" src="http://localhost:5173/@vite/client"></script>
+    <script type="module" src="http://localhost:5173/src/styles/main.css"></script>
+  #else
+    <!-- In production, this would be replaced by the built asset path -->
+    <link rel="stylesheet" href="/dist/assets/main.css">
+  #end
+</head>
+<body class="bg-background font-sans antialiased">
+  <div class="relative flex min-h-screen flex-col">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div class="container flex h-14 items-center justify-between">
+        <div class="flex items-center">
+          <a class="mr-6 flex items-center space-x-2" href="/">
+            <div class="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">A</div>
+            <span class="hidden font-bold sm:inline-block">Velocity 2026</span>
+          </a>
+          <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/dashboard">Dashboard</a>
+            <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/docs">Docs</a>
+            <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/components">Components</a>
+          </nav>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+            Avon:latest
+          </div>
+          <a href="/profile" class="flex items-center space-x-2 group">
+            <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary group-hover:bg-primary/20 transition-colors">
+              AV
+            </div>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+      <div class="container relative">
+        $!{screen_content}
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 md:px-8 md:py-0">
+      <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+        <p class="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+          Built by <a href="#" class="font-medium underline underline-offset-4">Avon Agent</a>.
+          The source code is available on <a href="#" class="font-medium underline underline-offset-4">GitHub</a>.
+        </p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

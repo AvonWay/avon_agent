@@ -1,0 +1,9 @@
+[
+    {
+        "type": "procedural",
+        "context": "Velocity site optimization",
+        "lesson": "Always profile TTFB before optimizing JS bundles",
+        "confidence": 0.92,
+        "source": "web + validation"
+    }
+]

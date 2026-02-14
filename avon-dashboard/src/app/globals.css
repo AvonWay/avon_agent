@@ -16,4 +16,6 @@ body {
     color: var(--color-text-main);
     background: var(--color-background);
     font-family: 'Inter', sans-serif;
+    border-top: 5px solid #0052FF;
+    /* Industrial Verification Line */
 }
