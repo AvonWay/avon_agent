@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #0052FF;
+    --color-background: #F9FAFB;
+    --color-text-main: #1F2937;
+}
+
+:root {
+    --foreground-rgb: 31, 41, 55;
+    --background-start-rgb: 249, 250, 251;
+    --background-end-rgb: 249, 250, 251;
+}
+
+body {
+    color: var(--color-text-main);
+    background: var(--color-background);
+    font-family: 'Inter', sans-serif;
+}

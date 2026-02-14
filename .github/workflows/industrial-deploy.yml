@@ -1,0 +1,36 @@
+name: Industrial Node Deployment
+
+on:
+  repository_dispatch:
+    types: [deploy-node]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Inject Node Configuration
+        run: |
+          echo "Building Node: ${{ github.event.client_payload.node_id }}"
+          echo "Template: ${{ github.event.client_payload.template_id }}"
+          echo "Prompt: ${{ github.event.client_payload.prompt }}"
+          # In a real factory, this would pull the template and run 'npm install && npm run build'
+          mkdir -p dist
+          echo "<h1>${{ github.event.client_payload.prompt }}</h1>" > dist/index.html
+          echo "Deployed via Avon Velocity Engine" >> dist/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          force_orphan: true
+          user_name: 'Avon Factory Bot'
+          user_email: 'bot@avon.ai'
