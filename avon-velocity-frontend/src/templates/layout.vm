@@ -20,7 +20,7 @@
       <div class="container flex h-14 items-center justify-between">
         <div class="flex items-center">
           <a class="mr-6 flex items-center space-x-2" href="/">
-            <div class="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">A</div>
+            <img src="/src/assets/velocity-logo.png" alt="Velocity" class="h-7 w-auto" />
             <span class="hidden font-bold sm:inline-block">Velocity 2026</span>
           </a>
           <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
