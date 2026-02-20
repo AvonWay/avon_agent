@@ -1,0 +1,815 @@
+#parse("src/macros/ui.vm")
+
+#set( $pageTitle = "Documentation - Velocity 2026" )
+#set( $pageDescription = "Complete developer documentation for the Velocity Industrial Builder platform." )
+
+<div class="relative min-h-screen">
+    <!-- Background Accents -->
+    <div class="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px]"></div>
+    <div class="absolute bottom-0 left-0 -z-10 h-[400px] w-[400px] rounded-full bg-blue-500/5 blur-[100px]"></div>
+
+    <div class="flex gap-8 py-8 md:py-12">
+
+        <!-- Sidebar Navigation -->
+        <aside class="hidden lg:block w-64 shrink-0">
+            <div class="sticky top-20 space-y-1">
+                <p class="text-xs font-black uppercase tracking-widest text-primary mb-4">Documentation</p>
+
+                <nav id="docs-nav" class="space-y-0.5">
+                    <a href="#getting-started" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        Getting Started
+                    </a>
+                    <a href="#architecture" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        Architecture
+                    </a>
+                    <a href="#api-reference" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        API Reference
+                    </a>
+                    <a href="#templates" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        VTL Templates
+                    </a>
+                    <a href="#macros" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        UI Macros
+                    </a>
+                    <a href="#swarm" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        Swarm Intelligence
+                    </a>
+                    <a href="#deployment" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        Deployment
+                    </a>
+                    <a href="#env" class="docs-nav-link block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground font-medium">
+                        Environment
+                    </a>
+                </nav>
+
+                <div class="mt-6 pt-4 border-t border-border/50">
+                    <p class="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Resources</p>
+                    <a href="/components" class="block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground">
+                        Component Library
+                    </a>
+                    <a href="/blueprints" class="block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground">
+                        Industrial Blueprints
+                    </a>
+                    <a href="/chat" class="block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground">
+                        Agent Chat
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 min-w-0">
+
+            <!-- Header -->
+            <div class="flex flex-col gap-4 mb-16 border-b border-primary/10 pb-12">
+                <div class="flex items-center gap-2">
+                    #badge("v2.0", "default")
+                    #badge("Industrial Standard", "outline")
+                    #badge("Last updated: Feb 2026", "secondary")
+                </div>
+                <h1 class="text-5xl font-black tracking-tighter lg:text-7xl bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
+                    Documentation
+                </h1>
+                <p class="text-xl text-muted-foreground max-w-2xl leading-relaxed">
+                    Everything you need to build, deploy, and scale with the Velocity Industrial Builder platform. From first install to multi-agent swarm orchestration.
+                </p>
+            </div>
+
+            <!-- Getting Started -->
+            <section id="getting-started" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">01. Getting Started</h2>
+                    <p class="text-sm text-muted-foreground">Set up the Velocity platform locally in under 5 minutes.</p>
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-2 mb-8">
+                    #set( $step1 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Clone the repository and install dependencies for all workspaces.</p><div class='bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto'><pre>git clone https://github.com/AvonWay/avon_agent.git
+cd Avon_Agent
+npm install
+cd avon-backend &amp;&amp; npm install
+cd ../avon-dashboard &amp;&amp; npm install
+cd ../avon-velocity-frontend &amp;&amp; npm install</pre></div></div>" )
+                    #card( "Step 1: Clone & Install", "", $step1, "" )
+
+                    #set( $step2 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Configure your environment variables for Supabase and Ollama.</p><div class='bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto'><pre># avon-backend/.env
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_service_role_key
+OLLAMA_URL=http://localhost:11434
+
+# avon-dashboard/.env.local
+NEXT_PUBLIC_API_URL=http://localhost:4000/api
+NEXT_PUBLIC_PREVIEW_URL=http://localhost:3001</pre></div></div>" )
+                    #card( "Step 2: Configure Environment", "", $step2, "" )
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-2 mb-8">
+                    #set( $step3 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Start Ollama and ensure the Velocity model is available.</p><div class='bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto'><pre># Windows PowerShell
+$env:OLLAMA_ORIGINS='*'; ollama serve
+
+# Verify model is available
+ollama list</pre></div></div>" )
+                    #card( "Step 3: Start Ollama", "", $step3, "" )
+
+                    #set( $step4 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Start all services: backend (4000), dashboard (3000), renderer (8080).</p><div class='bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto'><pre># Terminal 1: Backend
+cd avon-backend &amp;&amp; node server.js
+
+# Terminal 2: Dashboard
+cd avon-dashboard &amp;&amp; npm run dev
+
+# Terminal 3: Velocity Renderer
+cd avon-velocity-frontend &amp;&amp; node server.js</pre></div></div>" )
+                    #card( "Step 4: Launch Services", "", $step4, "" )
+                </div>
+
+                #set( $prereqContent = "<div class='space-y-2'><div class='flex items-center gap-3 py-2 border-b border-muted/50'><span class='w-2 h-2 bg-green-500 rounded-full'></span><span class='text-sm font-medium'>Node.js 18+</span><span class='text-xs text-muted-foreground ml-auto'>Runtime</span></div><div class='flex items-center gap-3 py-2 border-b border-muted/50'><span class='w-2 h-2 bg-green-500 rounded-full'></span><span class='text-sm font-medium'>Ollama</span><span class='text-xs text-muted-foreground ml-auto'>Local LLM</span></div><div class='flex items-center gap-3 py-2 border-b border-muted/50'><span class='w-2 h-2 bg-green-500 rounded-full'></span><span class='text-sm font-medium'>Supabase Project</span><span class='text-xs text-muted-foreground ml-auto'>Database + Auth</span></div><div class='flex items-center gap-3 py-2'><span class='w-2 h-2 bg-green-500 rounded-full'></span><span class='text-sm font-medium'>Git</span><span class='text-xs text-muted-foreground ml-auto'>Version Control</span></div></div>" )
+                #card("Prerequisites", "Required software and services", $prereqContent, "")
+            </section>
+
+            <!-- Architecture -->
+            <section id="architecture" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">02. Architecture</h2>
+                    <p class="text-sm text-muted-foreground">The Velocity platform is a multi-service system designed for autonomous site generation.</p>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                    #stat("Backend API", "Port 4000", "Express.js", "text-blue-500")
+                    #stat("Dashboard", "Port 3000", "Next.js 16", "text-purple-500")
+                    #stat("Renderer", "Port 8080", "Velocity.js", "text-green-500")
+                    #stat("Preview", "Port 3001", "Static HTML", "text-amber-500")
+                </div>
+
+                <div class="rounded-2xl border bg-card/40 p-8 space-y-6">
+                    <h3 class="text-lg font-bold">System Flow</h3>
+                    <div class="grid gap-4 md:grid-cols-5">
+                        <div class="text-center p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                            <p class="text-2xl mb-2">💬</p>
+                            <p class="text-xs font-bold uppercase text-blue-600">User Prompt</p>
+                            <p class="text-[11px] text-muted-foreground mt-1">Natural language input</p>
+                        </div>
+                        <div class="text-center p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                            <p class="text-2xl mb-2">🤖</p>
+                            <p class="text-xs font-bold uppercase text-purple-600">AI Engine</p>
+                            <p class="text-[11px] text-muted-foreground mt-1">Ollama LLM generates plan</p>
+                        </div>
+                        <div class="text-center p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+                            <p class="text-2xl mb-2">🏗️</p>
+                            <p class="text-xs font-bold uppercase text-green-600">Builder</p>
+                            <p class="text-[11px] text-muted-foreground mt-1">Template + data merge</p>
+                        </div>
+                        <div class="text-center p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                            <p class="text-2xl mb-2">📦</p>
+                            <p class="text-xs font-bold uppercase text-amber-600">Storage</p>
+                            <p class="text-[11px] text-muted-foreground mt-1">Supabase persistence</p>
+                        </div>
+                        <div class="text-center p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                            <p class="text-2xl mb-2">🌐</p>
+                            <p class="text-xs font-bold uppercase text-red-600">Deploy</p>
+                            <p class="text-[11px] text-muted-foreground mt-1">Live node preview</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 rounded-lg bg-muted/30 border border-border/50">
+                        <h4 class="text-sm font-bold mb-2">Directory Structure</h4>
+                        <div class="font-mono text-xs text-muted-foreground leading-relaxed">
+                            <pre>Avon_Agent/
+├── avon-backend/          # Express.js REST API (port 4000)
+│   ├── server.js          # Main server with all routes
+│   ├── supabaseClient.js  # Supabase connection
+│   └── agents/            # AI agent orchestration
+├── avon-dashboard/        # Next.js 16 IDE Dashboard (port 3000)
+│   └── src/app/page.tsx   # IDE-style main view
+├── avon-velocity-frontend/# Velocity Template Renderer (port 8080)
+│   ├── server.js          # Express renderer with 2-pass VTL
+│   └── src/
+│       ├── templates/     # .vm page fragments
+│       ├── macros/        # Reusable VTL macros
+│       └── styles/        # Tailwind CSS
+├── kernel/                # Template manifest & fixtures
+├── agents/                # Supervisor & worker agents
+├── memory/                # Agent heuristics & memory
+└── io/                    # Input/output processors</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API Reference -->
+            <section id="api-reference" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">03. API Reference</h2>
+                    <p class="text-sm text-muted-foreground">All endpoints run on <code class="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">http://localhost:4000/api</code></p>
+                </div>
+
+                <!-- Auth -->
+                <div class="space-y-4 mb-8">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        Authentication
+                    </h3>
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                            <span class="px-2 py-0.5 bg-green-600 text-white text-xs font-black rounded">POST</span>
+                            <code class="text-sm font-mono font-medium">/api/auth/login</code>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <p class="text-sm text-muted-foreground">Authenticate and receive a JWT token for subsequent requests.</p>
+                            <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                <pre>// Request
+{ "username": "avon_admin", "role": "industrial" }
+
+// Response
+{ "token": "eyJhbGciOiJIUzI1N..." }</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sites -->
+                <div class="space-y-4 mb-8">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        Sites
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-blue-500/10 border-b border-blue-500/20">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-black rounded">GET</span>
+                                <code class="text-sm font-mono font-medium">/api/sites</code>
+                                <span class="ml-auto text-xs text-muted-foreground">🔒 Auth Required</span>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">Fetch all generated sites for the authenticated user.</p>
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                                <span class="px-2 py-0.5 bg-green-600 text-white text-xs font-black rounded">POST</span>
+                                <code class="text-sm font-mono font-medium">/api/generate-site</code>
+                                <span class="ml-auto text-xs text-muted-foreground">🔒 Auth Required</span>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <p class="text-sm text-muted-foreground">Generate a new site using AI. This is the core build endpoint.</p>
+                                <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                    <pre>// Request
+{
+  "prompt": "A futuristic SaaS landing page",
+  "templateId": "vibe-01",
+  "tone": "Light Blue",
+  "theme": "light"
+}
+
+// Response
+{
+  "node_id": "n_abc123",
+  "plan": "Generated HTML content..."
+}</pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-red-500/10 border-b border-red-500/20">
+                                <span class="px-2 py-0.5 bg-red-600 text-white text-xs font-black rounded">DELETE</span>
+                                <code class="text-sm font-mono font-medium">/api/sites/:id</code>
+                                <span class="ml-auto text-xs text-muted-foreground">🔒 Auth Required</span>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">Delete a site by its ID.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workspaces -->
+                <div class="space-y-4 mb-8">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                        Workspaces
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-blue-500/10 border-b border-blue-500/20">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-black rounded">GET</span>
+                                <code class="text-sm font-mono font-medium">/api/workspaces</code>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">List all workspaces for the current user.</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                                <span class="px-2 py-0.5 bg-green-600 text-white text-xs font-black rounded">POST</span>
+                                <code class="text-sm font-mono font-medium">/api/workspaces/switch</code>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <p class="text-sm text-muted-foreground">Switch the active workspace context.</p>
+                                <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                    <pre>{ "workspaceId": "ws_abc123" }</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-blue-500/10 border-b border-blue-500/20">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-black rounded">GET</span>
+                                <code class="text-sm font-mono font-medium">/api/workspaces/:id/members</code>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">Fetch members of a specific workspace.</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                                <span class="px-2 py-0.5 bg-green-600 text-white text-xs font-black rounded">POST</span>
+                                <code class="text-sm font-mono font-medium">/api/workspaces/:id/invite</code>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <p class="text-sm text-muted-foreground">Invite a team member to a workspace.</p>
+                                <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                    <pre>{ "email": "dev@team.com", "role": "editor" }</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal & FS -->
+                <div class="space-y-4 mb-8">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        Terminal & File System
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                                <span class="px-2 py-0.5 bg-green-600 text-white text-xs font-black rounded">POST</span>
+                                <code class="text-sm font-mono font-medium">/api/terminal/exec</code>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <p class="text-sm text-muted-foreground">Execute a shell command on the server.</p>
+                                <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                    <pre>{ "command": "ls -la", "cwd": "/var/app" }</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-blue-500/10 border-b border-blue-500/20">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-black rounded">GET</span>
+                                <code class="text-sm font-mono font-medium">/api/fs/list?path=</code>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">List files and directories at a given path.</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-blue-500/10 border-b border-blue-500/20">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-black rounded">GET</span>
+                                <code class="text-sm font-mono font-medium">/api/fs/read?path=</code>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">Read the content of a file.</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                                <span class="px-2 py-0.5 bg-green-600 text-white text-xs font-black rounded">POST</span>
+                                <code class="text-sm font-mono font-medium">/api/fs/write</code>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <p class="text-sm text-muted-foreground">Write content to a file (create or overwrite).</p>
+                                <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                    <pre>{ "path": "/app/index.html", "content": "&lt;h1&gt;Hello&lt;/h1&gt;" }</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Config -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                        Configuration
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-blue-500/10 border-b border-blue-500/20">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-black rounded">GET</span>
+                                <code class="text-sm font-mono font-medium">/api/config/check</code>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">Check the status of Supabase and GitHub integrations.</p>
+                            </div>
+                        </div>
+                        <div class="rounded-xl border overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-green-500/10 border-b border-green-500/20">
+                                <span class="px-2 py-0.5 bg-green-600 text-white text-xs font-black rounded">POST</span>
+                                <code class="text-sm font-mono font-medium">/api/config/update</code>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-muted-foreground">Update system configuration values (Supabase URL, keys, etc).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Templates -->
+            <section id="templates" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">04. VTL Templates</h2>
+                    <p class="text-sm text-muted-foreground">The Velocity Template Language (VTL) rendering engine uses a two-pass architecture.</p>
+                </div>
+
+                <div class="rounded-2xl border bg-card/40 p-8 space-y-6">
+                    <h3 class="text-lg font-bold">Two-Pass Render Pipeline</h3>
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="p-6 rounded-xl bg-blue-500/10 border border-blue-500/20 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-blue-600 text-white text-xs font-black rounded">Pass 1</span>
+                                <span class="text-sm font-bold">Page Fragment</span>
+                            </div>
+                            <p class="text-sm text-muted-foreground">Each page template (e.g. <code class="bg-muted px-1 rounded">dashboard.vm</code>) is a fragment — no HTML shell. It gets rendered first with macros and data context.</p>
+                            <div class="bg-gray-950 rounded-lg p-3 font-mono text-xs text-green-400">
+                                <pre>macros + page.vm → screenContent</pre>
+                            </div>
+                        </div>
+                        <div class="p-6 rounded-xl bg-purple-500/10 border border-purple-500/20 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-purple-600 text-white text-xs font-black rounded">Pass 2</span>
+                                <span class="text-sm font-bold">Layout Injection</span>
+                            </div>
+                            <p class="text-sm text-muted-foreground">The rendered fragment is injected into <code class="bg-muted px-1 rounded">layout.vm</code> via the <code class="bg-muted px-1 rounded">$!{screen_content}</code> variable to produce the final HTML document.</p>
+                            <div class="bg-gray-950 rounded-lg p-3 font-mono text-xs text-green-400">
+                                <pre>macros + layout.vm(screenContent) → HTML</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold mt-8">Available Templates</h3>
+                    <div class="relative w-full overflow-auto">
+                        <table class="w-full caption-bottom text-sm">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="h-10 px-4 text-left font-medium text-muted-foreground">File</th>
+                                    <th class="h-10 px-4 text-left font-medium text-muted-foreground">Route</th>
+                                    <th class="h-10 px-4 text-left font-medium text-muted-foreground">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">index.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/</code></td>
+                                    <td class="p-4 text-muted-foreground">Landing page with hero and feature cards</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">dashboard.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/dashboard</code></td>
+                                    <td class="p-4 text-muted-foreground">Live node stats + recent deployments table</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">blueprints.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/blueprints</code></td>
+                                    <td class="p-4 text-muted-foreground">Industrial template marketplace</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">chat.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/chat</code></td>
+                                    <td class="p-4 text-muted-foreground">Agent-powered chat interface</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">components.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/components</code></td>
+                                    <td class="p-4 text-muted-foreground">UI macro library showcase</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">betting.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/betting</code></td>
+                                    <td class="p-4 text-muted-foreground">Developer Swarm probability engine</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">audit.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/audit</code></td>
+                                    <td class="p-4 text-muted-foreground">System integrity and security audit</td>
+                                </tr>
+                                <tr class="hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-sm">docs.vm</td>
+                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/docs</code></td>
+                                    <td class="p-4 text-muted-foreground">This documentation page</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Macros -->
+            <section id="macros" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">05. UI Macros</h2>
+                    <p class="text-sm text-muted-foreground">Reusable Shadcn-style components defined as VTL macros. See them in action on the <a href="/components" class="text-primary hover:underline font-medium">Component Library</a> page.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- button -->
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#button( $text, $variant, $class, $attrs )</code>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <p class="text-sm text-muted-foreground">Renders a styled button. Variants: <code class="bg-muted px-1 rounded text-xs">default</code>, <code class="bg-muted px-1 rounded text-xs">destructive</code>, <code class="bg-muted px-1 rounded text-xs">outline</code>, <code class="bg-muted px-1 rounded text-xs">secondary</code>, <code class="bg-muted px-1 rounded text-xs">ghost</code>, <code class="bg-muted px-1 rounded text-xs">premium</code></p>
+                            <div class="flex flex-wrap gap-3">
+                                #button("Default", "default", "h-9 px-4", "")
+                                #button("Outline", "outline", "h-9 px-4", "")
+                                #button("Premium", "premium", "h-9 px-4", "")
+                                #button("Ghost", "ghost", "h-9 px-4", "")
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- card -->
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#card( $title, $description, $content, $footer )</code>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-sm text-muted-foreground">Renders a card container with glassmorphism styling. All parameters are optional — pass empty strings to skip.</p>
+                        </div>
+                    </div>
+
+                    <!-- stat -->
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#stat( $label, $value, $trend, $color )</code>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-sm text-muted-foreground">Renders a KPI telemetry unit. Trend text color is set via <code class="bg-muted px-1 rounded text-xs">$color</code> (e.g. <code class="bg-muted px-1 rounded text-xs">text-green-500</code>).</p>
+                        </div>
+                    </div>
+
+                    <!-- badge -->
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#badge( $text, $variant )</code>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <p class="text-sm text-muted-foreground">Renders a status indicator. Variants: <code class="bg-muted px-1 rounded text-xs">default</code>, <code class="bg-muted px-1 rounded text-xs">secondary</code>, <code class="bg-muted px-1 rounded text-xs">success</code>, <code class="bg-muted px-1 rounded text-xs">destructive</code>, <code class="bg-muted px-1 rounded text-xs">outline</code></p>
+                            <div class="flex flex-wrap gap-2">
+                                #badge("Default", "default")
+                                #badge("Success", "success")
+                                #badge("Destructive", "destructive")
+                                #badge("Outline", "outline")
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- input -->
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#input( $label, $id, $type, $placeholder, $value )</code>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-sm text-muted-foreground">Renders a labeled input form field with glassmorphism backdrop and auto-highlight on focus.</p>
+                        </div>
+                    </div>
+
+                    <!-- alert -->
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#alert( $title, $message, $variant )</code>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-sm text-muted-foreground">Renders a notification banner. Variants: <code class="bg-muted px-1 rounded text-xs">info</code> (default), <code class="bg-muted px-1 rounded text-xs">error</code></p>
+                        </div>
+                    </div>
+
+                    <!-- Core macros -->
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#metaTags( $title, $description )</code>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-sm text-muted-foreground">Inserts meta charset, viewport, title, description, and Open Graph tags. Used in <code class="bg-muted px-1 rounded text-xs">layout.vm</code>.</p>
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border overflow-hidden">
+                        <div class="flex items-center gap-3 px-4 py-3 bg-primary/5 border-b">
+                            <code class="text-sm font-mono font-bold text-primary">#lazyImg( $src, $alt, $class )</code>
+                        </div>
+                        <div class="p-4">
+                            <p class="text-sm text-muted-foreground">Renders a lazy-loaded image with a transparent SVG placeholder until the real image loads.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Swarm Intelligence -->
+            <section id="swarm" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">06. Swarm Intelligence</h2>
+                    <p class="text-sm text-muted-foreground">Multi-agent orchestration for parallel, high-throughput builds.</p>
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-3 mb-8">
+                    #set( $agent1 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Drafts the architectural blueprint from the user prompt, determining page structure, data schema, and component composition.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Planning', 'default') #badge('Schema Design', 'outline')</div></div>" )
+                    #card( "🤖 Architect Agent", "Phase 1: Blueprint", $agent1, "" )
+
+                    #set( $agent2 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Executes the build plan by synthesizing HTML, CSS, and JS from the Architect's blueprint. Uses templates and macros.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Code Generation', 'default') #badge('Template Merge', 'outline')</div></div>" )
+                    #card( "👷 Builder Agent", "Phase 2: Construction", $agent2, "" )
+
+                    #set( $agent3 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Performs automated linting, accessibility checks, performance scoring, and security audits before deployment.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Security Audit', 'success') #badge('A11y Check', 'outline')</div></div>" )
+                    #card( "🛡️ Guardian Agent", "Phase 3: Validation", $agent3, "" )
+                </div>
+
+                <div class="p-6 rounded-xl bg-muted/30 border border-border/50">
+                    <h4 class="text-sm font-bold mb-3">Swarm Mode Toggle</h4>
+                    <p class="text-sm text-muted-foreground mb-4">Swarm Mode can be toggled in the IDE Dashboard (port 3000) via the ⚡ Swarm button in the Velocity Assistant panel. When enabled, all builds go through the 3-phase multi-agent pipeline. When disabled, a simpler single-pass build is used.</p>
+                    <div class="flex gap-3">
+                        #badge("Default: Enabled", "success")
+                        #badge("Configurable per-session", "outline")
+                    </div>
+                </div>
+            </section>
+
+            <!-- Deployment -->
+            <section id="deployment" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">07. Deployment</h2>
+                    <p class="text-sm text-muted-foreground">Automated deployment via GitHub Actions and the Industrial Node Deployment workflow.</p>
+                </div>
+
+                <div class="rounded-2xl border bg-card/40 p-8 space-y-6">
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold">GitHub Actions Pipeline</h3>
+                            <p class="text-sm text-muted-foreground leading-relaxed">
+                                The <code class="bg-muted px-1 rounded text-xs">industrial-deploy.yml</code> workflow is triggered via <code class="bg-muted px-1 rounded text-xs">repository_dispatch</code> events. It builds the node and deploys to GitHub Pages automatically.
+                            </p>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                                    <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center text-xs font-bold">1</span>
+                                    <span class="text-sm">Checkout code from repository</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                                    <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center text-xs font-bold">2</span>
+                                    <span class="text-sm">Setup Node.js 20 environment</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                                    <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-600 flex items-center justify-center text-xs font-bold">3</span>
+                                    <span class="text-sm">Inject node configuration from dispatch payload</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                                    <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center text-xs font-bold">4</span>
+                                    <span class="text-sm">Deploy to GitHub Pages</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-bold">Dispatch Payload</h3>
+                            <div class="bg-gray-950 rounded-lg p-4 font-mono text-sm text-green-400 overflow-x-auto">
+                                <pre>{
+  "event_type": "deploy-node",
+  "client_payload": {
+    "node_id": "n_abc123",
+    "template_id": "vibe-01",
+    "prompt": "Your site description"
+  }
+}</pre>
+                            </div>
+                            <p class="text-sm text-muted-foreground">This can be triggered programmatically via the GitHub API or automatically by the Velocity backend after a successful build.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Environment -->
+            <section id="env" class="scroll-mt-20 mb-20">
+                <div class="flex flex-col gap-1 mb-8">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">08. Environment Variables</h2>
+                    <p class="text-sm text-muted-foreground">All required and optional configuration values.</p>
+                </div>
+
+                <div class="rounded-2xl border overflow-hidden">
+                    <div class="relative w-full overflow-auto">
+                        <table class="w-full caption-bottom text-sm">
+                            <thead>
+                                <tr class="border-b bg-muted/30">
+                                    <th class="h-10 px-4 text-left font-medium text-muted-foreground">Variable</th>
+                                    <th class="h-10 px-4 text-left font-medium text-muted-foreground">Service</th>
+                                    <th class="h-10 px-4 text-left font-medium text-muted-foreground">Required</th>
+                                    <th class="h-10 px-4 text-left font-medium text-muted-foreground">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-xs">SUPABASE_URL</td>
+                                    <td class="p-4 text-sm">Backend</td>
+                                    <td class="p-4">#badge("Required", "destructive")</td>
+                                    <td class="p-4 text-sm text-muted-foreground">Supabase project URL</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-xs">SUPABASE_KEY</td>
+                                    <td class="p-4 text-sm">Backend</td>
+                                    <td class="p-4">#badge("Required", "destructive")</td>
+                                    <td class="p-4 text-sm text-muted-foreground">Service role key for server-side ops</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-xs">OLLAMA_URL</td>
+                                    <td class="p-4 text-sm">Backend</td>
+                                    <td class="p-4">#badge("Required", "destructive")</td>
+                                    <td class="p-4 text-sm text-muted-foreground">Ollama API endpoint (default: localhost:11434)</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-xs">NEXT_PUBLIC_API_URL</td>
+                                    <td class="p-4 text-sm">Dashboard</td>
+                                    <td class="p-4">#badge("Required", "destructive")</td>
+                                    <td class="p-4 text-sm text-muted-foreground">Backend API URL for the Next.js dashboard</td>
+                                </tr>
+                                <tr class="border-b hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-xs">NEXT_PUBLIC_PREVIEW_URL</td>
+                                    <td class="p-4 text-sm">Dashboard</td>
+                                    <td class="p-4">#badge("Optional", "outline")</td>
+                                    <td class="p-4 text-sm text-muted-foreground">Preview renderer URL (default: localhost:3001)</td>
+                                </tr>
+                                <tr class="hover:bg-muted/50 transition-colors">
+                                    <td class="p-4 font-mono text-xs">PORT</td>
+                                    <td class="p-4 text-sm">Renderer</td>
+                                    <td class="p-4">#badge("Optional", "outline")</td>
+                                    <td class="p-4 text-sm text-muted-foreground">Velocity renderer port (default: 8080)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <section class="mb-20 text-center py-12">
+                <div class="mx-auto max-w-lg space-y-6">
+                    <h2 class="text-3xl font-black tracking-tight">Ready to Build?</h2>
+                    <p class="text-muted-foreground">Jump into the Velocity chat to start generating your first site, or explore the component library for UI inspiration.</p>
+                    <div class="flex items-center justify-center gap-4">
+                        <a href="/chat">#button("Start Building", "premium", "h-12 px-8", "")</a>
+                        <a href="/components">#button("Component Library", "outline", "h-12 px-8", "")</a>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<script>
+#[[
+document.addEventListener('DOMContentLoaded', () => {
+    // Active nav highlighting on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.docs-nav-link');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.remove('bg-primary/10', 'text-primary', 'font-bold');
+                    link.classList.add('text-muted-foreground');
+                });
+                const activeLink = document.querySelector(`.docs-nav-link[href="#${entry.target.id}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('bg-primary/10', 'text-primary', 'font-bold');
+                    activeLink.classList.remove('text-muted-foreground');
+                }
+            }
+        });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+
+    // Smooth scrolling for nav links
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Copy code blocks on click
+    document.querySelectorAll('pre').forEach(pre => {
+        pre.style.cursor = 'pointer';
+        pre.title = 'Click to copy';
+        pre.addEventListener('click', () => {
+            navigator.clipboard.writeText(pre.textContent).then(() => {
+                const original = pre.innerHTML;
+                pre.innerHTML = '<span style="color: #4ade80; font-weight: bold;">✓ Copied to clipboard!</span>';
+                setTimeout(() => { pre.innerHTML = original; }, 1500);
+            });
+        });
+    });
+});
+]]#
+</script>
