@@ -188,8 +188,16 @@ function getAIResponse(msg) {
     return `\u26a1 <strong>Starting your build now.</strong><br><br>Generating a custom site based on: "<em>${msg}</em>"<br>Tokens: ~320 of 500 used<br><br>Scaffolding layout, creating components, applying styles...`;
 }
 
+function isLoggedIn() {
+    return !!localStorage.getItem('velocity_user');
+}
+
+function getUser() {
+    const data = localStorage.getItem('velocity_user');
+    return data ? JSON.parse(data) : null;
+}
+
 function triggerBuild(blueprintName, tokensUsed) {
-    // Store the build so signup can deploy it
     const slug = blueprintName.toLowerCase().replace(/\s+/g, '-');
     lastBuild = { name: blueprintName, slug, tokensUsed };
 
@@ -207,13 +215,12 @@ function triggerBuild(blueprintName, tokensUsed) {
     }, 3000);
 
     setTimeout(() => {
-        // Check if user signed up during the build
-        const user = localStorage.getItem('velocity_user');
+        // Always deliver the live link if the user is signed in
+        const user = getUser();
         if (user) {
-            // Already signed up — deliver the live link directly
-            deliverLiveLink(JSON.parse(user).name, lastBuild);
+            deliverLiveLink(user.name, lastBuild);
         } else {
-            // Not signed up — prompt to sign up to get the live link
+            // Only show signup prompt for users who are NOT signed in
             addMessage(
                 `\ud83d\ude80 <strong>Build complete!</strong> Your ${blueprintName} site is ready.<br><br>` +
                 '<div class="build-result">' +
