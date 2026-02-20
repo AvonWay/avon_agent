@@ -298,7 +298,8 @@ app.get('/blueprints/preview/:id', async (req, res) => {
 /** Industrial Audit Page */
 app.get('/audit', async (req, res) => {
     try {
-        const token = await getToken(); // Get valid token from backend
+        let token = '';
+        try { token = await getToken(); } catch (_) { /* backend offline — page still renders */ }
         const html = renderPage('audit', {
             config: { environment: 'development' },
             pageTitle: 'Industrial Audit — Velocity',
