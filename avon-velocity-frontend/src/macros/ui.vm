@@ -3,20 +3,20 @@
 #macro( button $text $variant $class $attrs )
   #if( !$variant ) #set( $variant = "default" ) #end
   
-  #set( $baseClass = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" )
+  #set( $baseClass = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 shadow-sm" )
   
   #if( $variant == "default" )
-    #set( $variantClass = "bg-primary text-primary-foreground hover:bg-primary/90" )
+    #set( $variantClass = "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-primary/20 hover:shadow-lg" )
   #elseif( $variant == "destructive" )
-    #set( $variantClass = "bg-destructive text-destructive-foreground hover:bg-destructive/90" )
+    #set( $variantClass = "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:shadow-destructive/20 hover:shadow-lg" )
   #elseif( $variant == "outline" )
-    #set( $variantClass = "border border-input bg-background hover:bg-accent hover:text-accent-foreground" )
+    #set( $variantClass = "border border-input bg-background hover:bg-accent hover:text-accent-foreground border-primary/20 hover:border-primary/50" )
   #elseif( $variant == "secondary" )
     #set( $variantClass = "bg-secondary text-secondary-foreground hover:bg-secondary/80" )
   #elseif( $variant == "ghost" )
-    #set( $variantClass = "hover:bg-accent hover:text-accent-foreground" )
-  #elseif( $variant == "link" )
-    #set( $variantClass = "text-primary underline-offset-4 hover:underline" )
+    #set( $variantClass = "text-muted-foreground hover:bg-accent hover:text-accent-foreground" )
+  #elseif( $variant == "premium" )
+    #set( $variantClass = "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 border-none shadow-md hover:shadow-xl" )
   #end
   
   <button class="$baseClass $variantClass $!{class}" $!{attrs}>
@@ -25,40 +25,75 @@
 #end
 
 #macro( card $title $description $content $footer )
-<div class="rounded-lg border bg-card text-card-foreground shadow-sm">
-  <div class="flex flex-col space-y-1.5 p-6">
-    <h3 class="text-2xl font-semibold leading-none tracking-tight">$!{title}</h3>
+<div class="rounded-xl border bg-card/60 backdrop-blur-md text-card-foreground shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/20 group">
+  <div class="flex flex-col space-y-1.5 p-6 border-b border-muted/50 bg-muted/30 rounded-t-xl group-hover:bg-primary/5 transition-colors">
+    <h3 class="text-xl font-bold tracking-tight">$!{title}</h3>
     #if( $description )
     <p class="text-sm text-muted-foreground">$!{description}</p>
     #end
   </div>
-  <div class="p-6 pt-0">
+  <div class="p-6">
     $!{content}
   </div>
   #if( $footer )
-  <div class="flex items-center p-6 pt-0">
+  <div class="flex items-center p-6 pt-0 mt-auto border-t border-muted/50 pt-4">
     $!{footer}
   </div>
   #end
 </div>
 #end
 
+#macro( stat $label $value $trend $color )
+<div class="p-6 rounded-xl border bg-card hover:bg-muted/50 transition-colors shadow-sm">
+  <p class="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">$!{label}</p>
+  <div class="flex items-baseline gap-2">
+    <h4 class="text-3xl font-black">$!{value}</h4>
+    #if( $trend )
+    <span class="text-xs font-bold ${color}">$!{trend}</span>
+    #end
+  </div>
+</div>
+#end
+
 #macro( badge $text $variant )
   #if( !$variant ) #set( $variant = "default" ) #end
   
-  #set( $badgeBase = "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" )
+  #set( $badgeBase = "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold tracking-tight transition-all duration-200" )
   
   #if( $variant == "default" )
-    #set( $badgeColor = "border-transparent bg-primary text-primary-foreground hover:bg-primary/80" )
+    #set( $badgeColor = "border-transparent bg-primary/10 text-primary hover:bg-primary/20" )
   #elseif( $variant == "secondary" )
-    #set( $badgeColor = "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80" )
+    #set( $badgeColor = "border-transparent bg-secondary text-secondary-foreground" )
   #elseif( $variant == "destructive" )
-    #set( $badgeColor = "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80" )
+    #set( $badgeColor = "border-transparent bg-destructive/10 text-destructive hover:bg-destructive/20" )
   #elseif( $variant == "outline" )
-    #set( $badgeColor = "text-foreground" )
+    #set( $badgeColor = "text-muted-foreground border-muted-foreground/30 hover:bg-muted/50" )
+  #elseif( $variant == "success" )
+    #set( $badgeColor = "border-transparent bg-green-500/10 text-green-600 hover:bg-green-500/20" )
   #end
 
   <div class="$badgeBase $badgeColor">
     $text
+  </div>
+#end
+
+#macro( input $label $id $type $placeholder $value )
+  <div class="space-y-2 group">
+    #if( $label )
+    <label for="$!{id}" class="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">$label</label>
+    #end
+    <input 
+      id="$!{id}" 
+      type="$!{type}" 
+      placeholder="$!{placeholder}" 
+      value="$!{value}"
+      class="flex h-12 w-full rounded-lg border border-input bg-background/50 backdrop-blur-sm px-4 py-2 text-sm ring-offset-background transition-all placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+    />
+  </div>
+#macro( alert $title $message $variant )
+  #if( !$variant ) #set( $variant = "info" ) #end
+  <div class="flex flex-col gap-1 p-4 rounded-lg border #if($variant == 'error') bg-destructive/10 border-destructive/20 text-destructive #else bg-blue-500/10 border-blue-500/20 text-blue-700 #end">
+    #if( $title ) <h5 class="font-bold text-sm tracking-tight capitalize">$title</h5> #end
+    <p class="text-xs opacity-90">$message</p>
   </div>
 #end

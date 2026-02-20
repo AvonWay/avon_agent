@@ -1,0 +1,15 @@
+velocity
+#card(class="betting-dashboard")
+## Velocity Industrial Betting Dashboard
+
+**Live Betting Edge:**
+
+#foreach($event in $events)
+    #row
+        #cell($!{event.name})
+        #cell($!{event.odds})
+        #cell($!{event.edge}%)
+    #endrow
+#endforeach
+
+#button(class="refresh-button", onclick="refreshData()") Refresh Data

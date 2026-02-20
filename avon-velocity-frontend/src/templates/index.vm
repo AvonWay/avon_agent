@@ -16,8 +16,8 @@
     Packaged for Apache Velocity environments.
   </p>
   <div class="flex w-full items-center justify-center space-x-4 py-4 md:pb-10">
-    #button( "Get Started", "default", "h-11 px-8 rounded-md" )
-    #button( "GitHub", "outline", "h-11 px-8 rounded-md" )
+    <a href="/chat">#button( "Get Started", "default", "h-11 px-8 rounded-md" )</a>
+    <a href="https://github.com/avon-agent" target="_blank" rel="noopener">#button( "GitHub", "outline", "h-11 px-8 rounded-md" )</a>
   </div>
 </section>
 

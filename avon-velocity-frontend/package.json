@@ -2,6 +2,7 @@
     "name": "avon-velocity-frontend",
     "version": "1.0.0",
     "description": "High-performance Velocity template setup with Vite, Biome, and Tailwind CSS",
+    "type": "module",
     "scripts": {
         "dev": "vite",
         "build": "vite build",
@@ -15,5 +16,9 @@
         "postcss": "^8.4.35",
         "tailwindcss": "^3.4.1",
         "vite": "^5.1.4"
+    },
+    "dependencies": {
+        "express": "^5.2.1",
+        "velocityjs": "^2.1.5"
     }
 }

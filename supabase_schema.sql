@@ -1,13 +1,19 @@
--- AVON INDUSTRIAL SCHEMA (10Web Identity)
+-- AVON INDUSTRIAL SCHEMA (Gold Master Aligned)
+-- Last Updated: 2026-02-19
 
 -- 1. Users table (Extends Supabase Auth)
 CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL PRIMARY KEY,
+  updated_at TIMESTAMP WITH TIME ZONE,
   full_name TEXT,
   avatar_url TEXT,
-  subscription_tier TEXT DEFAULT 'free' CHECK (subscription_tier IN ('free', 'pro', 'industrial')),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  email TEXT UNIQUE,
+  stripe_customer_id TEXT UNIQUE,
+  stripe_subscription_id TEXT,
+  subscription_status TEXT DEFAULT 'none'
+    CHECK (subscription_status IN ('active', 'trailing', 'past_due', 'canceled', 'none')),
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 2. Workspaces table
@@ -38,9 +44,18 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.workspaces ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sites ENABLE ROW LEVEL SECURITY;
 
--- Profiles: Users can only see their own profile
-CREATE POLICY "Users can view own profile" ON public.profiles
-  FOR SELECT USING (auth.uid() = id);
+-- Profiles: Public profiles are viewable by everyone (needed for dashboard + leaderboards)
+CREATE POLICY "Public profiles are viewable by everyone."
+  ON public.profiles FOR SELECT
+  USING (true);
+
+CREATE POLICY "Users can insert their own profile."
+  ON public.profiles FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile."
+  ON public.profiles FOR UPDATE
+  USING (auth.uid() = id);
 
 -- Workspaces: Users can see workspaces they own
 CREATE POLICY "Users can view own workspaces" ON public.workspaces
@@ -73,3 +88,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Realtime for live dashboard updates
+ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.sites;
