@@ -60,14 +60,19 @@ function handleAuth(e) {
         const account = {
             name, email,
             plan: 'starter',
-            tokensRemaining: 500,
+            tokensRemaining: lastBuild ? (500 - lastBuild.tokensUsed) : 500,
             blueprintsAvailable: ['SaaS Landing', 'Portfolio', 'Blog'],
             trialEnds: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
             features: { swarm: false, cicd: false, customDomains: false, allBlueprints: false }
         };
         localStorage.setItem('velocity_user', JSON.stringify(account));
         closeModal();
-        showNotification(`Welcome, ${name}! Your 3-day trial is active. You have 500 tokens and 3 blueprints ready.`, 'success');
+        showNotification(`Welcome, ${name}! Your 3-day trial is active.`, 'success');
+
+        // If there was a build, deploy it and show the live link in chat
+        if (lastBuild) {
+            deliverLiveLink(name, lastBuild);
+        }
     } else {
         const stored = localStorage.getItem('velocity_user');
         if (stored) {
@@ -83,6 +88,7 @@ function handleAuth(e) {
 
 // ---- Chat Widget ----
 let chatOpen = false;
+let lastBuild = null; // Track the most recent build for post-signup deploy
 
 function openChat() {
     chatOpen = true;
@@ -183,6 +189,10 @@ function getAIResponse(msg) {
 }
 
 function triggerBuild(blueprintName, tokensUsed) {
+    // Store the build so signup can deploy it
+    const slug = blueprintName.toLowerCase().replace(/\s+/g, '-');
+    lastBuild = { name: blueprintName, slug, tokensUsed };
+
     setTimeout(() => {
         addMessage(
             `\ud83d\udd28 <strong>Build Progress \u2014 ${blueprintName}</strong><br><br>` +
@@ -197,17 +207,46 @@ function triggerBuild(blueprintName, tokensUsed) {
     }, 3000);
 
     setTimeout(() => {
-        addMessage(
-            `\ud83d\ude80 <strong>Build complete!</strong> Your ${blueprintName} site is ready.<br><br>` +
-            '<div class="build-result">' +
-            '\ud83d\udcc1 Files: 4 generated<br>' +
-            '\ud83c\udfa8 Styles: Tailwind CSS applied<br>' +
-            '\ud83d\udcf1 Mobile: Fully responsive<br>' +
-            '\u26a1 Performance: 98/100<br><br>' +
-            `Tokens remaining: ${500 - tokensUsed} of 500<br><br>` +
-            '<strong>\u2192 <a href="#" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to deploy live</a></strong>' +
-            '</div>', 'bot');
+        // Check if user signed up during the build
+        const user = localStorage.getItem('velocity_user');
+        if (user) {
+            // Already signed up — deliver the live link directly
+            deliverLiveLink(JSON.parse(user).name, lastBuild);
+        } else {
+            // Not signed up — prompt to sign up to get the live link
+            addMessage(
+                `\ud83d\ude80 <strong>Build complete!</strong> Your ${blueprintName} site is ready.<br><br>` +
+                '<div class="build-result">' +
+                '\ud83d\udcc1 Files: 4 generated<br>' +
+                '\ud83c\udfa8 Styles: Tailwind CSS applied<br>' +
+                '\ud83d\udcf1 Mobile: Fully responsive<br>' +
+                '\u26a1 Performance: 98/100<br><br>' +
+                `Tokens remaining: ${500 - tokensUsed} of 500<br><br>` +
+                '<strong>\u2192 <a href="#" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to get your live link</a></strong>' +
+                '</div>', 'bot');
+        }
     }, 6000);
+}
+
+function deliverLiveLink(userName, build) {
+    // Open chat if not already open
+    if (!chatOpen) openChat();
+
+    const siteUrl = `https://velocity.site/${build.slug}-${Date.now().toString(36)}`;
+    const previewUrl = `https://avonway.github.io/avon_agent/`;
+
+    setTimeout(() => {
+        addMessage(
+            `\ud83c\udf89 <strong>Deployed! Your site is live, ${userName}!</strong><br><br>` +
+            '<div class="build-result">' +
+            `\ud83c\udf10 <strong>Live URL:</strong> <a href="${previewUrl}" target="_blank" rel="noopener" class="build-deploy-link">${siteUrl}</a><br><br>` +
+            `\ud83d\udcca Site: ${build.name}<br>` +
+            `\u26a1 Status: Live & Serving<br>` +
+            `\ud83d\udd12 SSL: Active<br>` +
+            `Tokens used: ${build.tokensUsed} of 500<br><br>` +
+            'You can edit your site anytime from the <strong>IDE Dashboard</strong>. Need changes? Just tell me what to update.' +
+            '</div>', 'bot');
+    }, 1500);
 }
 
 // ---- Notifications ----
