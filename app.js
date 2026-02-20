@@ -57,25 +57,18 @@ function handleAuth(e) {
     const name = document.getElementById('auth-name').value;
 
     if (authMode === 'signup') {
-        // Simulate signup with token allocation
         const account = {
             name, email,
             plan: 'starter',
             tokensRemaining: 500,
             blueprintsAvailable: ['SaaS Landing', 'Portfolio', 'Blog'],
             trialEnds: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-            features: {
-                swarm: false,
-                cicd: false,
-                customDomains: false,
-                allBlueprints: false
-            }
+            features: { swarm: false, cicd: false, customDomains: false, allBlueprints: false }
         };
         localStorage.setItem('velocity_user', JSON.stringify(account));
         closeModal();
         showNotification(`Welcome, ${name}! Your 3-day trial is active. You have 500 tokens and 3 blueprints ready.`, 'success');
     } else {
-        // Simulate login
         const stored = localStorage.getItem('velocity_user');
         if (stored) {
             const user = JSON.parse(stored);
@@ -111,11 +104,7 @@ function sendMessage(e) {
     if (!msg) return;
     addMessage(msg, 'user');
     input.value = '';
-
-    // Hide suggestions after first message
     document.getElementById('chat-suggestions').style.display = 'none';
-
-    // Simulate AI response
     setTimeout(() => {
         const response = getAIResponse(msg);
         addMessage(response, 'bot');
@@ -135,43 +124,90 @@ function addMessage(text, type) {
     const container = document.getElementById('chat-messages');
     const div = document.createElement('div');
     div.className = `chat-msg ${type}`;
-
     if (type === 'bot') {
         div.innerHTML = `<div class="msg-avatar">V</div><div class="msg-bubble">${text}</div>`;
     } else {
         div.innerHTML = `<div class="msg-bubble">${text}</div>`;
     }
-
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
 }
 
+// ---- AI Responses — Action-first, no follow-up questions ----
 function getAIResponse(msg) {
     const lower = msg.toLowerCase();
 
-    if (lower.includes('saas') || lower.includes('landing')) {
-        return '🏗️ Great choice! The <strong>SaaS Landing</strong> blueprint is one of our 3 free starter templates. It includes a hero section, feature grid, pricing table, and CTA — all responsive and ready to customize. Want me to start building it?';
+    // Build requests — start building immediately
+    if (lower.includes('saas') || lower.includes('landing') || lower.includes('startup')) {
+        triggerBuild('SaaS Landing', 280);
+        return '\u26a1 <strong>Building your SaaS Landing Page now.</strong><br><br>Blueprint: SaaS Landing (Free)<br>Tokens: ~280 of 500 used<br><br>Generating hero, feature grid, pricing table, testimonials, and CTA...';
     }
-    if (lower.includes('e-commerce') || lower.includes('shop') || lower.includes('store')) {
-        return '🛒 For e-commerce, I\'d recommend the <strong>Storefront Pro</strong> blueprint. It has product grids, cart UI, and checkout flow. This one requires the <strong>Pro plan</strong> for full access, but you can preview it now! Want to see a demo?';
+    if (lower.includes('e-commerce') || lower.includes('shop') || lower.includes('store') || lower.includes('product')) {
+        triggerBuild('Storefront Pro', 350);
+        return '\u26a1 <strong>Building your E-Commerce Storefront now.</strong><br><br>Blueprint: Storefront Pro<br>Tokens: ~350 of 500 used<br><br>Generating product grid, cart UI, checkout flow, and category pages...';
     }
-    if (lower.includes('free') || lower.includes('blueprint') || lower.includes('trial')) {
-        return '🎁 Your free trial includes 3 blueprints:<br><br>• <strong>SaaS Landing</strong> — Modern startup page<br>• <strong>Portfolio</strong> — Creative showcase<br>• <strong>Blog</strong> — Content-focused layout<br><br>Plus 500 tokens — enough for a complete first build! Want to start with one?';
+    if (lower.includes('portfolio') || lower.includes('creative') || lower.includes('showcase')) {
+        triggerBuild('Portfolio', 220);
+        return '\u26a1 <strong>Building your Portfolio site now.</strong><br><br>Blueprint: Portfolio (Free)<br>Tokens: ~220 of 500 used<br><br>Generating hero, project gallery, about section, skills grid, and contact form...';
     }
-    if (lower.includes('token') || lower.includes('cost') || lower.includes('price')) {
-        return '🪙 You start with <strong>500 free tokens</strong> — that\'s enough to generate a complete site. A typical build uses 200-400 tokens depending on complexity. The Pro plan ($29/mo) gives you <strong>unlimited tokens</strong> plus Swarm Intelligence and all 20+ blueprints.';
+    if (lower.includes('blog') || lower.includes('article') || lower.includes('content') || lower.includes('write')) {
+        triggerBuild('Blog', 200);
+        return '\u26a1 <strong>Building your Blog now.</strong><br><br>Blueprint: Blog (Free)<br>Tokens: ~200 of 500 used<br><br>Generating article layout, sidebar, categories, featured posts, and newsletter signup...';
     }
-    if (lower.includes('swarm') || lower.includes('agent')) {
-        return '🐝 Swarm Intelligence uses 3 specialized AI agents working together:<br><br>• <strong>Architect</strong> — Plans structure & routing<br>• <strong>Builder</strong> — Generates code & UI<br>• <strong>Guardian</strong> — Validates & tests<br><br>This is a Pro feature. Start your free trial and upgrade when ready!';
+    if (lower.includes('dashboard') || lower.includes('admin') || lower.includes('panel')) {
+        triggerBuild('Admin Dashboard', 400);
+        return '\u26a1 <strong>Building your Dashboard now.</strong><br><br>Blueprint: Admin Dashboard<br>Tokens: ~400 of 500 used<br><br>Generating stats grid, data tables, charts, sidebar nav, and settings panel...';
     }
-    if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-        return 'Hey there! 👋 I\'m your Velocity AI assistant. I can help you pick a blueprint, plan your site, or answer questions about the platform. What are you looking to build?';
-    }
-    if (lower.includes('portfolio')) {
-        return '🎨 The <strong>Portfolio</strong> blueprint is free with your trial! It features a hero with image gallery, project showcase cards, about section, and contact form. Clean, modern, and works beautifully on mobile. Shall I set it up?';
+    if (lower.includes('restaurant') || lower.includes('food') || lower.includes('menu') || lower.includes('cafe')) {
+        triggerBuild('Restaurant', 300);
+        return '\u26a1 <strong>Building your Restaurant site now.</strong><br><br>Blueprint: Restaurant<br>Tokens: ~300 of 500 used<br><br>Generating menu display, reservation form, gallery, and location map...';
     }
 
-    return `I'd love to help with that! Here's what I can do for you:<br><br>• Generate a complete site from any of our 20+ blueprints<br>• Help you customize layouts, colors, and content<br>• Set up deployment pipelines<br><br>What kind of site are you building? Tell me more about your project and I'll recommend the best approach.`;
+    // Info queries — answer directly, no follow-up questions
+    if (lower.includes('free') || lower.includes('blueprint') || lower.includes('trial')) {
+        return '\ud83c\udf81 Your free trial includes 3 blueprints:<br><br>\u2022 <strong>SaaS Landing</strong><br>\u2022 <strong>Portfolio</strong><br>\u2022 <strong>Blog</strong><br><br>500 tokens included. Just tell me what to build and I start immediately.';
+    }
+    if (lower.includes('token') || lower.includes('cost') || lower.includes('price')) {
+        return '\ud83e\ude99 You get <strong>500 free tokens</strong>. A build uses 200\u2013400 tokens. Pro ($29/mo) = unlimited tokens + Swarm + all 20+ blueprints.';
+    }
+    if (lower.includes('swarm') || lower.includes('agent')) {
+        return '\ud83d\udc1d Swarm Intelligence runs 3 agents in parallel:<br><br>\u2022 <strong>Architect</strong> \u2014 Plans structure<br>\u2022 <strong>Builder</strong> \u2014 Generates code<br>\u2022 <strong>Guardian</strong> \u2014 Validates output<br><br>Available on Pro plan. Builds run 3x faster.';
+    }
+    if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
+        return 'Hey! \ud83d\udc4b Tell me what to build and I\'ll start generating it right now. Example: "Build me a SaaS landing page"';
+    }
+
+    // Default: treat ANY prompt as a build request
+    triggerBuild('Custom Site', 320);
+    return `\u26a1 <strong>Starting your build now.</strong><br><br>Generating a custom site based on: "<em>${msg}</em>"<br>Tokens: ~320 of 500 used<br><br>Scaffolding layout, creating components, applying styles...`;
+}
+
+function triggerBuild(blueprintName, tokensUsed) {
+    setTimeout(() => {
+        addMessage(
+            `\ud83d\udd28 <strong>Build Progress \u2014 ${blueprintName}</strong><br><br>` +
+            '<div class="build-progress">' +
+            '\u2705 Layout scaffolded<br>' +
+            '\u2705 Components generated<br>' +
+            '\u2705 Styles applied<br>' +
+            '\u2705 Responsive breakpoints set<br>' +
+            '\u2705 SEO meta tags added<br>' +
+            '\u23f3 Final optimization...' +
+            '</div>', 'bot');
+    }, 3000);
+
+    setTimeout(() => {
+        addMessage(
+            `\ud83d\ude80 <strong>Build complete!</strong> Your ${blueprintName} site is ready.<br><br>` +
+            '<div class="build-result">' +
+            '\ud83d\udcc1 Files: 4 generated<br>' +
+            '\ud83c\udfa8 Styles: Tailwind CSS applied<br>' +
+            '\ud83d\udcf1 Mobile: Fully responsive<br>' +
+            '\u26a1 Performance: 98/100<br><br>' +
+            `Tokens remaining: ${500 - tokensUsed} of 500<br><br>` +
+            '<strong>\u2192 <a href="#" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to deploy live</a></strong>' +
+            '</div>', 'bot');
+    }, 6000);
 }
 
 // ---- Notifications ----
@@ -186,7 +222,6 @@ function showNotification(message, type) {
     <button onclick="this.parentElement.remove()" aria-label="Close notification">&times;</button>
   `;
 
-    // Inject styles if not present
     if (!document.getElementById('notif-styles')) {
         const style = document.createElement('style');
         style.id = 'notif-styles';
@@ -205,6 +240,16 @@ function showNotification(message, type) {
       }
       .notification button:hover { opacity: 1; }
       @keyframes notifIn { from { transform: translateX(-50%) translateY(-10px); opacity:0; } to { transform: translateX(-50%) translateY(0); opacity:1; } }
+      .build-progress {
+        background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px;
+        padding: 12px; font-size: 12px; margin-top: 4px; line-height: 1.8;
+      }
+      .build-result {
+        background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px;
+        padding: 12px; font-size: 12px; margin-top: 4px; line-height: 1.8;
+      }
+      .build-deploy-link { color: #6366f1; text-decoration: none; }
+      .build-deploy-link:hover { text-decoration: underline; }
     `;
         document.head.appendChild(style);
     }
