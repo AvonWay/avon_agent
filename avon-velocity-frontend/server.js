@@ -329,6 +329,23 @@ app.get('/chat', (req, res) => {
     }
 });
 
+/** Docs route — Full documentation */
+app.get('/docs', (req, res) => {
+    try {
+        const html = renderPage('docs', {
+            config: { environment: 'development' },
+            pageTitle: 'Documentation — Velocity',
+            pageDescription: 'Complete developer documentation for the Velocity Industrial Builder platform.',
+            user: { name: 'Avon Admin', role: 'Industrial' }
+        });
+        res.set('Content-Type', 'text/html');
+        res.send(html);
+    } catch (err) {
+        console.error('[GET /docs] Render Error:', err.message);
+        res.status(500).send(errorPage(err));
+    }
+});
+
 /** Components route — UI Library */
 app.get('/components', (req, res) => {
     try {
