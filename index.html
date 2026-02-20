@@ -4,1003 +4,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velocity Industrial Builder — Avon Agent</title>
+    <title>Velocity — AI-Powered Site Builder</title>
     <meta name="description"
-        content="AI-powered autonomous site generation platform. Build, deploy, and scale websites with multi-agent swarm intelligence.">
-    <meta property="og:title" content="Velocity Industrial Builder — Avon Agent">
-    <meta property="og:description"
-        content="AI-powered autonomous site generation platform. Build, deploy, and scale with swarm intelligence.">
+        content="Build production websites with swarm intelligence. Start free with 3 blueprints and enough tokens for your first build.">
+    <meta property="og:title" content="Velocity — AI-Powered Site Builder">
+    <meta property="og:description" content="Build production websites with swarm intelligence. Start free.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://avonway.github.io/avon_agent/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #09090b;
-            --fg: #fafafa;
-            --muted: #a1a1aa;
-            --border: rgba(255, 255, 255, 0.08);
-            --primary: #6366f1;
-            --primary-glow: rgba(99, 102, 241, 0.15);
-            --card: rgba(255, 255, 255, 0.03);
-            --card-hover: rgba(255, 255, 255, 0.06);
-            --green: #22c55e;
-            --blue: #3b82f6;
-            --purple: #a855f7;
-            --amber: #f59e0b;
-            --red: #ef4444;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--fg);
-            line-height: 1.6;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Ambient glow backgrounds */
-        .glow-1 {
-            position: fixed;
-            top: -200px;
-            right: -200px;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .glow-2 {
-            position: fixed;
-            bottom: -200px;
-            left: -200px;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .glow-3 {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.04) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            -webkit-backdrop-filter: blur(20px);
-            backdrop-filter: blur(20px);
-            background: rgba(9, 9, 11, 0.8);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 60px;
-        }
-
-        .logo {
-            font-size: 16px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--fg);
-        }
-
-        .logo-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--green);
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
-            animation: pulse-dot 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-dot {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        .header-links {
-            display: flex;
-            gap: 28px;
-            align-items: center;
-        }
-
-        .header-links a {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--muted);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .header-links a:hover {
-            color: var(--fg);
-        }
-
-        .gh-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 16px;
-            border-radius: 8px;
-            background: var(--fg);
-            color: var(--bg);
-            font-size: 13px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-        }
-
-        .gh-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-
-        .gh-btn svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Hero */
-        .hero {
-            padding: 100px 0 80px;
-            text-align: center;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border-radius: 100px;
-            background: var(--primary-glow);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            font-size: 12px;
-            font-weight: 700;
-            color: #818cf8;
-            margin-bottom: 28px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .hero-badge .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green);
-        }
-
-        .hero h1 {
-            font-size: clamp(40px, 7vw, 72px);
-            font-weight: 900;
-            letter-spacing: -2px;
-            line-height: 1.05;
-            background: linear-gradient(135deg, #fafafa 0%, #a1a1aa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 em {
-            font-style: italic;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: var(--muted);
-            max-width: 560px;
-            margin: 0 auto 40px;
-            line-height: 1.7;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 32px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: white;
-            font-size: 15px;
-            font-weight: 700;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 4px 24px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 32px;
-            border-radius: 12px;
-            background: transparent;
-            color: var(--fg);
-            font-size: 15px;
-            font-weight: 700;
-            text-decoration: none;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .btn-secondary:hover {
-            background: var(--card-hover);
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
-        }
-
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            background: var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            margin-bottom: 100px;
-        }
-
-        .stat-item {
-            background: var(--bg);
-            padding: 28px 24px;
-            text-align: center;
-            transition: background 0.2s;
-        }
-
-        .stat-item:hover {
-            background: var(--card-hover);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin-bottom: 4px;
-        }
-
-        .stat-value--blue {
-            color: var(--blue);
-        }
-
-        .stat-value--green {
-            color: var(--green);
-        }
-
-        .stat-value--purple {
-            color: var(--purple);
-        }
-
-        .stat-value--amber {
-            color: var(--amber);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Architecture section */
-        .section {
-            margin-bottom: 100px;
-        }
-
-        .section-label {
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--primary);
-            margin-bottom: 12px;
-        }
-
-        .section h2 {
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: -1.5px;
-            margin-bottom: 12px;
-        }
-
-        .section>p {
-            color: var(--muted);
-            font-size: 16px;
-            margin-bottom: 40px;
-            max-width: 600px;
-        }
-
-        /* Service cards */
-        .services {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .service-card {
-            padding: 32px;
-            border-radius: 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-
-        .service-card:hover {
-            background: var(--card-hover);
-            border-color: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
-        }
-
-        .service-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 16px;
-        }
-
-        .service-icon--blue {
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .service-icon--purple {
-            background: rgba(168, 85, 247, 0.1);
-        }
-
-        .service-icon--green {
-            background: rgba(34, 197, 94, 0.1);
-        }
-
-        .service-icon--amber {
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .service-card h3 {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-        }
-
-        .service-port {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            font-family: monospace;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--muted);
-            margin-bottom: 12px;
-        }
-
-        .service-card p {
-            font-size: 14px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        /* Pages grid */
-        .pages-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .page-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            border-radius: 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            transition: all 0.25s;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .page-row:hover {
-            background: var(--card-hover);
-            border-color: rgba(99, 102, 241, 0.2);
-            transform: translateX(4px);
-        }
-
-        .page-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .page-icon {
-            font-size: 18px;
-        }
-
-        .page-name {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .page-route {
-            font-size: 12px;
-            font-family: monospace;
-            color: var(--muted);
-            background: rgba(255, 255, 255, 0.04);
-            padding: 3px 8px;
-            border-radius: 6px;
-        }
-
-        .page-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--green);
-            box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
-        }
-
-        .page-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Tech stack */
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .tech-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 20px;
-            border-radius: 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            transition: all 0.2s;
-        }
-
-        .tech-item:hover {
-            background: var(--card-hover);
-        }
-
-        .tech-icon {
-            font-size: 24px;
-        }
-
-        .tech-name {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .tech-desc {
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        /* CTA */
-        .cta {
-            text-align: center;
-            padding: 80px 0;
-            border-top: 1px solid var(--border);
-        }
-
-        .cta h2 {
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: -1.5px;
-            margin-bottom: 12px;
-        }
-
-        .cta p {
-            color: var(--muted);
-            font-size: 16px;
-            margin-bottom: 32px;
-        }
-
-        /* Footer */
-        footer {
-            padding: 40px 0;
-            border-top: 1px solid var(--border);
-            text-align: center;
-        }
-
-        footer p {
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .services {
-                grid-template-columns: 1fr;
-            }
-
-            .pages-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tech-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-links {
-                display: none;
-            }
-
-            .hero {
-                padding: 60px 0 40px;
-            }
-        }
-
-        /* Entrance animations */
-        .animate-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeUp 0.6s ease forwards;
-        }
-
-        @keyframes fadeUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .delay-1 {
-            animation-delay: 0.1s;
-        }
-
-        .delay-2 {
-            animation-delay: 0.2s;
-        }
-
-        .delay-3 {
-            animation-delay: 0.3s;
-        }
-
-        .delay-4 {
-            animation-delay: 0.4s;
-        }
-
-        .delay-5 {
-            animation-delay: 0.5s;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="glow-1"></div>
-    <div class="glow-2"></div>
-    <div class="glow-3"></div>
-
     <!-- Header -->
-    <header>
+    <header id="site-header">
         <div class="container header-inner">
-            <a href="/" class="logo">
-                <div class="logo-dot"></div>
-                Velocity 2026
+            <a href="/" class="logo" id="logo">
+                <div class="logo-icon">V</div>
+                Velocity
             </a>
-            <div class="header-links">
+            <nav class="nav-links" id="main-nav">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
                 <a href="#architecture">Architecture</a>
-                <a href="#pages">Pages</a>
-                <a href="#stack">Stack</a>
-                <a href="https://github.com/AvonWay/avon_agent" target="_blank" rel="noopener" class="gh-btn">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                    </svg>
-                    GitHub
-                </a>
+                <a href="https://github.com/AvonWay/avon_agent" target="_blank" rel="noopener">GitHub</a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn-ghost" id="login-btn" onclick="openModal('login')">Log In</button>
+                <button class="btn-primary-sm" id="signup-btn" onclick="openModal('signup')">Start Free Trial</button>
             </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </header>
 
     <!-- Hero -->
-    <div class="container">
-        <section class="hero">
-            <div class="hero-badge animate-in">
-                <span class="dot"></span>
-                Industrial-Grade AI Platform
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                3-Day Free Trial — No Credit Card
             </div>
-            <h1 class="animate-in delay-1">Build Sites with<br><em>Swarm Intelligence</em></h1>
-            <p class="animate-in delay-2">
-                Velocity is an autonomous AI-powered platform that generates, deploys, and scales production websites
-                through multi-agent orchestration and industrial-grade tooling.
-            </p>
-            <div class="hero-actions animate-in delay-3">
-                <a href="https://github.com/AvonWay/avon_agent" target="_blank" rel="noopener" class="btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            <h1>Build Websites with<br><span class="gradient-text">Swarm Intelligence</span></h1>
+            <p class="hero-desc">Velocity uses multi-agent AI to generate, deploy, and scale production sites. Start
+                with 3 free blueprints and enough tokens for your first build.</p>
+            <div class="hero-actions">
+                <button class="btn-primary" id="hero-cta" onclick="openModal('signup')">
+                    Start Building Free
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
-                    View on GitHub
-                </a>
-                <a href="https://github.com/AvonWay/avon_agent#readme" target="_blank" rel="noopener"
-                    class="btn-secondary">
-                    Read Documentation →
-                </a>
+                </button>
+                <button class="btn-secondary" id="hero-chat-btn" onclick="openChat()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                    Talk to Velocity AI
+                </button>
             </div>
-        </section>
-
-        <!-- Stats -->
-        <div class="stats animate-in delay-4">
-            <div class="stat-item">
-                <div class="stat-value stat-value--blue">10</div>
-                <div class="stat-label">Live Pages</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value stat-value--green">4</div>
-                <div class="stat-label">Microservices</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value stat-value--purple">3</div>
-                <div class="stat-label">AI Agents</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value stat-value--amber">20+</div>
-                <div class="stat-label">Blueprints</div>
+            <div class="hero-metrics">
+                <div class="metric"><span class="metric-val">20+</span><span class="metric-label">Blueprints</span>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric"><span class="metric-val">3</span><span class="metric-label">AI Agents</span></div>
+                <div class="metric-divider"></div>
+                <div class="metric"><span class="metric-val">&lt;60s</span><span class="metric-label">Build Time</span>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric"><span class="metric-val">10</span><span class="metric-label">Pages</span></div>
             </div>
         </div>
+        <div class="hero-glow"></div>
+    </section>
 
-        <!-- Architecture -->
-        <section class="section" id="architecture">
-            <div class="section-label">System Architecture</div>
-            <h2>Four Services. One Platform.</h2>
-            <p>Each service runs independently and communicates via REST APIs, creating a modular, scalable system.</p>
-
-            <div class="services">
-                <div class="service-card">
-                    <div class="service-icon service-icon--blue">🔧</div>
-                    <h3>Backend API</h3>
-                    <span class="service-port">localhost:4000</span>
-                    <p>Express.js REST API handling auth, site generation, workspace management, terminal execution, and
-                        file system operations. Connected to Supabase for persistence.</p>
+    <!-- Features -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Features</span>
+                <h2>Everything You Need to Ship Fast</h2>
+                <p>From AI generation to one-click deploy — Velocity handles the entire pipeline.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card" id="feat-blueprints">
+                    <div class="feature-icon icon-blue">🏗️</div>
+                    <h3>20+ Premium Blueprints</h3>
+                    <p>Pre-built, production-ready templates for SaaS, e-commerce, portfolios, dashboards, and more. 3
+                        included free.</p>
+                    <span class="feature-tag tag-free">3 Free</span>
                 </div>
-                <div class="service-card">
-                    <div class="service-icon service-icon--purple">💻</div>
-                    <h3>IDE Dashboard</h3>
-                    <span class="service-port">localhost:3000</span>
-                    <p>Next.js 16 developer interface with integrated terminal, file explorer, AI-assisted building, and
-                        multi-workspace management.</p>
+                <div class="feature-card" id="feat-swarm">
+                    <div class="feature-icon icon-purple">🐝</div>
+                    <h3>Swarm Intelligence</h3>
+                    <p>Three specialized AI agents — Architect, Builder, and Guardian — orchestrate your builds with
+                        industrial precision.</p>
+                    <span class="feature-tag tag-pro">Pro</span>
                 </div>
-                <div class="service-card">
-                    <div class="service-icon service-icon--green">⚡</div>
-                    <h3>Velocity Renderer</h3>
-                    <span class="service-port">localhost:8080</span>
-                    <p>VTL template engine with two-pass rendering, macro system, and Tailwind CSS integration. Serves
-                        all 10 UI pages with Shadcn-style components.</p>
+                <div class="feature-card" id="feat-tokens">
+                    <div class="feature-icon icon-green">🪙</div>
+                    <h3>Token System</h3>
+                    <p>Start with enough tokens for your first complete build. Upgrade for unlimited generation and
+                        advanced features.</p>
+                    <span class="feature-tag tag-free">Free Starter</span>
                 </div>
-                <div class="service-card">
-                    <div class="service-icon service-icon--amber">🌐</div>
-                    <h3>Preview Server</h3>
-                    <span class="service-port">localhost:3001</span>
-                    <p>Static HTML preview of generated sites. Renders AI-built nodes in real-time for instant feedback
-                        and QA review.</p>
+                <div class="feature-card" id="feat-deploy">
+                    <div class="feature-icon icon-amber">🚀</div>
+                    <h3>One-Click Deploy</h3>
+                    <p>GitHub Actions CI/CD pipeline baked in. Push to deploy with automatic preview environments.</p>
+                    <span class="feature-tag tag-pro">Pro</span>
+                </div>
+                <div class="feature-card" id="feat-ide">
+                    <div class="feature-icon icon-rose">💻</div>
+                    <h3>Built-in IDE</h3>
+                    <p>Full developer dashboard with terminal, file explorer, and live preview. Edit anything the AI
+                        generates.</p>
+                    <span class="feature-tag tag-free">Included</span>
+                </div>
+                <div class="feature-card" id="feat-chat">
+                    <div class="feature-icon icon-cyan">💬</div>
+                    <h3>Velocity Agent Chat</h3>
+                    <p>Conversational AI that understands your vision. Describe what you want and watch it build in
+                        real-time.</p>
+                    <span class="feature-tag tag-free">Included</span>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Pages -->
-        <section class="section" id="pages">
-            <div class="section-label">All Routes Verified</div>
-            <h2>10 Pages. All Passing.</h2>
-            <p>Every page on the Velocity renderer has been tested and returns HTTP 200.</p>
-
-            <div class="pages-grid">
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">🏠</span>
-                        <span class="page-name">Home</span>
+    <!-- Pricing -->
+    <section class="section section-alt" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Pricing</span>
+                <h2>Start Free, Scale When Ready</h2>
+                <p>Get your first site live with zero risk. Upgrade only when you need more power.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card" id="plan-free">
+                    <div class="plan-header">
+                        <h3>Starter</h3>
+                        <div class="plan-price"><span class="price-amount">$0</span><span class="price-period">/ 3-day
+                                trial</span></div>
+                        <p class="plan-desc">Perfect for trying Velocity risk-free</p>
                     </div>
-                    <div class="page-meta">
-                        <span class="page-route">/</span>
-                        <span class="page-status"></span>
-                    </div>
+                    <ul class="plan-features">
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>3 Premium Blueprints</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>500 Build Tokens</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Velocity Agent Chat</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Built-in IDE</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>1 Live Site</li>
+                        <li class="excluded"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                            </svg>Swarm Intelligence</li>
+                        <li class="excluded"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                            </svg>CI/CD Pipeline</li>
+                        <li class="excluded"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12" />
+                            </svg>Custom Domains</li>
+                    </ul>
+                    <button class="btn-outline" id="plan-free-btn" onclick="openModal('signup')">Start Free
+                        Trial</button>
                 </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">📊</span>
-                        <span class="page-name">Dashboard</span>
+                <div class="pricing-card pricing-featured" id="plan-pro">
+                    <div class="popular-badge">Most Popular</div>
+                    <div class="plan-header">
+                        <h3>Pro</h3>
+                        <div class="plan-price"><span class="price-amount">$29</span><span class="price-period">/
+                                month</span></div>
+                        <p class="plan-desc">Full power for serious builders</p>
                     </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/dashboard</span>
-                        <span class="page-status"></span>
-                    </div>
+                    <ul class="plan-features">
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>All 20+ Blueprints</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Unlimited Tokens</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Swarm Intelligence</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>CI/CD Pipeline</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>10 Live Sites</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Custom Domains</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Priority Support</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>System Audit Tools</li>
+                    </ul>
+                    <button class="btn-primary" id="plan-pro-btn" onclick="openModal('signup')">Start Free, Upgrade
+                        Later</button>
                 </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">📖</span>
-                        <span class="page-name">Documentation</span>
+                <div class="pricing-card" id="plan-team">
+                    <div class="plan-header">
+                        <h3>Team</h3>
+                        <div class="plan-price"><span class="price-amount">$79</span><span class="price-period">/
+                                month</span></div>
+                        <p class="plan-desc">For agencies and growing teams</p>
                     </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/docs</span>
-                        <span class="page-status"></span>
-                    </div>
-                </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">🧩</span>
-                        <span class="page-name">Components</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/components</span>
-                        <span class="page-status"></span>
-                    </div>
-                </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">🏗️</span>
-                        <span class="page-name">Blueprints</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/blueprints</span>
-                        <span class="page-status"></span>
-                    </div>
-                </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">💬</span>
-                        <span class="page-name">Agent Chat</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/chat</span>
-                        <span class="page-status"></span>
-                    </div>
-                </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">🐝</span>
-                        <span class="page-name">Developer Swarm</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/betting</span>
-                        <span class="page-status"></span>
-                    </div>
-                </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">🛡️</span>
-                        <span class="page-name">System Audit</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/audit</span>
-                        <span class="page-status"></span>
-                    </div>
-                </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">👤</span>
-                        <span class="page-name">Profile</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/profile</span>
-                        <span class="page-status"></span>
-                    </div>
-                </div>
-                <div class="page-row">
-                    <div class="page-info">
-                        <span class="page-icon">🚀</span>
-                        <span class="page-name">New Site</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="page-route">/new-site</span>
-                        <span class="page-status"></span>
-                    </div>
+                    <ul class="plan-features">
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Everything in Pro</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>5 Team Members</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Unlimited Sites</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>White-Label Builds</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Advanced Analytics</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>API Access</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Dedicated Support</li>
+                        <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>Custom Integrations</li>
+                    </ul>
+                    <button class="btn-outline" id="plan-team-btn" onclick="openModal('signup')">Contact Sales</button>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Tech Stack -->
-        <section class="section" id="stack">
-            <div class="section-label">Technology</div>
-            <h2>Industrial-Grade Stack</h2>
-            <p>Built with proven, production-ready technologies designed for performance and scalability.</p>
-
-            <div class="tech-grid">
-                <div class="tech-item">
-                    <span class="tech-icon">⚙️</span>
-                    <div>
-                        <div class="tech-name">Node.js</div>
-                        <div class="tech-desc">Server runtime</div>
-                    </div>
+    <!-- Architecture -->
+    <section class="section" id="architecture">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Architecture</span>
+                <h2>Industrial-Grade Platform</h2>
+                <p>Four microservices working in concert to deliver production-ready sites.</p>
+            </div>
+            <div class="arch-grid">
+                <div class="arch-card">
+                    <div class="arch-icon icon-blue">🔧</div>
+                    <h3>Backend API</h3><span class="arch-port">:4000</span>
+                    <p>Express 5 REST API — auth, generation, workspaces, terminal</p>
                 </div>
-                <div class="tech-item">
-                    <span class="tech-icon">🚂</span>
-                    <div>
-                        <div class="tech-name">Express 5</div>
-                        <div class="tech-desc">REST API framework</div>
-                    </div>
+                <div class="arch-card">
+                    <div class="arch-icon icon-purple">💻</div>
+                    <h3>IDE Dashboard</h3><span class="arch-port">:3000</span>
+                    <p>Next.js 16 developer interface with full editing capabilities</p>
                 </div>
-                <div class="tech-item">
-                    <span class="tech-icon">⚛️</span>
-                    <div>
-                        <div class="tech-name">Next.js 16</div>
-                        <div class="tech-desc">React dashboard</div>
-                    </div>
+                <div class="arch-card">
+                    <div class="arch-icon icon-green">⚡</div>
+                    <h3>Velocity Renderer</h3><span class="arch-port">:8080</span>
+                    <p>VTL template engine with macro system and Tailwind CSS</p>
                 </div>
-                <div class="tech-item">
-                    <span class="tech-icon">🎨</span>
-                    <div>
-                        <div class="tech-name">Tailwind CSS</div>
-                        <div class="tech-desc">Utility-first styling</div>
-                    </div>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">⚡</span>
-                    <div>
-                        <div class="tech-name">Velocity.js</div>
-                        <div class="tech-desc">Template engine</div>
-                    </div>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">🤖</span>
-                    <div>
-                        <div class="tech-name">Ollama</div>
-                        <div class="tech-desc">Local AI inference</div>
-                    </div>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">🗄️</span>
-                    <div>
-                        <div class="tech-name">Supabase</div>
-                        <div class="tech-desc">Database + Auth</div>
-                    </div>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">📦</span>
-                    <div>
-                        <div class="tech-name">Vite</div>
-                        <div class="tech-desc">CSS build tool</div>
-                    </div>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">🔄</span>
-                    <div>
-                        <div class="tech-name">GitHub Actions</div>
-                        <div class="tech-desc">CI/CD pipeline</div>
-                    </div>
+                <div class="arch-card">
+                    <div class="arch-icon icon-amber">🌐</div>
+                    <h3>Preview Server</h3><span class="arch-port">:3001</span>
+                    <p>Real-time preview of AI-generated sites for instant QA</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- CTA -->
-        <section class="cta">
-            <h2>Ready to Explore?</h2>
-            <p>Clone the repo and start the platform locally in under 5 minutes.</p>
+    <!-- CTA -->
+    <section class="cta-section" id="cta">
+        <div class="container">
+            <h2>Ready to Build Your First Site?</h2>
+            <p>Start free with 3 blueprints and 500 tokens. No credit card required.</p>
             <div class="hero-actions">
-                <a href="https://github.com/AvonWay/avon_agent" target="_blank" rel="noopener" class="btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                    </svg>
-                    Clone Repository
-                </a>
+                <button class="btn-primary" id="cta-signup" onclick="openModal('signup')">Create Free Account</button>
+                <button class="btn-secondary" id="cta-chat" onclick="openChat()">Chat with Velocity AI</button>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
 
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>Built by <a href="https://github.com/AvonWay">Avon Agent</a> · Powered by Velocity 2026 · <a
-                    href="https://github.com/AvonWay/avon_agent">Source Code</a></p>
+    <footer id="site-footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="logo-icon">V</div>Velocity
+                </div>
+                <p>AI-powered autonomous site generation.</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-col">
+                    <h4>Product</h4><a href="#features">Features</a><a href="#pricing">Pricing</a><a
+                        href="#architecture">Architecture</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4><a href="https://github.com/AvonWay/avon_agent" target="_blank"
+                        rel="noopener">GitHub</a><a href="https://github.com/AvonWay/avon_agent#readme" target="_blank"
+                        rel="noopener">Docs</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4><a href="https://github.com/AvonWay" target="_blank" rel="noopener">AvonWay</a>
+                </div>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 Velocity by AvonWay. All rights reserved.</p>
         </div>
     </footer>
 
-    <script>
-        // Intersection Observer for scroll animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, { threshold: 0.1 });
+    <!-- Login/Signup Modal -->
+    <div class="modal-overlay" id="auth-modal" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="modal-close" id="modal-close-btn" onclick="closeModal()" aria-label="Close">&times;</button>
+            <div class="modal-header">
+                <div class="logo">
+                    <div class="logo-icon">V</div>Velocity
+                </div>
+                <h2 id="modal-title">Welcome Back</h2>
+                <p id="modal-desc">Log in to access your dashboard</p>
+            </div>
+            <form class="modal-form" id="auth-form" onsubmit="handleAuth(event)">
+                <div id="name-field" class="form-group hidden">
+                    <label for="auth-name">Full Name</label>
+                    <input type="text" id="auth-name" placeholder="John Doe" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="auth-email">Email</label>
+                    <input type="email" id="auth-email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" required
+                        autocomplete="current-password" minlength="8">
+                </div>
+                <button type="submit" class="btn-primary btn-full" id="auth-submit">Log In</button>
+                <div id="trial-info" class="trial-info hidden">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                        <path d="M12 16v-4M12 8h.01" />
+                    </svg>
+                    <span>3-day free trial · 3 blueprints · 500 tokens · No credit card</span>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <p id="modal-switch">Don't have an account? <button onclick="toggleAuthMode()" id="switch-mode-btn">Sign
+                        up free</button></p>
+            </div>
+        </div>
+    </div>
 
-        document.querySelectorAll('.service-card, .page-row, .tech-item').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(15px)';
-            el.style.transition = 'all 0.5s ease';
-            observer.observe(el);
-        });
+    <!-- Chat Widget -->
+    <button class="chat-fab" id="chat-fab" onclick="openChat()" aria-label="Chat with Velocity AI">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+        </svg>
+    </button>
+    <div class="chat-panel" id="chat-panel">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-avatar">V</div>
+                <div>
+                    <div class="chat-title">Velocity AI</div>
+                    <div class="chat-status"><span class="status-dot"></span>Online</div>
+                </div>
+            </div>
+            <button class="chat-close-btn" id="chat-close-btn" onclick="closeChat()"
+                aria-label="Close chat">&times;</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg bot">
+                <div class="msg-avatar">V</div>
+                <div class="msg-bubble">Hey! 👋 I'm the Velocity AI agent. I can help you plan your site, pick
+                    blueprints, or answer questions about the platform. What would you like to build?</div>
+            </div>
+        </div>
+        <div class="chat-suggestions" id="chat-suggestions">
+            <button onclick="sendSuggestion('Build me a SaaS landing page')">SaaS Landing Page</button>
+            <button onclick="sendSuggestion('I need an e-commerce site')">E-Commerce Site</button>
+            <button onclick="sendSuggestion('What blueprints are free?')">Free Blueprints?</button>
+        </div>
+        <form class="chat-input" id="chat-form" onsubmit="sendMessage(event)">
+            <input type="text" id="chat-input" placeholder="Describe what you want to build..." autocomplete="off">
+            <button type="submit" id="chat-send-btn" aria-label="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                </svg>
+            </button>
+        </form>
+    </div>
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(a => {
-            a.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 
 </html>
