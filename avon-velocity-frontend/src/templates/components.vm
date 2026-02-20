@@ -1,0 +1,148 @@
+#parse("src/macros/ui.vm")
+
+#set( $pageTitle = "Component Library - Velocity 2026" )
+#set( $pageDescription = "Industrial UI Design System upgraded for 2026 standards." )
+
+<div class="relative min-h-screen">
+    <!-- Background Accents -->
+    <div class="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px]"></div>
+    <div class="absolute bottom-0 left-0 -z-10 h-[500px] w-[500px] rounded-full bg-blue-500/5 blur-[120px]"></div>
+
+    <section class="py-12 md:py-20 lg:py-24">
+        <div class="flex flex-col gap-4 mb-16 border-b border-primary/10 pb-12">
+            <div class="flex items-center gap-2">
+                #badge("System 4.0", "default")
+                #badge("Industrial Standard", "outline")
+            </div>
+            <h1 class="text-5xl font-black tracking-tighter lg:text-7xl bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
+                Design System <span class="text-primary italic">2026</span>
+            </h1>
+            <p class="text-xl text-muted-foreground max-w-2xl leading-relaxed">
+                The core architectural components of the Avon Way ecosystem. Optimized for high-performance industrial interfaces and autonomous agent coordination.
+            </p>
+        </div>
+
+        <div class="grid gap-24">
+            
+            <!-- Statistics Section -->
+            <div class="space-y-8">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">01. Telemetry Units</h2>
+                    <p class="text-sm text-muted-foreground font-mono">Macro: #stat( $label, $value, $trend, $color )</p>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    #stat("Throughput", "1.2GB/s", "↑ 12%", "text-green-500")
+                    #stat("Latency", "4ms", "↓ 2ms", "text-blue-500")
+                    #stat("Swarm Sync", "99.9%", "Stable", "text-muted-foreground")
+                    #stat("Active Nodes", "248", "+14", "text-primary")
+                </div>
+            </div>
+
+            <!-- Buttons Section -->
+            <div class="space-y-8">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">02. Control Interface</h2>
+                    <p class="text-sm text-muted-foreground font-mono">Macro: #button( $text, $variant, $class, $attrs )</p>
+                </div>
+                <div class="p-10 rounded-2xl border bg-card/30 backdrop-blur-sm shadow-inner">
+                    <div class="flex flex-wrap gap-8 items-end">
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] uppercase font-bold text-muted-foreground">Premium Build</span>
+                            #button("Initialize Swarm", "premium", "h-12 px-8", "")
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] uppercase font-bold text-muted-foreground">Primary Action</span>
+                            #button("Deploy Node", "default", "h-12 px-8", "")
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] uppercase font-bold text-muted-foreground">Secondary</span>
+                            #button("Configure", "secondary", "h-12 px-8", "")
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] uppercase font-bold text-muted-foreground">Containment</span>
+                            #button("Audit Log", "outline", "h-12 px-8", "")
+                        </div>
+                        <div class="flex flex-col gap-3">
+                            <span class="text-[10px] uppercase font-bold text-muted-foreground">Hazard</span>
+                            #button("Terminate", "destructive", "h-12 px-8", "")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badges Section -->
+            <div class="space-y-8">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">03. Status Indicators</h2>
+                    <p class="text-sm text-muted-foreground font-mono">Macro: #badge( $text, $variant )</p>
+                </div>
+                <div class="flex flex-wrap gap-4 p-8 rounded-2xl border bg-muted/20">
+                    #badge("Industrial Mode", "default")
+                    #badge("Compiling Node", "secondary")
+                    #badge("Secure Terminal", "success")
+                    #badge("Critical Fault", "destructive")
+                    #badge("Legacy Protocol", "outline")
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="space-y-8">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">04. Data Input</h2>
+                    <p class="text-sm text-muted-foreground font-mono">Macro: #input( $label, $id, $type, $placeholder, $value )</p>
+                </div>
+                <div class="grid gap-8 md:grid-cols-2 p-10 rounded-2xl border bg-card/40">
+                    <div class="space-y-6">
+                        #input("Project Identifier", "pid", "text", "e.g. SWARM_DELTA_01", "")
+                        #input("Admin Access Key", "pass", "password", "••••••••", "")
+                        #button("Authenticate Node", "premium", "w-full h-12", "")
+                    </div>
+                    <div class="flex flex-col justify-center gap-4 border-l pl-8 border-primary/10">
+                        <h4 class="font-bold text-primary flex items-center gap-2">
+                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                             Real-time Validation
+                        </h4>
+                        <p class="text-sm text-muted-foreground leading-relaxed">
+                            Form components in System 2026 feature glassmorphism backdrops and automatic highlight states for autonomous coordination.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards Section -->
+            <div class="space-y-8 pb-20">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-2xl font-black uppercase tracking-widest text-primary/80">05. Containment Field</h2>
+                    <p class="text-sm text-muted-foreground font-mono">Macro: #card( $title, $description, $content, $footer )</p>
+                </div>
+                <div class="grid gap-8 lg:grid-cols-2">
+                    #set( $cardContent = "<div class='space-y-4 py-2'><div class='h-2 w-full bg-muted rounded animate-pulse'></div><div class='h-2 w-3/4 bg-muted rounded animate-pulse'></div><div class='mt-6 p-4 rounded bg-primary/5 border border-primary/10 font-mono text-xs text-primary'>NODE_DATA: [READY]<br/>STATUS: [OPTIMAL]</div></div>" )
+                    #set( $cardFooter = "#button('View Detailed Telemetry', 'ghost', 'w-full', '')" )
+                    
+                    #card("Project Avon Beta", "Autonomous Generation Node", $cardContent, $cardFooter)
+                    #card("Developer Swarm", "Industrial Logic Engine", $cardContent, $cardFooter)
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+#[[
+document.addEventListener('DOMContentLoaded', () => {
+    const macroCodes = document.querySelectorAll('p.font-mono');
+    macroCodes.forEach(p => {
+        p.style.cursor = 'pointer';
+        p.title = 'Click to copy macro signature';
+        p.addEventListener('click', () => {
+            const code = p.textContent.split(': ')[1];
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = p.innerHTML;
+                p.innerHTML = '<span class="text-green-500 font-bold">✓ Copied to clipboard!</span>';
+                setTimeout(() => { p.innerHTML = originalText; }, 2000);
+            });
+        });
+    });
+});
+]]#
+</script>

@@ -5,17 +5,21 @@ import { Bell, Search, User, Cpu } from 'lucide-react';
 
 const AVAILABLE_MODELS = [
     {
-        id: "avon",
-        name: "Avon (Local)",
+        id: "velocity",
+        name: "Velocity (Local)",
         provider: "ollama",
-        model: "Avon:latest",
+        model: "Velocity:latest",
         locked: true
     }
 ];
 
 function ModelDropdown() {
     return (
-        <select className="text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700">
+        <select
+            aria-label="Select AI Model"
+            title="Select AI Model"
+            className="text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700"
+        >
             {AVAILABLE_MODELS.map((m) => (
                 <option key={m.id} value={m.model}>{m.name}</option>
             ))}
@@ -53,14 +57,18 @@ export default function TopNav() {
                     </div>
                 )}
 
-                <button className="text-gray-400 hover:text-primary transition-colors relative">
+                <button
+                    aria-label="Notifications"
+                    title="Notifications"
+                    className="text-gray-400 hover:text-primary transition-colors relative"
+                >
                     <Bell size={20} />
                     <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                 </button>
 
                 <div className="flex items-center gap-3 pl-6 border-l border-gray-100 cursor-pointer">
                     <div className="text-right">
-                        <p className="text-sm font-semibold text-gray-900">Avon Agent</p>
+                        <p className="text-sm font-semibold text-gray-900">Velocity Agent</p>
                         <p className="text-xs text-gray-500">Admin</p>
                     </div>
                     <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center text-primary">

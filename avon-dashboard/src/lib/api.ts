@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 export const login = async (username: string, role?: string) => {
     const res = await fetch(`${API_URL}/auth/login`, {
@@ -25,14 +25,14 @@ export const fetchTemplates = async (token: string) => {
     return res.json();
 };
 
-export const generateSite = async (token: string, prompt: string, templateId: string) => {
+export const generateSite = async (token: string, prompt: string, templateId: string, tone?: string, theme?: string) => {
     const res = await fetch(`${API_URL}/generate-site`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ prompt, templateId })
+        body: JSON.stringify({ prompt, templateId, tone, theme })
     });
     return res.json();
 };
@@ -98,6 +98,65 @@ export const deleteSite = async (token: string, siteId: string) => {
     const res = await fetch(`${API_URL}/sites/${siteId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+};
+
+export const checkConfig = async (token: string) => {
+    const res = await fetch(`${API_URL}/config/check`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+};
+
+export const updateConfig = async (token: string, data: any) => {
+    const res = await fetch(`${API_URL}/config/update`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+    });
+    return res.json();
+};
+
+// --- Terminal & FS ---
+
+export const executeCommand = async (token: string, command: string, cwd?: string) => {
+    const res = await fetch(`${API_URL}/terminal/exec`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ command, cwd })
+    });
+    return res.json();
+};
+
+export const listFiles = async (token: string, path?: string) => {
+    const res = await fetch(`${API_URL}/fs/list?path=${encodeURIComponent(path || '')}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+};
+
+export const readFile = async (token: string, path: string) => {
+    const res = await fetch(`${API_URL}/fs/read?path=${encodeURIComponent(path)}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+};
+
+export const writeFile = async (token: string, path: string, content: string) => {
+    const res = await fetch(`${API_URL}/fs/write`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ path, content })
     });
     return res.json();
 };

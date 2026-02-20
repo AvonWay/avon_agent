@@ -1,0 +1,66 @@
+#parse("src/macros/ui.vm")
+
+#set( $pageTitle = "Industrial Blueprints — Velocity" )
+#set( $pageDescription = "High-performance site templates with pre-engineered logic." )
+
+<section class="py-12">
+    <div class="flex flex-col gap-2 mb-12">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-primary animate-ping"></span>
+            <span class="text-xs font-bold uppercase tracking-widest text-primary">Pre-Engineered Systems</span>
+        </div>
+        <h1 class="text-4xl font-black tracking-tight">Industrial Blueprints</h1>
+        <p class="text-muted-foreground max-w-2xl">
+            Don't start from zero. Deploy a <strong>Velocity Blueprint</strong> with all functions and logic pre-planned. 
+            Just rebrand, customize, and launch.
+        </p>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        #foreach( $blueprint in $templates )
+        <div class="group relative flex flex-col rounded-2xl border bg-card/40 backdrop-blur-sm overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1">
+            <div class="p-6 border-b bg-muted/20 flex justify-between items-start">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">$!{blueprint.category}</span>
+                    <h3 class="text-xl font-black mt-1">$!{blueprint.name}</h3>
+                </div>
+                #badge($!{blueprint.tier}, "secondary")
+            </div>
+            <div class="p-6 flex-1">
+                <p class="text-sm text-muted-foreground leading-relaxed mb-6">
+                    $!{blueprint.description}
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-[10px] font-bold uppercase tracking-tighter">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-muted-foreground opacity-60">Complexity</span>
+                        <span class="text-foreground">$!{blueprint.complexity}</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-muted-foreground opacity-60">Logic Stack</span>
+                        <span class="text-foreground">2026 Core</span>
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 pt-0 mt-auto flex gap-3">
+                #button("Preview", "outline", "flex-1 h-11", "onclick=\"openPreview('$!{blueprint.id}')\"")
+                #button("Build", "default", "flex-1 h-11", "onclick=\"initBlueprint('$!{blueprint.id}')\"")
+            </div>
+        </div>
+        #end
+    </div>
+</section>
+
+<script>
+#[[
+async function initBlueprint(id) {
+    const confirmed = confirm(`Are you sure you want to initialize the ${id} blueprint? This will deploy a high-performance logic bundle to your workspace.`);
+    if (confirmed) {
+        window.location.href = `/chat?blueprint=${id}`;
+    }
+}
+
+function openPreview(id) {
+    window.open(`/blueprints/preview/${id}`, '_blank');
+}
+]]#
+</script>

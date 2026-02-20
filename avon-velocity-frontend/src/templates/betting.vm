@@ -1,0 +1,52 @@
+#set( $pageTitle = "Live Betting Edge - Velocity" )
+
+<section class="py-8 md:py-12">
+  <div class="flex flex-col gap-2 mb-8">
+    <div class="flex items-center gap-2">
+      <span class="relative flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+      </span>
+      <h1 class="text-3xl font-bold tracking-tight">Developer Swarm</h1>
+    </div>
+    <p class="text-muted-foreground">Industrial probability analysis for the Betting Edge engine, synthesized by the Velocity Swarm.</p>
+  </div>
+
+  #set( $tableContent = "
+    <div class='relative w-full overflow-auto'>
+      <table class='w-full caption-bottom text-sm'>
+        <thead class='[&_tr]:border-b'>
+          <tr class='border-b transition-colors hover:bg-muted/50'>
+            <th class='h-12 px-4 text-left align-middle font-medium text-muted-foreground'>Event</th>
+            <th class='h-12 px-4 text-left align-middle font-medium text-muted-foreground'>Market</th>
+            <th class='h-12 px-4 text-left align-middle font-medium text-muted-foreground'>Best Odds</th>
+            <th class='h-12 px-4 text-left align-middle font-medium text-muted-foreground'>Edge</th>
+            <th class='h-12 px-4 text-left align-middle font-medium text-muted-foreground'>Action</th>
+          </tr>
+        </thead>
+        <tbody class='[&_tr:last-child]:border-0'>
+          #foreach( $bet in $bets )
+          <tr class='border-b transition-colors hover:bg-muted/50'>
+            <td class='p-4 align-middle font-medium'>$!{bet.homeTeam} vs $!{bet.awayTeam}</td>
+            <td class='p-4 align-middle'>$!{bet.market}</td>
+            <td class='p-4 align-middle font-mono'>$!{bet.odds}</td>
+            <td class='p-4 align-middle'>
+              <div class='inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-green-100 text-green-800'>
+                +$!{bet.edge}%
+              </div>
+            </td>
+            <td class='p-4 align-middle'>
+              <button class='inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 text-xs'>
+                Bet Now
+              </button>
+            </td>
+          </tr>
+          #end
+        </tbody>
+      </table>
+    </div>
+  " )
+
+  #card( "💰 Active Opportunities", "Mathematical edges detected by the Swarm using Industrial Probability Models.", $tableContent, "" )
+
+</section>

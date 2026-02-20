@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Dark scrollbar for Repl UI */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+@layer utilities {
+    @keyframes loading {
+        0% {
+            left: -100%;
+            width: 50%;
+        }
+
+        50% {
+            left: 25%;
+            width: 50%;
+        }
+
+        100% {
+            left: 100%;
+            width: 50%;
+        }
+    }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+@supports (scrollbar-width: none) {
+    .hide-scrollbar {
+        scrollbar-width: none;
+    }
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+}

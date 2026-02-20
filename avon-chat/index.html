@@ -453,6 +453,12 @@
             box-shadow: 0 8px 32px var(--accent-glow);
         }
 
+        .welcome-icon img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
         .welcome h2 {
             font-size: 24px;
             font-weight: 700;
@@ -656,8 +662,7 @@
             <div class="messages" id="messages">
                 <div class="messages-inner" id="messagesInner">
                     <div class="welcome" id="welcome">
-                        <div class="welcome-icon"><img src="velocity-logo.png" alt="Avon"
-                                style="width:40px;height:40px;object-fit:contain;"></div>
+                        <div class="welcome-icon"><img src="velocity-logo.png" alt="Avon"></div>
                         <h2>Talk to Avon</h2>
                         <p>Your local AI agent running on Ollama. Completely private, no data leaves your machine.</p>
                         <div class="quick-actions">
@@ -690,7 +695,8 @@
                     <div class="input-box">
                         <textarea id="userInput" placeholder="Message Avon..." rows="1" onkeydown="handleKey(event)"
                             oninput="autoResize(this)"></textarea>
-                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send Message"
+                            aria-label="Send Message">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="22" y1="2" x2="11" y2="13" />

@@ -42,7 +42,7 @@ export default function Sidebar({ activeView, setActiveView }: { activeView: str
 
             <nav className="flex-1 px-4 space-y-2">
                 <SidebarItem icon={LayoutDashboard} label={expanded ? "Nodes" : ""} active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
-                <SidebarItem icon={Bot} label={expanded ? "Avon AI Builder" : ""} active={activeView === 'ai-builder'} onClick={() => setActiveView('ai-builder')} />
+                <SidebarItem icon={Bot} label={expanded ? "Velocity AI Builder" : ""} active={activeView === 'ai-builder'} onClick={() => setActiveView('ai-builder')} />
                 <SidebarItem icon={Users} label={expanded ? "Team" : ""} active={activeView === 'team'} onClick={() => setActiveView('team')} />
                 <SidebarItem icon={Activity} label={expanded ? "CI/CD Log" : ""} active={activeView === 'activity'} onClick={() => setActiveView('activity')} />
             </nav>
@@ -51,6 +51,8 @@ export default function Sidebar({ activeView, setActiveView }: { activeView: str
                 <SidebarItem icon={Settings} label={expanded ? "Settings" : ""} />
                 <button
                     onClick={() => setExpanded(!expanded)}
+                    aria-label={expanded ? "Collapse Sidebar" : "Expand Sidebar"}
+                    title={expanded ? "Collapse Sidebar" : "Expand Sidebar"}
                     className="w-full mt-4 flex items-center justify-center p-2 text-gray-500 hover:text-white transition-colors"
                 >
                     <ChevronLeft className={`transition-transform duration-300 ${!expanded ? 'rotate-180' : ''}`} />
