@@ -2,6 +2,18 @@
    Velocity Landing — App Logic
    ====================== */
 
+// ---- Security Helpers ----
+function escapeHTML(str) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+    }[tag] || tag));
+}
+
 // ---- Auth Modal ----
 let authMode = 'login'; // 'login' | 'signup'
 
@@ -80,9 +92,9 @@ function toggleAuthMode() {
 
 function handleAuth(e) {
     e.preventDefault();
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    const name = document.getElementById('auth-name').value;
+    const email = escapeHTML(document.getElementById('auth-email').value);
+    const password = document.getElementById('auth-password').value; // don't sanitize password, but don't render it either
+    const name = escapeHTML(document.getElementById('auth-name').value);
 
     if (authMode === 'signup') {
         const account = {
@@ -167,7 +179,7 @@ function addMessage(text, type) {
     if (type === 'bot') {
         div.innerHTML = `<div class="msg-avatar">V</div><div class="msg-bubble">${text}</div>`;
     } else {
-        div.innerHTML = `<div class="msg-bubble">${text}</div>`;
+        div.innerHTML = `<div class="msg-bubble">${escapeHTML(text)}</div>`;
     }
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
