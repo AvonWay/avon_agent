@@ -521,3 +521,34 @@ function toggleMobileMenu() {
         btn.classList.toggle('active');
     }
 }
+
+// ---- Hero Interactive Terminal ----
+function runHeroDemo() {
+    const input = document.getElementById('demo-prompt');
+    const term = document.getElementById('hero-terminal');
+    if (!input || !term) return;
+
+    const prompt = input.value.trim() || "Build a gym landing page";
+    input.value = prompt; // fill if empty
+
+    term.innerHTML = `<div class="term-line action">> Receiving specs: <span style="color:#fff">"${escapeHTML(prompt)}"</span></div>`;
+
+    setTimeout(() => { term.innerHTML += `<div class="term-line">> <span class="term-keyword">[Architect]</span> Analyzing layout requirements...</div>`; }, 800);
+    setTimeout(() => { term.innerHTML += `<div class="term-line">> <span class="term-keyword">[Architect]</span> Scaffold complete. Passing to Builder.</div>`; }, 1800);
+    setTimeout(() => { term.innerHTML += `<div class="term-line">> <span class="term-keyword">[Builder]</span> Writing React/Tailwind components...</div>`; }, 2600);
+    setTimeout(() => { term.innerHTML += `<div class="term-line">> <span class="term-keyword">[Guardian]</span> Running QA & Lighthouse Audit...</div>`; }, 3800);
+
+    setTimeout(() => {
+        term.innerHTML += `<br><div class="term-line success">✓ Build successful (98/100 Performance)</div>`;
+        term.innerHTML += `<div class="term-line success">✓ Deployed to edge network.</div>`;
+    }, 4800);
+
+    setTimeout(() => {
+        // Open the actual chat to complete the illusion
+        openChat();
+
+        // Pass the request to the real engine
+        document.getElementById('chat-input').value = prompt;
+        sendMessage({ preventDefault: () => { } });
+    }, 6000);
+}
