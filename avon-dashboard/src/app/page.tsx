@@ -404,7 +404,14 @@ export default function VelocityIDE() {
                                     : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'}`}
                         >
                             <span className="truncate flex-1">{tab.title}</span>
-                            <X size={14} className="opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-500 rounded p-0.5 transition-all" onClick={(e) => { e.stopPropagation(); setOpenTabs(openTabs.filter(t => t.id !== tab.id)); }} />
+                            <X size={14} className="opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-500 rounded p-0.5 transition-all" onClick={(e) => {
+                                e.stopPropagation();
+                                const newTabs = openTabs.filter(t => t.id !== tab.id);
+                                setOpenTabs(newTabs);
+                                if (activeTab === tab.id) {
+                                    setActiveTab(newTabs.length > 0 ? newTabs[newTabs.length - 1].id : 'welcome');
+                                }
+                            }} />
                         </div>
                     ))}
                 </div>

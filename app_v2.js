@@ -18,7 +18,7 @@ function openModal(mode) {
 
     if (mode === 'signup') {
         title.textContent = 'Start Your Free Trial';
-        desc.textContent = '3 days free · 3 blueprints · 500 tokens';
+        desc.textContent = '3 days free · All 20+ blueprints · 500 tokens';
         nameField.classList.remove('hidden');
         submit.textContent = 'Create Account';
         switchText.innerHTML = 'Already have an account? <button onclick="toggleAuthMode()" id="switch-mode-btn">Log in</button>';
@@ -39,11 +39,39 @@ function openModal(mode) {
     setTimeout(() => document.getElementById('auth-email').focus(), 300);
 }
 
+// ---- Mobile Menu ----
+function toggleMobileMenu() {
+    const navLinks = document.getElementById('main-nav');
+    if (navLinks) {
+        navLinks.classList.toggle('active');
+    }
+}
+
+function toggleDropdown() {
+    const content = document.getElementById('blueprint-links');
+    if (content) {
+        content.classList.toggle('show');
+    }
+}
+
 function closeModal(e) {
     if (e && e.target !== e.currentTarget) return;
     const modal = document.getElementById('auth-modal');
     modal.classList.remove('active');
     document.body.style.overflow = '';
+}
+
+// Close dropdown if clicked outside
+window.onclick = function (event) {
+    if (!event.target.matches('.dropbtn') && !event.target.closest('.dropbtn')) {
+        const dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+            let openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
 }
 
 function toggleAuthMode() {
@@ -61,9 +89,15 @@ function handleAuth(e) {
             name, email,
             plan: 'starter',
             tokensRemaining: lastBuild ? (500 - lastBuild.tokensUsed) : 500,
-            blueprintsAvailable: ['SaaS Landing', 'Portfolio', 'Blog'],
+            blueprintsAvailable: [
+                'SaaS Landing', 'Portfolio', 'Blog', 'Storefront Pro',
+                'Admin Dashboard', 'Restaurant', 'Agency', 'Real Estate',
+                'Healthcare', 'Education', 'Fitness', 'Event', 'Nonprofit',
+                'Consulting', 'Photography', 'Law Firm', 'Travel',
+                'Music', 'Fintech', 'Crypto'
+            ],
             trialEnds: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-            features: { swarm: false, cicd: false, customDomains: false, allBlueprints: false }
+            features: { swarm: false, cicd: false, customDomains: false, allBlueprints: true }
         };
         localStorage.setItem('velocity_user', JSON.stringify(account));
         closeModal();
@@ -145,33 +179,89 @@ function getAIResponse(msg) {
 
     // Build requests — start building immediately
     if (lower.includes('saas') || lower.includes('landing') || lower.includes('startup')) {
-        triggerBuild('SaaS Landing', 280);
+        triggerBuild('SaaS Landing', 280, 'saas-landing');
         return '\u26a1 <strong>Building your SaaS Landing Page now.</strong><br><br>Blueprint: SaaS Landing (Free)<br>Tokens: ~280 of 500 used<br><br>Generating hero, feature grid, pricing table, testimonials, and CTA...';
     }
     if (lower.includes('e-commerce') || lower.includes('shop') || lower.includes('store') || lower.includes('product')) {
-        triggerBuild('Storefront Pro', 350);
+        triggerBuild('Storefront Pro', 350, 'storefront-pro');
         return '\u26a1 <strong>Building your E-Commerce Storefront now.</strong><br><br>Blueprint: Storefront Pro<br>Tokens: ~350 of 500 used<br><br>Generating product grid, cart UI, checkout flow, and category pages...';
     }
     if (lower.includes('portfolio') || lower.includes('creative') || lower.includes('showcase')) {
-        triggerBuild('Portfolio', 220);
+        triggerBuild('Portfolio', 220, 'portfolio');
         return '\u26a1 <strong>Building your Portfolio site now.</strong><br><br>Blueprint: Portfolio (Free)<br>Tokens: ~220 of 500 used<br><br>Generating hero, project gallery, about section, skills grid, and contact form...';
     }
     if (lower.includes('blog') || lower.includes('article') || lower.includes('content') || lower.includes('write')) {
-        triggerBuild('Blog', 200);
+        triggerBuild('Blog', 200, 'blog');
         return '\u26a1 <strong>Building your Blog now.</strong><br><br>Blueprint: Blog (Free)<br>Tokens: ~200 of 500 used<br><br>Generating article layout, sidebar, categories, featured posts, and newsletter signup...';
     }
     if (lower.includes('dashboard') || lower.includes('admin') || lower.includes('panel')) {
-        triggerBuild('Admin Dashboard', 400);
+        triggerBuild('Admin Dashboard', 400, 'admin-dashboard');
         return '\u26a1 <strong>Building your Dashboard now.</strong><br><br>Blueprint: Admin Dashboard<br>Tokens: ~400 of 500 used<br><br>Generating stats grid, data tables, charts, sidebar nav, and settings panel...';
     }
     if (lower.includes('restaurant') || lower.includes('food') || lower.includes('menu') || lower.includes('cafe')) {
-        triggerBuild('Restaurant', 300);
+        triggerBuild('Restaurant', 300, 'restaurant');
         return '\u26a1 <strong>Building your Restaurant site now.</strong><br><br>Blueprint: Restaurant<br>Tokens: ~300 of 500 used<br><br>Generating menu display, reservation form, gallery, and location map...';
+    }
+    if (lower.includes('agency') || lower.includes('marketing') || lower.includes('creative agency')) {
+        triggerBuild('Agency', 240, 'agency');
+        return '\u26a1 <strong>Building your Agency Site now.</strong><br><br>Blueprint: Agency<br>Tokens: ~240 of 500 used<br><br>Generating creative layouts and marketing tools...';
+    }
+    if (lower.includes('real estate') || lower.includes('property') || lower.includes('realtor')) {
+        triggerBuild('Real Estate', 290, 'real-estate');
+        return '\u26a1 <strong>Building your Real Estate Site now.</strong><br><br>Blueprint: Real Estate<br>Tokens: ~290 of 500 used<br><br>Generating property listings and search modules...';
+    }
+    if (lower.includes('healthcare') || lower.includes('medical') || lower.includes('doctor')) {
+        triggerBuild('Healthcare', 260, 'healthcare');
+        return '\u26a1 <strong>Building your Healthcare Site now.</strong><br><br>Blueprint: Healthcare<br>Tokens: ~260 of 500 used<br><br>Generating patient portals and medical services...';
+    }
+    if (lower.includes('education') || lower.includes('school') || lower.includes('university') || lower.includes('course')) {
+        triggerBuild('Education', 310, 'education');
+        return '\u26a1 <strong>Building your Education Site now.</strong><br><br>Blueprint: Education<br>Tokens: ~310 of 500 used<br><br>Generating courses and academic showcases...';
+    }
+    if (lower.includes('fitness') || lower.includes('gym') || lower.includes('workout')) {
+        triggerBuild('Fitness', 230, 'fitness');
+        return '\u26a1 <strong>Building your Fitness Site now.</strong><br><br>Blueprint: Fitness<br>Tokens: ~230 of 500 used<br><br>Generating training schedules and memberships...';
+    }
+    if (lower.includes('event') || lower.includes('conference')) {
+        triggerBuild('Event', 210, 'event');
+        return '\u26a1 <strong>Building your Event Site now.</strong><br><br>Blueprint: Event<br>Tokens: ~210 of 500 used<br><br>Generating schedules and ticketing systems...';
+    }
+    if (lower.includes('nonprofit') || lower.includes('charity') || lower.includes('donate')) {
+        triggerBuild('Nonprofit', 220, 'nonprofit');
+        return '\u26a1 <strong>Building your Nonprofit Site now.</strong><br><br>Blueprint: Nonprofit<br>Tokens: ~220 of 500 used<br><br>Generating donation flows and impact metrics...';
+    }
+    if (lower.includes('consulting') || lower.includes('advisor')) {
+        triggerBuild('Consulting', 250, 'consulting');
+        return '\u26a1 <strong>Building your Consulting Site now.</strong><br><br>Blueprint: Consulting<br>Tokens: ~250 of 500 used<br><br>Generating advisory models and booking functionality...';
+    }
+    if (lower.includes('photography') || lower.includes('photo')) {
+        triggerBuild('Photography', 300, 'photography');
+        return '\u26a1 <strong>Building your Photography Site now.</strong><br><br>Blueprint: Photography<br>Tokens: ~300 of 500 used<br><br>Generating visual galleries and portfolios...';
+    }
+    if (lower.includes('law firm') || lower.includes('legal') || lower.includes('lawyer')) {
+        triggerBuild('Law Firm', 240, 'law-firm');
+        return '\u26a1 <strong>Building your Law Firm Site now.</strong><br><br>Blueprint: Law Firm<br>Tokens: ~240 of 500 used<br><br>Generating practice areas and legal disclaimers...';
+    }
+    if (lower.includes('travel') || lower.includes('tour')) {
+        triggerBuild('Travel', 270, 'travel');
+        return '\u26a1 <strong>Building your Travel Site now.</strong><br><br>Blueprint: Travel<br>Tokens: ~270 of 500 used<br><br>Generating destination showcases and bookings...';
+    }
+    if (lower.includes('music') || lower.includes('band') || lower.includes('artist')) {
+        triggerBuild('Music', 260, 'music');
+        return '\u26a1 <strong>Building your Music Site now.</strong><br><br>Blueprint: Music<br>Tokens: ~260 of 500 used<br><br>Generating tour dates and media players...';
+    }
+    if (lower.includes('fintech') || lower.includes('finance') || lower.includes('bank')) {
+        triggerBuild('Fintech', 320, 'fintech');
+        return '\u26a1 <strong>Building your Fintech Site now.</strong><br><br>Blueprint: Fintech<br>Tokens: ~320 of 500 used<br><br>Generating banking dashboards and financial charts...';
+    }
+    if (lower.includes('crypto') || lower.includes('web3') || lower.includes('token')) {
+        triggerBuild('Crypto', 330, 'crypto');
+        return '\u26a1 <strong>Building your Crypto Site now.</strong><br><br>Blueprint: Crypto<br>Tokens: ~330 of 500 used<br><br>Generating tokenomics and Web3 integrations...';
     }
 
     // Info queries — answer directly, no follow-up questions
     if (lower.includes('free') || lower.includes('blueprint') || lower.includes('trial')) {
-        return '\ud83c\udf81 Your free trial includes 3 blueprints:<br><br>\u2022 <strong>SaaS Landing</strong><br>\u2022 <strong>Portfolio</strong><br>\u2022 <strong>Blog</strong><br><br>500 tokens included. Just tell me what to build and I start immediately.';
+        return '\ud83c\udf81 Your free trial includes all 20+ blueprints!<br><br>500 tokens included. Just tell me what to build and I start immediately.';
     }
     if (lower.includes('token') || lower.includes('cost') || lower.includes('price')) {
         return '\ud83e\ude99 You get <strong>500 free tokens</strong>. A build uses 200\u2013400 tokens. Pro ($29/mo) = unlimited tokens + Swarm + all 20+ blueprints.';
@@ -183,9 +273,61 @@ function getAIResponse(msg) {
         return 'Hey! \ud83d\udc4b Tell me what to build and I\'ll start generating it right now. Example: "Build me a SaaS landing page"';
     }
 
-    // Default: treat ANY prompt as a build request
-    triggerBuild('Custom Site', 320);
-    return `\u26a1 <strong>Starting your build now.</strong><br><br>Generating a custom site based on: "<em>${msg}</em>"<br>Tokens: ~320 of 500 used<br><br>Scaffolding layout, creating components, applying styles...`;
+    // Default: treat ANY prompt as a custom build request to Ollama
+    triggerActualAIBuild(msg, 'Custom Site', 320);
+    return `\u26a1 <strong>Starting your AI build now.</strong><br><br>Generating a custom site based on: "<em>${msg}</em>"<br>Tokens: ~320 of 500 used<br><br>Summoning local Swarm agent to write HTML, CSS, and JS...`;
+}
+
+function triggerActualAIBuild(msg, blueprintName = 'Custom Site', tokensUsed = 320) {
+    const slug = 'custom-site'; // Always push to the AI custom html loader
+    lastBuild = { name: blueprintName, slug, tokensUsed };
+
+    setTimeout(() => {
+        addMessage(
+            `\ud83d\udd28 <strong>Build Progress \u2014 ${blueprintName}</strong><br><br>` +
+            '<div class="build-progress">' +
+            '\u2705 Initializing Swarm Agents...<br>' +
+            '\u23f3 Writing code (this takes a few seconds)...' +
+            '</div>', 'bot');
+    }, 1500);
+
+    fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            model: 'Avon:latest',
+            prompt: `Write a complete, single-file HTML page with inline CSS and embedded JavaScript for the following request: "${msg}". You must include beautiful modern styling, responsive design with dark mode by default, and interactive elements. DO NOT explain your code. DO NOT wrap the code in markdown blocks like \`\`\`html. PROVIDE EXACTLY AND ONLY THE RAW HTML CODE starting with <!DOCTYPE html>.`,
+            stream: false
+        })
+    }).then(r => r.json()).then(data => {
+        let code = data.response || '';
+        const match = code.match(/```(?:html)?\s*([\s\S]*?)```/i);
+        if (match) {
+            code = match[1].trim();
+        } else if (code.includes('<!DOCTYPE html>')) {
+            code = code.substring(code.indexOf('<!DOCTYPE html>')).trim();
+        }
+
+        localStorage.setItem('custom_build_html', code);
+
+        setTimeout(() => {
+            const user = getUser();
+            if (user) {
+                deliverLiveLink(user.name, lastBuild);
+            } else {
+                addMessage(
+                    `\ud83d\ude80 <strong>Build complete!</strong> Your ${blueprintName} is ready.<br><br>` +
+                    '<div class="build-result">' +
+                    '\ud83d\udcc1 Files: 1 generated<br>' +
+                    '\ud83c\udfa8 Styles: Applied inline<br>' +
+                    `Tokens remaining: ${500 - tokensUsed} of 500<br><br>` +
+                    '<strong>\u2192 <a href="javascript:void(0)" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to get your live link</a></strong>' +
+                    '</div>', 'bot');
+            }
+        }, 1000);
+    }).catch(err => {
+        addMessage(`⚠️ Failed to connect to local AI: ${err.message}. Make sure Ollama is running and model Avon:latest exists. Run \`ollama run Avon:latest\``, 'bot');
+    });
 }
 
 function isLoggedIn() {
@@ -197,8 +339,8 @@ function getUser() {
     return data ? JSON.parse(data) : null;
 }
 
-function triggerBuild(blueprintName, tokensUsed) {
-    const slug = blueprintName.toLowerCase().replace(/\s+/g, '-');
+function triggerBuild(blueprintName, tokensUsed, slugDef) {
+    const slug = slugDef || blueprintName.toLowerCase().replace(/\s+/g, '-');
     lastBuild = { name: blueprintName, slug, tokensUsed };
 
     setTimeout(() => {
@@ -229,24 +371,50 @@ function triggerBuild(blueprintName, tokensUsed) {
                 '\ud83d\udcf1 Mobile: Fully responsive<br>' +
                 '\u26a1 Performance: 98/100<br><br>' +
                 `Tokens remaining: ${500 - tokensUsed} of 500<br><br>` +
-                '<strong>\u2192 <a href="#" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to get your live link</a></strong>' +
+                '<strong>\u2192 <a href="javascript:void(0)" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to get your live link</a></strong>' +
                 '</div>', 'bot');
         }
     }, 6000);
 }
 
 function deliverLiveLink(userName, build) {
-    // Open chat if not already open
     if (!chatOpen) openChat();
 
-    const siteUrl = `https://velocity.site/${build.slug}-${Date.now().toString(36)}`;
-    const previewUrl = `https://avonway.github.io/avon_agent/`;
+    // Map blueprints to real preview pages
+    const previewPages = {
+        'saas-landing': 'previews/saas-landing.html',
+        'portfolio': 'previews/portfolio.html',
+        'blog': 'previews/blog.html',
+        'storefront-pro': 'previews/storefront-pro.html',
+        'admin-dashboard': 'previews/admin-dashboard.html',
+        'restaurant': 'previews/restaurant.html',
+        'agency': 'previews/agency.html',
+        'real-estate': 'previews/real-estate.html',
+        'healthcare': 'previews/healthcare.html',
+        'education': 'previews/education.html',
+        'fitness': 'previews/fitness.html',
+        'event': 'previews/event.html',
+        'nonprofit': 'previews/nonprofit.html',
+        'consulting': 'previews/consulting.html',
+        'photography': 'previews/photography.html',
+        'law-firm': 'previews/law-firm.html',
+        'travel': 'previews/travel.html',
+        'music': 'previews/music.html',
+        'fintech': 'previews/fintech.html',
+        'crypto': 'previews/crypto.html',
+        'custom-site': 'previews/custom.html'
+    };
+
+    const basePath = './';
+    const page = previewPages[build.slug] || 'previews/saas-landing.html';
+    // Append cache busting parameter so the browser always loads the freshly updated blueprint
+    const liveUrl = basePath + page + '?v=' + Date.now();
 
     setTimeout(() => {
         addMessage(
             `\ud83c\udf89 <strong>Deployed! Your site is live, ${userName}!</strong><br><br>` +
             '<div class="build-result">' +
-            `\ud83c\udf10 <strong>Live URL:</strong> <a href="${previewUrl}" target="_blank" rel="noopener" class="build-deploy-link">${siteUrl}</a><br><br>` +
+            `\ud83c\udf10 <strong>Live URL:</strong> <a href="${liveUrl}" target="_blank" class="build-deploy-link">Click here to open live preview</a><br><br>` +
             `\ud83d\udcca Site: ${build.name}<br>` +
             `\u26a1 Status: Live & Serving<br>` +
             `\ud83d\udd12 SSL: Active<br>` +
@@ -332,3 +500,12 @@ document.addEventListener('keydown', (e) => {
         closeChat();
     }
 });
+
+function toggleMobileMenu() {
+    const nav = document.getElementById('main-nav');
+    const btn = document.getElementById('mobile-menu-btn');
+    if (nav) {
+        nav.classList.toggle('active');
+        btn.classList.toggle('active');
+    }
+}

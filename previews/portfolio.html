@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AvonWay — Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #fafafa;
+            --card: #fff;
+            --border: #e5e7eb;
+            --fg: #111827;
+            --muted: #6b7280;
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --green: #10b981;
+            --amber: #f59e0b
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 24px
+        }
+
+        .built-with {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: linear-gradient(135deg, var(--primary), #a855f7);
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff
+        }
+
+        .built-with a {
+            color: #fff;
+            text-decoration: underline;
+            margin-left: 4px
+        }
+
+        nav {
+            position: sticky;
+            top: 36px;
+            z-index: 100;
+            padding: 16px 0;
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            background: rgba(250, 250, 250, 0.85);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: -0.5px
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s
+        }
+
+        .nav-links a:hover {
+            color: var(--fg)
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 0 60px
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 48px;
+            color: #fff;
+            font-weight: 900
+        }
+
+        .avatar-aw {
+            font-size: 32px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 8px
+        }
+
+        .hero .subtitle {
+            font-size: 20px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 16px
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--muted);
+            max-width: 480px;
+            margin: 0 auto 32px;
+            line-height: 1.7
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25)
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(99, 102, 241, 0.35)
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--fg);
+            border: 1.5px solid var(--border)
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary)
+        }
+
+        .section {
+            padding: 64px 0
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px
+        }
+
+        .section h2 {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 12px
+        }
+
+        .section>p {
+            color: var(--muted);
+            margin-bottom: 32px
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 48px
+        }
+
+        .skill {
+            padding: 6px 16px;
+            border-radius: 100px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--fg)
+        }
+
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px
+        }
+
+        .project-card {
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--card);
+            border: 1px solid var(--border);
+            transition: all 0.3s
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08)
+        }
+
+        .project-img {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px
+        }
+
+        .project-img.p1 {
+            background: linear-gradient(135deg, #6366f1, #a855f7)
+        }
+
+        .project-img.p2 {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4)
+        }
+
+        .project-img.p3 {
+            background: linear-gradient(135deg, #f59e0b, #f43f5e)
+        }
+
+        .project-img.p4 {
+            background: linear-gradient(135deg, #10b981, #3b82f6)
+        }
+
+        .project-body {
+            padding: 20px
+        }
+
+        .project-body h3 {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 6px
+        }
+
+        .project-body p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 12px
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+
+        .project-tags span {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center
+        }
+
+        .about-text p {
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 16px;
+            font-size: 15px
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px
+        }
+
+        .about-stat {
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            text-align: center
+        }
+
+        .about-stat .val {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--primary)
+        }
+
+        .about-stat .label {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px
+        }
+
+        .contact {
+            text-align: center;
+            padding: 64px;
+            background: var(--primary-light);
+            border-radius: 20px;
+            margin: 24px 0 64px
+        }
+
+        .contact h2 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px
+        }
+
+        .contact p {
+            color: var(--muted);
+            margin-bottom: 24px
+        }
+
+        .contact-form {
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            background: var(--card)
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: var(--primary)
+        }
+
+        .contact-form textarea {
+            height: 100px;
+            resize: vertical
+        }
+
+        .contact-form button {
+            justify-content: center;
+        }
+
+        footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            text-align: center
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none
+        }
+
+        @media(max-width:768px) {
+
+            .projects,
+            .about-grid {
+                grid-template-columns: 1fr
+            }
+
+            .hero h1 {
+                font-size: 36px
+            }
+        }
+
+        .fade-up {
+            opacity: 1;
+            transform: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="built-with">⚡ Built with <a href="https://avonway.github.io/avon_agent/" rel="noopener">Velocity AI</a>
+        in under 60 seconds</div>
+    <nav>
+        <div class="container nav-inner">
+            <div class="brand">AvonWay</div>
+            <div class="nav-links"><a href="#projects">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="avatar avatar-aw">AW</div>
+            <h1>AvonWay</h1>
+            <div class="subtitle">AI & Multi-Agent Swarm Engineering</div>
+            <p>Creators of Velocity AI. We build autonomous agentic coders, multi-agent swarms, and high-performance
+                development workflows.</p>
+            <div class="hero-btns">
+                <a href="#contact" class="btn btn-primary">Get in Touch</a>
+                <a href="#projects" class="btn btn-outline">View Work →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="projects">
+        <div class="container">
+            <span class="section-tag">Portfolio</span>
+            <h2>Featured Projects</h2>
+            <div class="skills">
+                <span class="skill">React</span><span class="skill">Node.js</span><span class="skill">TypeScript</span>
+                <span class="skill">Python</span><span class="skill">Figma</span><span class="skill">AWS</span>
+                <span class="skill">PostgreSQL</span><span class="skill">Next.js</span>
+            </div>
+            <div class="projects">
+                <div class="project-card fade-up">
+                    <div class="project-img p1">🤖</div>
+                    <div class="project-body">
+                        <h3>Velocity IDE</h3>
+                        <p>Complete web dashboard and terminal interface for initiating and managing multi-agent build
+                            processes.
+                        </p>
+                        <div class="project-tags"><span>Next.js</span><span>React</span><span>Supabase</span></div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-img p2">🐝</div>
+                    <div class="project-body">
+                        <h3>Swarm Intelligence</h3>
+                        <p>Architect, Builder, and Guardian agents working in parallel to write and compile
+                            enterprise-grade code.</p>
+                        <div class="project-tags"><span>Ollama</span><span>Avon Model</span><span>AI</span></div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-img p3">⚡</div>
+                    <div class="project-body">
+                        <h3>Velocity Frontend Node</h3>
+                        <p>Real-time template rendering engine executing Velocity macros (.vm files) with Vite
+                            hot-reloading.</p>
+                        <div class="project-tags"><span>JavaScript</span><span>Express</span><span>Vite</span></div>
+                    </div>
+                </div>
+                <div class="project-card fade-up">
+                    <div class="project-img p4">🚀</div>
+                    <div class="project-body">
+                        <h3>Automated CI/CD</h3>
+                        <p>Pre-configured GitHub actions automatically building and deploying static bundles to GitHub
+                            Pages.</p>
+                        <div class="project-tags"><span>GitHub Actions</span><span>Bash</span><span>Deployment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="about">
+        <div class="container">
+            <span class="section-tag">About</span>
+            <h2>A Bit About Me</h2>
+            <div class="about-grid">
+                <div class="about-text">
+                    <p>We are a forward-thinking engineering team specializing in autonomous AI architectures and
+                        full-stack automation. Our flagship product is the Velocity AI system.</p>
+                    <p>By leveraging multi-agent Swarm Intelligence, we rapidly build, test, and deploy applications,
+                        dramatically reducing the time-to-market for digital products.</p>
+                    <p>We believe the future of software development is a collaborative partnership between human
+                        creativity and autonomous machine execution.</p>
+                </div>
+                <div class="about-stats">
+                    <div class="about-stat fade-up">
+                        <div class="val">20+</div>
+                        <div class="label">Blueprints</div>
+                    </div>
+                    <div class="about-stat fade-up">
+                        <div class="val">100x</div>
+                        <div class="label">Faster Builds</div>
+                    </div>
+                    <div class="about-stat fade-up">
+                        <div class="val">3</div>
+                        <div class="label">Swarm Agents</div>
+                    </div>
+                    <div class="about-stat fade-up">
+                        <div class="val">24/7</div>
+                        <div class="label">Deployment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <section class="contact" id="contact">
+            <h2>Let's Work Together</h2>
+            <p>Have a project in mind? I'd love to hear about it.</p>
+            <form class="contact-form" onsubmit="event.preventDefault();alert('Message sent! (Demo)')">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="your@email.com" required>
+                <textarea placeholder="Tell me about your project..."></textarea>
+                <button type="submit" class="btn btn-primary text-center">Send Message</button>
+            </form>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 AvonWay · Built with <a href="javascript:void(0)">Velocity AI</a></p>
+        </div>
+    </footer>
+    <script>
+        // Animations removed for mobile fix
+    </script>
+</body>
+
+</html>

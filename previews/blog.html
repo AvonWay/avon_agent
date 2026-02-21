@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InkWell — Modern Blog</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg: #fefefe;
+            --card: #fff;
+            --border: #e5e7eb;
+            --fg: #1a1a2e;
+            --muted: #6b7280;
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --accent: #f59e0b
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden
+        }
+
+        .container {
+            max-width: 1060px;
+            margin: 0 auto;
+            padding: 0 24px
+        }
+
+        .built-with {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: linear-gradient(135deg, var(--primary), #a855f7);
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff
+        }
+
+        .built-with a {
+            color: #fff;
+            text-decoration: underline;
+            margin-left: 4px
+        }
+
+        nav {
+            position: sticky;
+            top: 36px;
+            z-index: 100;
+            padding: 16px 0;
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            background: rgba(254, 254, 254, 0.9);
+            border-bottom: 1px solid var(--border)
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .brand {
+            font-family: 'Merriweather', serif;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.5px
+        }
+
+        .brand span {
+            color: var(--primary)
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500
+        }
+
+        .nav-links a:hover {
+            color: var(--fg)
+        }
+
+        .nav-sub {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        .hero {
+            padding: 80px 0 48px;
+            text-align: center
+        }
+
+        .hero h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            line-height: 1.2;
+            margin-bottom: 16px
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 520px;
+            margin: 0 auto 32px;
+            line-height: 1.7
+        }
+
+        .hero-cats {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 48px
+        }
+
+        .cat-pill {
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1.5px solid var(--border);
+            color: var(--muted);
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.2s
+        }
+
+        .cat-pill:hover,
+        .cat-pill.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary)
+        }
+
+        .featured {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            margin-bottom: 64px
+        }
+
+        .feat-post {
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--card);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer
+        }
+
+        .feat-post:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06)
+        }
+
+        .feat-img {
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px
+        }
+
+        .feat-img.i1 {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6)
+        }
+
+        .feat-img.i2 {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4)
+        }
+
+        .feat-body {
+            padding: 24px
+        }
+
+        .feat-cat {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            margin-bottom: 8px
+        }
+
+        .feat-body h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            line-height: 1.3
+        }
+
+        .feat-body p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 16px
+        }
+
+        .feat-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .feat-meta .dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--muted)
+        }
+
+        .posts-section h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 24px
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 48px
+        }
+
+        .posts-grid-2 {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+
+        .post-card {
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--card);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05)
+        }
+
+        .post-thumb {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px
+        }
+
+        .post-thumb.t1 {
+            background: linear-gradient(135deg, #f59e0b, #f43f5e)
+        }
+
+        .post-thumb.t2 {
+            background: linear-gradient(135deg, #10b981, #3b82f6)
+        }
+
+        .post-thumb.t3 {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6)
+        }
+
+        .post-thumb.t4 {
+            background: linear-gradient(135deg, #06b6d4, #6366f1)
+        }
+
+        .post-thumb.t5 {
+            background: linear-gradient(135deg, #f43f5e, #f59e0b)
+        }
+
+        .post-thumb.t6 {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6)
+        }
+
+        .post-body {
+            padding: 16px
+        }
+
+        .post-body .feat-cat {
+            margin-bottom: 6px
+        }
+
+        .post-body h3 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+            line-height: 1.3
+        }
+
+        .post-body p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 10px
+        }
+
+        .newsletter {
+            text-align: center;
+            padding: 64px;
+            background: var(--primary-light);
+            border-radius: 20px;
+            margin: 24px 0 64px
+        }
+
+        .newsletter h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 8px
+        }
+
+        .newsletter p {
+            color: var(--muted);
+            margin-bottom: 24px;
+            font-size: 15px
+        }
+
+        .nl-form {
+            display: flex;
+            gap: 8px;
+            max-width: 420px;
+            margin: 0 auto
+        }
+
+        .nl-form input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            background: var(--card)
+        }
+
+        .nl-form input:focus {
+            border-color: var(--primary)
+        }
+
+        .nl-form button {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer
+        }
+
+        .sidebar-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            margin-bottom: 64px
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 16px
+        }
+
+        .sidebar-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 32px
+        }
+
+        .sidebar-tags span {
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .popular li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none
+        }
+
+        .popular li:hover {
+            color: var(--primary)
+        }
+
+        footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            text-align: center
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none
+        }
+
+        @media(max-width:768px) {
+
+            .featured,
+            .posts-grid,
+            .sidebar-layout {
+                grid-template-columns: 1fr
+            }
+
+            .hero h1 {
+                font-size: 32px
+            }
+        }
+
+        .fade-up {
+            opacity: 1;
+            transform: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="built-with">⚡ Built with <a href="https://avonway.github.io/avon_agent/" rel="noopener">Velocity AI</a>
+        in under 60 seconds</div>
+    <nav>
+        <div class="container nav-inner">
+            <div class="brand">Ink<span>Well</span></div>
+            <div class="nav-links"><a href="#latest">Latest</a><a href="#topics">Topics</a><a
+                    href="#newsletter">Newsletter</a><button class="nav-sub">Subscribe</button></div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Stories, Ideas &<br>Perspectives</h1>
+            <p>A modern blog exploring technology, design, and the future of digital creation.</p>
+            <div class="hero-cats">
+                <button class="cat-pill active">All</button>
+                <button class="cat-pill">Technology</button>
+                <button class="cat-pill">Design</button>
+                <button class="cat-pill">AI & ML</button>
+                <button class="cat-pill">Startup</button>
+                <button class="cat-pill">Culture</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="featured">
+            <div class="feat-post fade-up">
+                <div class="feat-img i1">🤖</div>
+                <div class="feat-body">
+                    <div class="feat-cat">Artificial Intelligence</div>
+                    <h2>The Rise of Agentic AI: How Autonomous Systems Are Reshaping Work</h2>
+                    <p>From code generation to scientific discovery, AI agents are moving beyond chat interfaces into
+                        real-world problem solving.</p>
+                    <div class="feat-meta"><span>Feb 18, 2026</span><span class="dot"></span><span>8 min read</span>
+                    </div>
+                </div>
+            </div>
+            <div class="feat-post fade-up">
+                <div class="feat-img i2">🎨</div>
+                <div class="feat-body">
+                    <div class="feat-cat">Design</div>
+                    <h2>Why Minimalism Won: The Death of Skeuomorphism</h2>
+                    <p>How flat design conquered the digital world and what's coming next.</p>
+                    <div class="feat-meta"><span>Feb 15, 2026</span><span class="dot"></span><span>5 min read</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-layout" id="latest">
+            <div class="posts-section">
+                <h2>Latest Articles</h2>
+                <div class="posts-grid posts-grid-2">
+                    <div class="post-card fade-up">
+                        <div class="post-thumb t1">⚡</div>
+                        <div class="post-body">
+                            <div class="feat-cat">Technology</div>
+                            <h3>Edge Computing in 2026: The Distributed Future</h3>
+                            <p>Why processing data closer to users changes everything.</p>
+                            <div class="feat-meta"><span>Feb 12</span><span class="dot"></span><span>6 min</span></div>
+                        </div>
+                    </div>
+                    <div class="post-card fade-up">
+                        <div class="post-thumb t2">🌱</div>
+                        <div class="post-body">
+                            <div class="feat-cat">Startup</div>
+                            <h3>Building in Public: Lessons from 100 Days</h3>
+                            <p>What I learned sharing every step of my startup journey online.</p>
+                            <div class="feat-meta"><span>Feb 10</span><span class="dot"></span><span>4 min</span></div>
+                        </div>
+                    </div>
+                    <div class="post-card fade-up">
+                        <div class="post-thumb t3">💡</div>
+                        <div class="post-body">
+                            <div class="feat-cat">Design</div>
+                            <h3>The Psychology of Color in Product Design</h3>
+                            <p>How subtle color choices drive user behavior and emotion.</p>
+                            <div class="feat-meta"><span>Feb 8</span><span class="dot"></span><span>7 min</span></div>
+                        </div>
+                    </div>
+                    <div class="post-card fade-up">
+                        <div class="post-thumb t4">🔮</div>
+                        <div class="post-body">
+                            <div class="feat-cat">AI & ML</div>
+                            <h3>Prompt Engineering Is Dead, Long Live AI Agents</h3>
+                            <p>Why the future belongs to autonomous AI, not clever prompts.</p>
+                            <div class="feat-meta"><span>Feb 5</span><span class="dot"></span><span>5 min</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <aside class="sidebar" id="topics">
+                <h3>Popular Topics</h3>
+                <div class="sidebar-tags">
+                    <span>React</span><span>AI</span><span>Design
+                        Systems</span><span>DevOps</span><span>TypeScript</span><span>SaaS</span><span>Remote
+                        Work</span><span>Web3</span>
+                </div>
+                <h3>Most Read</h3>
+                <ol class="popular">
+                    <li>Why Every Developer Should Learn Rust in 2026</li>
+                    <li>The Complete Guide to System Design Interviews</li>
+                    <li>10 JavaScript Patterns You Should Know</li>
+                    <li>Building Micro-SaaS: From Idea to $10K MRR</li>
+                    <li>The Art of Writing Clean Code</li>
+                </ol>
+            </aside>
+        </div>
+    </div>
+
+    <div class="container" id="newsletter">
+        <section class="newsletter">
+            <h2>Stay in the Loop</h2>
+            <p>Get the best articles delivered to your inbox every week. No spam.</p>
+            <form class="nl-form" onsubmit="event.preventDefault();alert('Subscribed! (Demo)')">
+                <input type="email" placeholder="you@example.com" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 InkWell · Built with <a href="javascript:void(0)">Velocity AI</a></p>
+        </div>
+    </footer>
+    <script>
+        // Animations removed for mobile rendering
+        document.querySelectorAll('.cat-pill').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }));
+    </script>
+</body>
+
+</html>

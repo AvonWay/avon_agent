@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Velocity AI Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#3b82f6', background: '#0f172a', surface: '#1e293b' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: theme('colors.background');
+            color: #f8fafc;
+        }
+
+        .built-with {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden pt-8">
+    <div class="built-with">⚡ Built with <a href="javascript:void(0)" class="underline">Velocity AI</a> in under 60
+        seconds</div>
+
+    <aside class="w-64 bg-surface border-r border-slate-800 hidden md:flex flex-col">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="text-xl font-bold tracking-tight">Nexus<span class="text-primary">Admin</span></h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
+                Overview
+            </a>
+            <a href="#"
+                class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                Users
+            </a>
+            <a href="#"
+                class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+                Analytics
+            </a>
+            <a href="#"
+                class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                </svg>
+                Settings
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pravatar.cc/100?img=33" alt="Jane Doe Avatar"
+                    class="w-10 h-10 rounded-full border border-slate-600">
+                <div>
+                    <div class="text-sm font-medium">Jane Doe</div>
+                    <div class="text-xs text-slate-500">Admin</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden bg-background">
+        <header
+            class="h-16 border-b border-slate-800 bg-surface/50 backdrop-blur flex items-center justify-between px-6">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-slate-400" aria-label="Open Mobile Menu" title="Open Mobile Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <div class="relative w-64">
+                    <svg class="w-4 h-4 absolute left-3 top-3 text-slate-500" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" placeholder="Search..."
+                        class="w-full bg-slate-800 border-none rounded-md py-2 pl-10 pr-4 text-sm text-slate-200 focus:ring-2 focus:ring-primary outline-none">
+                </div>
+            </div>
+            <button class="relative bg-slate-800 p-2 rounded-full text-slate-400 hover:text-white transition"
+                aria-label="Notifications" title="Notifications">
+                <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-surface rounded-full"></span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                    </path>
+                </svg>
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-auto p-6">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold">Dashboard Overview</h2>
+                <p class="text-slate-400 text-sm mt-1">Welcome back. Here's what's happening today.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-surface border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-slate-400 font-medium text-sm">Total Revenue</h3>
+                        <div class="p-2 bg-green-500/10 text-green-400 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold">$48,294</div>
+                    <div class="mt-2 text-sm text-green-400 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        +12.5% from last month
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-slate-400 font-medium text-sm">Active Users</h3>
+                        <div class="p-2 bg-blue-500/10 text-blue-400 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold">12,491</div>
+                    <div class="mt-2 text-sm text-blue-400 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        +5.2% from last week
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-slate-800 rounded-xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-slate-400 font-medium text-sm">Server Latency</h3>
+                        <div class="p-2 bg-purple-500/10 text-purple-400 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold">24ms</div>
+                    <div class="mt-2 text-sm text-slate-400 flex items-center gap-1">
+                        Normal operational conditions
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-slate-800 rounded-xl overflow-hidden">
+                <div class="p-5 border-b border-slate-800 flex justify-between items-center">
+                    <h3 class="font-bold">Recent Signups</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-slate-800/50 text-slate-400">
+                            <tr>
+                                <th class="px-6 py-3 font-medium">User</th>
+                                <th class="px-6 py-3 font-medium">Status</th>
+                                <th class="px-6 py-3 font-medium">Date</th>
+                                <th class="px-6 py-3 font-medium text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <tr>
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <img src="https://i.pravatar.cc/100?img=12" alt="Avatar of Alex Rivera"
+                                        class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <div class="font-medium">Alex Rivera</div>
+                                        <div class="text-slate-500 text-xs">alex@example.com</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span
+                                        class="px-2 py-1 bg-green-500/10 text-green-400 rounded-full text-xs border border-green-500/20">Active</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400">Just now</td>
+                                <td class="px-6 py-4 text-right"><button
+                                        class="text-primary hover:underline">View</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <img src="https://i.pravatar.cc/100?img=47" alt="Avatar of Sarah Jenkins"
+                                        class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <div class="font-medium">Sarah Jenkins</div>
+                                        <div class="text-slate-500 text-xs">sarah@domain.com</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span
+                                        class="px-2 py-1 bg-amber-500/10 text-amber-400 rounded-full text-xs border border-amber-500/20">Pending</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400">2 hours ago</td>
+                                <td class="px-6 py-4 text-right"><button
+                                        class="text-primary hover:underline">View</button></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <img src="https://i.pravatar.cc/100?img=68" alt="Avatar of Marcus Chen"
+                                        class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <div class="font-medium">Marcus Chen</div>
+                                        <div class="text-slate-500 text-xs">marcus@startup.io</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4"><span
+                                        class="px-2 py-1 bg-green-500/10 text-green-400 rounded-full text-xs border border-green-500/20">Active</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-400">5 hours ago</td>
+                                <td class="px-6 py-4 text-right"><button
+                                        class="text-primary hover:underline">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
