@@ -8,10 +8,10 @@ const fs_extra = require('fs-extra');
 const path = require('path');
 
 const app = express();
-const PORT = 4000;
-const JWT_SECRET = 'industrial_secret_key_2024';
+const PORT = process.env.PORT || 4000;
+const JWT_SECRET = process.env.JWT_SECRET || 'industrial_secret_key_2024'; // DO NOT use default in production!
 
-app.use(cors());
+app.use(cors({ origin: '*' })); // Note: For strictly prod, restrict this to 'https://avonway.github.io'
 app.use(bodyParser.json());
 
 // --- MOCK STORAGE ---
