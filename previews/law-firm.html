@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law Firm — Velocity AI Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .built-with {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            text-align: center; padding: 8px; font-size: 13px; font-weight: 600; color: white;
+        }
+    </style>
+</head>
+<body class="pt-8">
+    <div class="built-with">⚡ Built with <a href="javascript:void(0)" class="underline text-white">Velocity AI</a> in under 60 seconds</div>
+    
+    <nav class="sticky top-8 z-50 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-8">
+                    <span class="text-xl font-bold text-white">Law Firm<span class="text-amber-700">Hub</span></span>
+                    <div class="hidden md:flex gap-6">
+                        <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition">About</a>
+                        <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition">Services</a>
+                        <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition">Contact</a>
+                    </div>
+                </div>
+                <button class="bg-amber-700 hover:bg-opacity-90 text-white px-4 py-2 rounded-lg text-sm font-medium transition" aria-label="Get Started" title="Get Started">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative overflow-hidden bg-slate-900 border-b border-slate-800">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/90 to-transparent"></div>
+            <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1920" alt="Law Firm Hero Background" class="w-full h-full object-cover opacity-60">
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-32 lg:py-48 text-center md:text-left">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6">Welcome to<br><span class="text-amber-700">Law Firm</span> Excellence</h1>
+            <p class="text-xl text-slate-300 mb-10 max-w-2xl">Legal excellence and representation. We build the future using state-of-the-art infrastructure. Transform your workflow today.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <button class="bg-amber-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-opacity-90 transition transform hover:-translate-y-1" aria-label="Explore Now" title="Explore Now">Explore Now</button>
+                <button class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-lg shadow border border-slate-700 transition" aria-label="Learn More" title="Learn More">Learn More</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold mb-4">Core Offerings</h2>
+            <p class="text-slate-400 max-w-2xl mx-auto">Discover how our specialized solutions can accelerate your growth.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 hover:border-amber-700 transition duration-300 cursor-pointer group">
+                <div class="w-14 h-14 bg-amber-700/20 rounded-xl flex items-center justify-center mb-6 text-amber-700">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold mb-3 group-hover:text-amber-700 transition">Performance</h3>
+                <p class="text-slate-400 leading-relaxed">Lightning-fast delivery optimized for modern standards and seamless scalability.</p>
+            </div>
+            <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 hover:border-amber-700 transition duration-300 cursor-pointer group">
+                <div class="w-14 h-14 bg-amber-700/20 rounded-xl flex items-center justify-center mb-6 text-amber-700">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold mb-3 group-hover:text-amber-700 transition">Security</h3>
+                <p class="text-slate-400 leading-relaxed">Enterprise-grade protection with encrypted transactions and secure data compliance.</p>
+            </div>
+            <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 hover:border-amber-700 transition duration-300 cursor-pointer group">
+                <div class="w-14 h-14 bg-amber-700/20 rounded-xl flex items-center justify-center mb-6 text-amber-700">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold mb-3 group-hover:text-amber-700 transition">Analytics</h3>
+                <p class="text-slate-400 leading-relaxed">Deep insights into user behavior with rich dashboards and reporting tools.</p>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="border-t border-slate-800 py-12 text-center text-slate-500 bg-slate-900">
+        <p>&copy; 2026 Law FirmHub. Powered by Velocity AI.</p>
+    </footer>
+</body>
+</html>

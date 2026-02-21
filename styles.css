@@ -118,6 +118,111 @@ header {
     color: var(--fg);
 }
 
+/* ---- Dropdown Navigation ---- */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--fg-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.dropbtn:hover {
+    color: var(--primary);
+}
+
+.dropdown-icon {
+    transition: transform 0.2s;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 40px;
+    left: -200px;
+    background-color: var(--bg);
+    min-width: 650px;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    z-index: 200;
+}
+
+/* Display on hover for desktop */
+@media (min-width: 769px) {
+    .dropdown:hover .dropdown-content {
+        display: block;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .dropdown:hover .dropdown-icon {
+        transform: rotate(180deg);
+    }
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.dropdown-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dropdown-heading {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
+
+.dropdown-col a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.dropdown-col a:hover {
+    color: var(--primary);
+    transform: translateX(2px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .header-actions {
     display: flex;
     gap: 8px;
@@ -1148,6 +1253,19 @@ footer {
     .nav-links,
     .header-actions {
         display: none;
+    }
+
+    .nav-links.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: var(--bg);
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid var(--border);
     }
 
     .mobile-menu-btn {

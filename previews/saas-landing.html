@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acme CRM — SaaS Landing Page Blueprint</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --card: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --fg: #f1f5f9;
+            --muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --green: #10b981;
+            --blue: #3b82f6;
+            --purple: #a855f7;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Banner */
+        .built-with {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: linear-gradient(135deg, var(--primary), #a855f7);
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .built-with a {
+            color: white;
+            text-decoration: underline;
+            margin-left: 4px;
+        }
+
+        /* Nav */
+        nav {
+            position: sticky;
+            top: 36px;
+            z-index: 100;
+            padding: 16px 0;
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            background: rgba(10, 10, 15, 0.8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--fg);
+        }
+
+        .nav-cta {
+            padding: 8px 20px;
+            border-radius: 8px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-cta:hover {
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 120px 0 80px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            background: var(--primary-glow);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 6vw, 72px);
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 1.05;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--purple), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 540px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero {
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-hero.primary {
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: white;
+            box-shadow: 0 4px 24px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-hero.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.45);
+        }
+
+        .btn-hero.secondary {
+            background: var(--card);
+            color: var(--fg);
+            border: 1px solid var(--border);
+        }
+
+        .btn-hero.secondary:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            padding: 40px 0 60px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .color-primary {
+            color: var(--primary);
+        }
+
+        .color-green {
+            color: var(--green);
+        }
+
+        .color-purple {
+            color: var(--purple);
+        }
+
+        .color-blue {
+            color: var(--blue);
+        }
+
+        .stat-val {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* Features */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: var(--primary-glow);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .section h2 {
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 12px;
+        }
+
+        .section>p {
+            color: var(--muted);
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .feat-card {
+            padding: 28px;
+            border-radius: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .feat-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .feat-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .feat-card h3 {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .feat-card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* Pricing */
+        .pricing {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        .price-card {
+            padding: 32px;
+            border-radius: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .price-card.featured {
+            border-color: var(--primary);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.1);
+            transform: scale(1.03);
+        }
+
+        .pop-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 14px;
+            border-radius: 100px;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .price-card h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .price-amount {
+            font-size: 40px;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .price-period {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .price-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .price-list li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .price-list li::before {
+            content: '✓';
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .price-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--fg);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .price-card.featured .price-btn {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .price-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .test-card {
+            padding: 24px;
+            border-radius: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+        }
+
+        .test-stars {
+            color: #fbbf24;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .test-quote {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .test-author {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .test-role {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* CTA */
+        .cta {
+            text-align: center;
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%);
+            border-radius: 24px;
+            margin: 40px 0 80px;
+        }
+
+        .cta h2 {
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 8px;
+        }
+
+        .cta p {
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+
+            .features,
+            .pricing,
+            .testimonials {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                gap: 24px;
+                flex-wrap: wrap;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .price-card.featured {
+                transform: none;
+            }
+        }
+
+        /* Animations Removed for Mobile Compatibility */
+        .fade-up {
+            opacity: 1;
+            transform: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="built-with">⚡ Built with <a href="javascript:void(0)" rel="noopener">Velocity AI</a>
+        in under 60 seconds</div>
+
+    <nav>
+        <div class="container nav-inner">
+            <div class="brand">Acme<span>CRM</span></div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#testimonials">Testimonials</a>
+                <button class="nav-cta">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">🚀 Now in Public Beta</div>
+            <h1>Manage Customers<br><span>10x Faster</span></h1>
+            <p>The all-in-one CRM platform for modern sales teams. Close deals, track leads, and scale your business
+                without the friction.</p>
+            <div class="hero-btns">
+                <button class="btn-hero primary">Start Free Trial →</button>
+                <button class="btn-hero secondary">▶ Watch Demo</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="stats fade-up">
+            <div class="stat">
+                <div class="stat-val color-primary">10K+</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val color-green">99.9%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val color-purple">50M+</div>
+                <div class="stat-label">API Calls/Day</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val color-blue">4.9★</div>
+                <div class="stat-label">Rating</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section" id="features">
+        <div class="container">
+            <span class="section-tag">Features</span>
+            <h2>Everything You Need</h2>
+            <p>Powerful tools designed for modern development teams.</p>
+            <div class="features">
+                <div class="feat-card fade-up">
+                    <div class="feat-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Sub-millisecond response times with edge computing and global CDN distribution.</p>
+                </div>
+                <div class="feat-card fade-up">
+                    <div class="feat-icon">🔒</div>
+                    <h3>Enterprise Security</h3>
+                    <p>SOC2 compliant with end-to-end encryption, SSO, and role-based access controls.</p>
+                </div>
+                <div class="feat-card fade-up">
+                    <div class="feat-icon">📊</div>
+                    <h3>Real-Time Analytics</h3>
+                    <p>Track every metric that matters with customizable dashboards and alerts.</p>
+                </div>
+                <div class="feat-card fade-up">
+                    <div class="feat-icon">🔌</div>
+                    <h3>100+ Integrations</h3>
+                    <p>Connect with Slack, GitHub, Jira, Stripe, and all your favorite tools.</p>
+                </div>
+                <div class="feat-card fade-up">
+                    <div class="feat-icon">🤖</div>
+                    <h3>AI-Powered</h3>
+                    <p>Smart suggestions, automated workflows, and predictive analytics built-in.</p>
+                </div>
+                <div class="feat-card fade-up">
+                    <div class="feat-icon">🌍</div>
+                    <h3>Global Scale</h3>
+                    <p>Deploy to 40+ regions worldwide with automatic failover and load balancing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="pricing">
+        <div class="container">
+            <span class="section-tag">Pricing</span>
+            <h2>Simple, Transparent Pricing</h2>
+            <p>No hidden fees. Cancel anytime.</p>
+            <div class="pricing">
+                <div class="price-card fade-up">
+                    <h3>Starter</h3>
+                    <div><span class="price-amount">$0</span><span class="price-period"> / month</span></div>
+                    <ul class="price-list">
+                        <li>Up to 3 projects</li>
+                        <li>1,000 API calls/day</li>
+                        <li>Community support</li>
+                        <li>Basic analytics</li>
+                    </ul>
+                    <button class="price-btn">Get Started Free</button>
+                </div>
+                <div class="price-card featured fade-up">
+                    <div class="pop-badge">Most Popular</div>
+                    <h3>Pro</h3>
+                    <div><span class="price-amount">$49</span><span class="price-period"> / month</span></div>
+                    <ul class="price-list">
+                        <li>Unlimited projects</li>
+                        <li>100K API calls/day</li>
+                        <li>Priority support</li>
+                        <li>Advanced analytics</li>
+                        <li>Custom domains</li>
+                        <li>Team collaboration</li>
+                    </ul>
+                    <button class="price-btn">Start Free Trial</button>
+                </div>
+                <div class="price-card fade-up">
+                    <h3>Enterprise</h3>
+                    <div><span class="price-amount">Custom</span></div>
+                    <ul class="price-list">
+                        <li>Everything in Pro</li>
+                        <li>Unlimited API calls</li>
+                        <li>Dedicated support</li>
+                        <li>SLA guarantee</li>
+                        <li>Custom integrations</li>
+                        <li>On-premise option</li>
+                    </ul>
+                    <button class="price-btn">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="testimonials">
+        <div class="container">
+            <span class="section-tag">Testimonials</span>
+            <h2>Loved by Teams</h2>
+            <p>See what developers and founders are saying.</p>
+            <div class="testimonials">
+                <div class="test-card fade-up">
+                    <div class="test-stars">★★★★★</div>
+                    <p class="test-quote">"LaunchPad cut our deployment time from hours to minutes. The developer
+                        experience is incredible."</p>
+                    <div class="test-author">Sarah Chen</div>
+                    <div class="test-role">CTO, TechFlow</div>
+                </div>
+                <div class="test-card fade-up">
+                    <div class="test-stars">★★★★★</div>
+                    <p class="test-quote">"We migrated our entire infrastructure in a weekend. The integrations just
+                        work out of the box."</p>
+                    <div class="test-author">Marcus Rivera</div>
+                    <div class="test-role">Lead Engineer, DataPulse</div>
+                </div>
+                <div class="test-card fade-up">
+                    <div class="test-stars">★★★★★</div>
+                    <p class="test-quote">"The analytics alone are worth the price. We've increased conversion by 40%
+                        using the insights."</p>
+                    <div class="test-author">Emily Park</div>
+                    <div class="test-role">Founder, GrowthLab</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <section class="cta">
+            <h2>Ready to Scale Your Sales?</h2>
+            <p>Join 10,000+ teams already building with Acme CRM.</p>
+            <button class="btn-hero primary">Start Trial Free →</button>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Acme CRM · Built with <a href="javascript:void(0)">Velocity AI</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Animations removed to fix mobile rendering bugs
+    </script>
+</body>
+
+</html>

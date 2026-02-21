@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storefront Pro — Velocity AI Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: '#6366f1',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .built-with {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .built-with a {
+            text-decoration: underline;
+            margin-left: 4px;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="pt-8">
+    <div class="built-with">⚡ Built with <a href="javascript:void(0)">Velocity AI</a> in under 60 seconds</div>
+
+    <nav class="sticky top-8 z-50 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-8">
+                    <span class="text-xl font-bold tracking-tighter text-white">Lumina<span
+                            class="text-primary">Store</span></span>
+                    <div class="hidden md:flex gap-6">
+                        <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition">Men</a>
+                        <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition">Women</a>
+                        <a href="#"
+                            class="text-sm font-medium text-slate-300 hover:text-white transition">Accessories</a>
+                        <a href="#" class="text-sm font-medium text-slate-300 hover:text-white transition">New
+                            Arrivals</a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="text-slate-300 hover:text-white transition" aria-label="Search" title="Search">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                    <button class="relative text-slate-300 hover:text-white transition" aria-label="Cart"
+                        title="Shopping Cart">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                        <span
+                            class="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">3</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative overflow-hidden bg-slate-900 border-b border-slate-800">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/90 to-transparent"></div>
+            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1920"
+                alt="Background showcasing lifestyle products" class="w-full h-full object-cover">
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-24 lg:py-48">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6">Redefine Your <br> <span
+                    class="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">Digital
+                    Lifestyle</span></h1>
+            <p class="text-lg text-slate-300 mb-8 max-w-md">Discover curated premium collections designed for the modern
+                individual. Elevate your aesthetic.</p>
+            <button
+                class="bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-8 rounded-lg shadow-lg shadow-primary/20 transition transform hover:-translate-y-1">Shop
+                Collection</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl font-bold">Trending Now</h2>
+            <a href="#" class="text-primary hover:text-white transition text-sm font-medium">View All →</a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Product 1 -->
+            <div class="group cursor-pointer">
+                <div class="relative bg-slate-800 rounded-2xl overflow-hidden aspect-[4/5] mb-4">
+                    <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=500"
+                        alt="Premium Wireless ANC Headphones"
+                        class="object-cover w-full h-full group-hover:scale-105 transition duration-500">
+                    <div
+                        class="absolute top-4 right-4 bg-white/10 backdrop-blur rounded-full p-2 text-white hover:bg-white/20 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-medium text-slate-100 group-hover:text-primary transition">Premium Wireless ANC
+                        </h3>
+                        <p class="text-sm text-slate-400 mt-1">Audio</p>
+                    </div>
+                    <span class="font-bold border border-slate-700 bg-slate-800/50 px-2 rounded">$299</span>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="group cursor-pointer">
+                <div class="relative bg-slate-800 rounded-2xl overflow-hidden aspect-[4/5] mb-4">
+                    <div class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-2 py-1 rounded">NEW
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=500"
+                        alt="Smart Watch Series"
+                        class="object-cover w-full h-full group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-medium text-slate-100 group-hover:text-primary transition">Smart Watch Series X
+                        </h3>
+                        <p class="text-sm text-slate-400 mt-1">Wearables</p>
+                    </div>
+                    <span class="font-bold border border-slate-700 bg-slate-800/50 px-2 rounded">$399</span>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="group cursor-pointer">
+                <div class="relative bg-slate-800 rounded-2xl overflow-hidden aspect-[4/5] mb-4">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=500"
+                        alt="Air Retro Kicks Shoes"
+                        class="object-cover w-full h-full group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-medium text-slate-100 group-hover:text-primary transition">Air Retro Kicks</h3>
+                        <p class="text-sm text-slate-400 mt-1">Footwear</p>
+                    </div>
+                    <span class="font-bold border border-slate-700 bg-slate-800/50 px-2 rounded">$150</span>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="group cursor-pointer">
+                <div class="relative bg-slate-800 rounded-2xl overflow-hidden aspect-[4/5] mb-4">
+                    <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">20% OFF
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1584916201218-f4242ceb4809?auto=format&fit=crop&q=80&w=500"
+                        alt="Minimalist Backpack"
+                        class="object-cover w-full h-full group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-medium text-slate-100 group-hover:text-primary transition">Minimalist Backpack
+                        </h3>
+                        <p class="text-sm text-slate-400 mt-1">Accessories</p>
+                    </div>
+                    <span class="font-bold border border-slate-700 bg-slate-800/50 px-2 rounded">
+                        <span class="line-through text-slate-500 text-xs mr-1">$120</span>$96
+                    </span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-slate-500 mt-12 text-sm bg-slate-900">
+        <p>&copy; 2026 LuminaStore. Powered by Velocity AI.</p>
+    </footer>
+</body>
+
+</html>

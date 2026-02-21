@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Custom AI Build</title>
+</head>
+
+<body>
+    <style>
+        #loader {
+            font-family: sans-serif;
+            text-align: center;
+            margin-top: 20vh;
+        }
+    </style>
+    <div id="loader">
+        <h2>Loading your Custom AI Build...</h2>
+        <p>If you see this, the code hasn't rendered yet.</p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const html = localStorage.getItem('custom_build_html');
+            if (html) {
+                document.open();
+                document.write(html);
+                document.close();
+            } else {
+                document.getElementById('loader').innerHTML = `
+                    <h2 style="color: #ef4444;">No Custom Build Found</h2>
+                    <p>Tell the AI to build something first, or ensure your local Ollama generated the code correctly.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Velocity — AI-Powered Site Builder</title>
     <meta name="description"
-        content="Build production websites with swarm intelligence. Start free with 3 blueprints and enough tokens for your first build.">
+        content="Build production websites with swarm intelligence. Start free with all 20+ blueprints and enough tokens for your first build.">
     <meta property="og:title" content="Velocity — AI-Powered Site Builder">
     <meta property="og:description" content="Build production websites with swarm intelligence. Start free.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://avonway.github.io/avon_agent/">
+    <meta property="og:url" content="https://velocity.sites/">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
@@ -29,8 +29,52 @@
             <nav class="nav-links" id="main-nav">
                 <a href="#features">Features</a>
                 <a href="#pricing">Pricing</a>
+                <div class="dropdown" id="blueprints-dropdown">
+                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false" onclick="toggleDropdown()">
+                        Blueprints
+                        <svg class="dropdown-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="dropdown-content" id="blueprint-links">
+                        <div class="dropdown-grid">
+                            <div class="dropdown-col">
+                                <span class="dropdown-heading">Business</span>
+                                <a href="previews/saas-landing.html">SaaS Landing</a>
+                                <a href="previews/admin-dashboard.html">Admin Dashboard</a>
+                                <a href="previews/consulting.html">Consulting Hub</a>
+                                <a href="previews/agency.html">Agency Hub</a>
+                                <a href="previews/law-firm.html">Law Firm Hub</a>
+                            </div>
+                            <div class="dropdown-col">
+                                <span class="dropdown-heading">Commerce & Tech</span>
+                                <a href="previews/storefront-pro.html">Storefront Pro</a>
+                                <a href="previews/crypto.html">Crypto Hub</a>
+                                <a href="previews/fintech.html">Fintech Hub</a>
+                                <a href="previews/real-estate.html">Real Estate Hub</a>
+                                <a href="previews/healthcare.html">Healthcare Hub</a>
+                            </div>
+                            <div class="dropdown-col">
+                                <span class="dropdown-heading">Creative & Lifestyle</span>
+                                <a href="previews/portfolio.html">Portfolio</a>
+                                <a href="previews/restaurant.html">Restaurant</a>
+                                <a href="previews/photography.html">Photography Hub</a>
+                                <a href="previews/music.html">Music Hub</a>
+                                <a href="previews/travel.html">Travel Hub</a>
+                            </div>
+                            <div class="dropdown-col">
+                                <span class="dropdown-heading">Community & Content</span>
+                                <a href="previews/blog.html">Blog</a>
+                                <a href="previews/education.html">Education Hub</a>
+                                <a href="previews/event.html">Event Hub</a>
+                                <a href="previews/fitness.html">Fitness Hub</a>
+                                <a href="previews/nonprofit.html">Nonprofit Hub</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <a href="#architecture">Architecture</a>
-                <a href="https://github.com/AvonWay/avon_agent" target="_blank" rel="noopener">GitHub</a>
             </nav>
             <div class="header-actions">
                 <button class="btn-ghost" id="login-btn" onclick="openModal('login')">Log In</button>
@@ -51,7 +95,7 @@
             </div>
             <h1>Build Websites with<br><span class="gradient-text">Swarm Intelligence</span></h1>
             <p class="hero-desc">Velocity uses multi-agent AI to generate, deploy, and scale production sites. Start
-                with 3 free blueprints and enough tokens for your first build.</p>
+                with all 20+ blueprints and enough tokens for your first build.</p>
             <div class="hero-actions">
                 <button class="btn-primary" id="hero-cta" onclick="openModal('signup')">
                     Start Building Free
@@ -94,9 +138,10 @@
                 <div class="feature-card" id="feat-blueprints">
                     <div class="feature-icon icon-blue">🏗️</div>
                     <h3>20+ Premium Blueprints</h3>
-                    <p>Pre-built, production-ready templates for SaaS, e-commerce, portfolios, dashboards, and more. 3
+                    <p>Pre-built, production-ready templates for SaaS, e-commerce, portfolios, dashboards, and more. All
+                        20+
                         included free.</p>
-                    <span class="feature-tag tag-free">3 Free</span>
+                    <span class="feature-tag tag-free">All 20+ Free</span>
                 </div>
                 <div class="feature-card" id="feat-swarm">
                     <div class="feature-icon icon-purple">🐝</div>
@@ -156,7 +201,7 @@
                         <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="3">
                                 <path d="M20 6L9 17l-5-5" />
-                            </svg>3 Premium Blueprints</li>
+                            </svg>All 20+ Blueprints</li>
                         <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="3">
                                 <path d="M20 6L9 17l-5-5" />
@@ -318,7 +363,7 @@
     <section class="cta-section" id="cta">
         <div class="container">
             <h2>Ready to Build Your First Site?</h2>
-            <p>Start free with 3 blueprints and 500 tokens. No credit card required.</p>
+            <p>Start free with all 20+ blueprints and 500 tokens. No credit card required.</p>
             <div class="hero-actions">
                 <button class="btn-primary" id="cta-signup" onclick="openModal('signup')">Create Free Account</button>
                 <button class="btn-secondary" id="cta-chat" onclick="openChat()">Chat with Velocity AI</button>
@@ -341,12 +386,11 @@
                         href="#architecture">Architecture</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Resources</h4><a href="https://github.com/AvonWay/avon_agent" target="_blank"
-                        rel="noopener">GitHub</a><a href="https://github.com/AvonWay/avon_agent#readme" target="_blank"
-                        rel="noopener">Docs</a>
+                    <h4>Resources</h4><a href="previews/portfolio.html">GitHub</a><a
+                        href="previews/portfolio.html">Docs</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Company</h4><a href="https://github.com/AvonWay" target="_blank" rel="noopener">AvonWay</a>
+                    <h4>Company</h4><a href="previews/portfolio.html">AvonWay</a>
                 </div>
             </div>
         </div>
@@ -386,7 +430,7 @@
                         <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
                         <path d="M12 16v-4M12 8h.01" />
                     </svg>
-                    <span>3-day free trial · 3 blueprints · 500 tokens · No credit card</span>
+                    <span>3-day free trial · All 20+ blueprints · 500 tokens · No credit card</span>
                 </div>
             </form>
             <div class="modal-footer">
@@ -436,7 +480,7 @@
         </form>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app_v2.js"></script>
 </body>
 
 </html>
