@@ -58,6 +58,7 @@
             top: 0;
             z-index: 50;
             background: rgba(5, 5, 16, 0.85);
+            -webkit-backdrop-filter: blur(20px);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
             padding: 0 2rem;
@@ -370,6 +371,18 @@
             font-size: 1rem;
         }
 
+        .agent-avatar.architect {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .agent-avatar.builder {
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .agent-avatar.guardian {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
         .agent-name {
             font-weight: 600;
             font-size: 0.85rem;
@@ -602,6 +615,13 @@
                 </svg>
                 About
             </a>
+            <a href="http://localhost:3000" target="_blank" rel="noopener" class="action-btn primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                </svg>
+                Open IDE
+            </a>
         </div>
 
         <!-- Metrics -->
@@ -639,7 +659,7 @@
                 <div class="panel-body">
                     <div class="agent-item">
                         <div class="agent-info">
-                            <div class="agent-avatar" style="background:rgba(99,102,241,0.1)">📐</div>
+                            <div class="agent-avatar architect">📐</div>
                             <div>
                                 <div class="agent-name">Architect</div>
                                 <div class="agent-role">Layout & Structure Planning</div>
@@ -649,7 +669,7 @@
                     </div>
                     <div class="agent-item">
                         <div class="agent-info">
-                            <div class="agent-avatar" style="background:rgba(34,197,94,0.1)">🔨</div>
+                            <div class="agent-avatar builder">🔨</div>
                             <div>
                                 <div class="agent-name">Builder</div>
                                 <div class="agent-role">Code Generation & Styling</div>
@@ -659,7 +679,7 @@
                     </div>
                     <div class="agent-item">
                         <div class="agent-info">
-                            <div class="agent-avatar" style="background:rgba(245,158,11,0.1)">🛡️</div>
+                            <div class="agent-avatar guardian">🛡️</div>
                             <div>
                                 <div class="agent-name">Guardian</div>
                                 <div class="agent-role">Quality Assurance & Validation</div>
