@@ -14,7 +14,11 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const JWT_SECRET = process.env.JWT_SECRET || 'industrial_secret_key_2024';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error('❌ FATAL: JWT_SECRET environment variable is required. Set it in your .env file.');
+    process.exit(1);
+}
 
 // --- Supabase (Service Role for server-side trust) ---
 // DS-002: Use SUPABASE_SERVICE_ROLE_KEY — never the anon key — for all server→Supabase calls.

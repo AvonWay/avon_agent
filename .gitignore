@@ -1,16 +1,47 @@
-node_modules/
-.next/
-dist/
+# ── Environment Variables (CRITICAL — never commit) ──────────
 .env
 .env.local
+.env.*.local
 .env*.local
 !.env.example
-.DS_Store
+avon-backend/.env
+avon-dashboard/.env.local
+
+# ── Dependency Directories ───────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ── Build Output ─────────────────────────────────────────────
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# ── Debug & Logs ─────────────────────────────────────────────
+debug.txt
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.idea/
+
+# ── OS Files ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE & Editor ─────────────────────────────────────────────
 .vscode/
-build/
-out/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Telemetry & Memory (may contain sensitive runtime data) ──
+memory/
+ollama_list.txt
+qr_code_output.txt
+
+# ── WhatsApp Web JS (browser session — contains secrets) ─────
+.wwebjs_auth/
+.wwebjs_cache/
