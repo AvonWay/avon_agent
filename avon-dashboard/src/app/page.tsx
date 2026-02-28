@@ -14,6 +14,19 @@ import {
 } from 'lucide-react';
 import ProfileSettings from '@/components/ProfileSettings';
 import TopNav from '@/components/TopNav';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const getLanguage = (filename: string) => {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    if (ext === 'js' || ext === 'jsx') return 'javascript';
+    if (ext === 'ts' || ext === 'tsx') return 'typescript';
+    if (ext === 'html') return 'html';
+    if (ext === 'css') return 'css';
+    if (ext === 'json') return 'json';
+    if (ext === 'md') return 'markdown';
+    return 'text';
+};
 
 const TerminalComponent = ({ lines, onCommand, height, onClose, problems = [], onFixProblem }: any) => {
     const [input, setInput] = useState('');
@@ -186,6 +199,9 @@ export default function VelocityIDE() {
     const [isSwarmMode, setIsSwarmMode] = useState(true);
     const [explorerMode, setExplorerMode] = useState<'nodes' | 'files'>('nodes');
     const [workspaceFiles, setWorkspaceFiles] = useState<any[]>([]);
+    const [fileContents, setFileContents] = useState<Record<string, string>>({});
+    const [editedContents, setEditedContents] = useState<Record<string, string>>({});
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => { initIDE(); }, []);
 
@@ -328,6 +344,7 @@ export default function VelocityIDE() {
                     if (authToken) {
                         const sites = await fetchSites(authToken);
                         setWebsites(sites);
+                        loadFiles(authToken); // Refresh file list after build
                     }
                     printTerminal(`Build Complete: ${prompt}`);
                 }, 4000);
@@ -352,12 +369,53 @@ export default function VelocityIDE() {
         }
     };
 
-    const handleOpenTab = (id: string, title: string, type: 'page' | 'preview') => {
+    const handleOpenTab = async (id: string, title: string, type: 'page' | 'preview' | 'file') => {
         if (!openTabs.find(t => t.id === id)) {
             setOpenTabs([...openTabs, { id, title, type }]);
         }
         setActiveTab(id);
+
+        if (type === 'file' && authToken && !fileContents[id]) {
+            try {
+                const res = await readFile(authToken, id);
+                setFileContents(prev => ({ ...prev, [id]: res.content || '' }));
+                setEditedContents(prev => ({ ...prev, [id]: res.content || '' }));
+            } catch (e) {
+                console.error("Failed to read file", e);
+                setFileContents(prev => ({ ...prev, [id]: `Error: Could not read file ${id}` }));
+            }
+        }
     };
+
+    const handleSave = async () => {
+        if (!authToken || !activeTab || !editedContents[activeTab]) return;
+        const type = openTabs.find(t => t.id === activeTab)?.type;
+        if (type !== 'file') return;
+
+        setIsSaving(true);
+        try {
+            await writeFile(authToken, activeTab, editedContents[activeTab]);
+            setFileContents(prev => ({ ...prev, [activeTab]: editedContents[activeTab] }));
+            printTerminal(`💾 Saved: ${activeTab}`);
+        } catch (e) {
+            console.error("Save Error", e);
+            printTerminal(`❌ Save Failed: ${activeTab}`);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeys = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                handleSave();
+            }
+        };
+        window.addEventListener('keydown', handleKeys);
+        return () => window.removeEventListener('keydown', handleKeys);
+    }, [authToken, activeTab, editedContents]);
 
     return (
         <div className="flex h-screen w-screen bg-[var(--ide-bg)] text-[var(--ide-fg)] overflow-hidden font-sans">
@@ -409,7 +467,9 @@ export default function VelocityIDE() {
                                 workspaceFiles.map(file => (
                                     <div
                                         key={file.path}
-                                        className="flex items-center gap-2 px-2 py-1 cursor-pointer hover:bg-[var(--ide-hover)] rounded text-xs text-gray-600 select-none group"
+                                        onClick={() => !file.isDirectory && handleOpenTab(file.path, file.name, 'file')}
+                                        className={`flex items-center gap-2 px-2 py-1 cursor-pointer rounded text-xs select-none group transition-colors
+                                        ${activeTab === file.path ? 'bg-[var(--ide-selection)] text-[var(--ide-selection-text)] font-medium' : 'hover:bg-[var(--ide-hover)] text-gray-600'}`}
                                     >
                                         {file.isDirectory ? <Folder size={14} className="text-blue-400" /> : <File size={14} className="text-gray-400" />}
                                         <span className="truncate">{file.name}</span>
@@ -452,6 +512,9 @@ export default function VelocityIDE() {
                                     : 'bg-gray-100 text-gray-500 border-transparent hover:bg-gray-200'}`}
                         >
                             <span className="truncate flex-1">{tab.title}</span>
+                            {tab.type === 'file' && editedContents[tab.id] !== fileContents[tab.id] && (
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" title="Unsaved changes" />
+                            )}
                             <X size={14} className="opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-500 rounded p-0.5 transition-all" onClick={(e) => {
                                 e.stopPropagation();
                                 const newTabs = openTabs.filter(t => t.id !== tab.id);
@@ -515,6 +578,77 @@ export default function VelocityIDE() {
                                 className="w-full h-full border-none bg-white"
                                 title="Preview"
                             />
+                        </div>
+                    )}
+
+                    {openTabs.find(t => t.id === activeTab)?.type === 'file' && (
+                        <div className="flex-1 flex flex-col relative h-full overflow-hidden bg-white text-gray-800 font-mono text-xs">
+                            {/* Editor Toolbar */}
+                            <div className="h-8 px-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
+                                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{activeTab}</div>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving || editedContents[activeTab] === fileContents[activeTab]}
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-bold transition-all
+                                    ${editedContents[activeTab] !== fileContents[activeTab]
+                                            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                                >
+                                    <RefreshCw size={10} className={isSaving ? 'animate-spin' : ''} />
+                                    {isSaving ? 'SAVING...' : 'SAVE'}
+                                </button>
+                            </div>
+
+                            <div className="flex-1 relative h-full overflow-hidden">
+                                {/* Invisible Textarea for Editing */}
+                                <textarea
+                                    id="code-editor"
+                                    title="Code Editor"
+                                    aria-label="Code Editor"
+                                    className="absolute inset-0 w-full h-full p-[24px] bg-transparent text-transparent caret-blue-600 outline-none resize-none z-20 font-mono"
+                                    style={{
+                                        fontSize: '13px',
+                                        lineHeight: '1.6',
+                                        whiteSpace: 'pre',
+                                        overflowWrap: 'normal',
+                                        tabSize: 4,
+                                    }}
+                                    value={editedContents[activeTab] || ''}
+                                    onChange={(e) => setEditedContents(prev => ({ ...prev, [activeTab]: e.target.value }))}
+                                    onScroll={(e: any) => {
+                                        const sync = document.getElementById('highlight-sync');
+                                        if (sync) {
+                                            sync.scrollTop = e.target.scrollTop;
+                                            sync.scrollLeft = e.target.scrollLeft;
+                                        }
+                                    }}
+                                    spellCheck={false}
+                                />
+                                {/* Syntax Highlighting for Display */}
+                                <div id="highlight-sync" className="absolute inset-0 z-10 pointer-events-none overflow-hidden h-full">
+                                    <SyntaxHighlighter
+                                        language={getLanguage(activeTab)}
+                                        style={oneLight}
+                                        customStyle={{
+                                            margin: 0,
+                                            padding: '24px',
+                                            fontSize: '13px',
+                                            lineHeight: '1.6',
+                                            background: 'white',
+                                            minHeight: '100%',
+                                            width: 'max-content',
+                                            minWidth: '100%',
+                                        }}
+                                        codeTagProps={{
+                                            style: {
+                                                fontFamily: 'inherit'
+                                            }
+                                        }}
+                                    >
+                                        {editedContents[activeTab] || ''}
+                                    </SyntaxHighlighter>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
