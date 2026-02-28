@@ -70,3 +70,11 @@ To build a scalable "Industrial AI" web development factory that standardizes th
 - **Phase 2**: Backend-First Implementation (Schema -> API -> UI).
 - **Phase 3**: Iterative Hardening (Security, Performance).
 - **Constraint**: NEVER build UI before Data Model is clear.
+
+## 8. 2026 COMPETITIVE STANDARDS (THE FIVE PILLARS)
+
+1. **Hybrid Orchestration**: Logic Router switches between local (boilreplate) and cloud (architecture) models.
+2. **Parallel Swarms**: Simultaneous specialized agents (Designer, Architect, Security) refine every build.
+3. **Project Constitution**: Absolute enforcement of architectural styles and tech stack via `.velocity_rules`.
+4. **Invisible DevOps**: Automated deployment adapters skip the manual config.
+5. **Self-Healing**: Automated build-check & repair loop before user delivery.

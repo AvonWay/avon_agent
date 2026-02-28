@@ -582,6 +582,49 @@
             transform: none;
         }
 
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            border-radius: 8px;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .action-btn.recording {
+            color: var(--error);
+            background: rgba(255, 71, 87, 0.1);
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
         .send-btn svg {
             width: 18px;
             height: 18px;
@@ -693,8 +736,27 @@
             <div class="input-area">
                 <div class="input-container">
                     <div class="input-box">
+                        <button class="action-btn" id="attachBtn"
+                            onclick="document.getElementById('file-input').click()" title="Attach Files">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+                        <input type="file" id="file-input" multiple class="hidden" onchange="handleFiles(this)"
+                            title="Attach file">
                         <textarea id="userInput" placeholder="Message Avon..." rows="1" onkeydown="handleKey(event)"
                             oninput="autoResize(this)"></textarea>
+                        <button class="action-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice Control">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"></path>
+                                <path d="M19 10v2a7 7 0 01-14 0v-2"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        </button>
                         <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send Message"
                             aria-label="Send Message">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -719,18 +781,20 @@
         let isStreaming = false;
         let chatHistories = JSON.parse(localStorage.getItem("avon_chats") || "[]");
         let currentChatId = null;
+        let attachedFiles = []; // Storage for base64 images and file context
 
-        // Check Ollama status
+        // Check Backend status
         async function checkStatus() {
             try {
-                const res = await fetch(`${OLLAMA_URL}/api/tags`);
+                const res = await fetch(`http://localhost:4000/api/health`);
                 if (res.ok) {
+                    const data = await res.json();
                     document.getElementById("statusDot").classList.add("online");
-                    document.getElementById("statusText").textContent = "Avon:latest · Online";
+                    document.getElementById("statusText").textContent = `Velocity API · ${data.provider}`;
                 }
             } catch {
                 document.getElementById("statusDot").classList.remove("online");
-                document.getElementById("statusText").textContent = "Ollama offline";
+                document.getElementById("statusText").textContent = "Backend offline";
             }
         }
 
@@ -784,6 +848,93 @@
                 .replace(/\n\n/g, '</p><p>')
                 // Single newlines
                 .replace(/\n/g, '<br>');
+        }
+
+        // File handling
+        async function handleFiles(input) {
+            if (input.files.length > 0) {
+                const filenames = Array.from(input.files).map(f => f.name).join(", ");
+                addMessage("user", `📎 Preparing: ${filenames}`);
+
+                for (const file of files = input.files) {
+                    if (file.type.startsWith('image/')) {
+                        const base64 = await toBase64(file);
+                        attachedFiles.push({ type: 'image', name: file.name, data: base64.split(',')[1] });
+                    } else {
+                        const text = await file.text();
+                        attachedFiles.push({ type: 'text', name: file.name, data: text });
+                    }
+                }
+
+                setTimeout(() => {
+                    addMessage("ai", `<strong>Analyzing ${input.files.length} file(s)...</strong><br>I've added the contents to my active memory. Ready for your instructions! 🚀`);
+                }, 1000);
+            }
+        }
+
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Voice recognition
+        let recognition = null;
+        let isRecording = false;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isRecording = true;
+                document.getElementById('voiceBtn').classList.add('recording');
+                document.getElementById('userInput').placeholder = "Listening to your instructions...";
+            };
+
+            recognition.onend = () => {
+                if (isRecording) {
+                    try { recognition.start(); } catch (e) { }
+                } else {
+                    document.getElementById('voiceBtn').classList.remove('recording');
+                    document.getElementById('userInput').placeholder = "Message Avon...";
+                }
+            };
+
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (finalTranscript) {
+                    document.getElementById('userInput').value = finalTranscript;
+                    setTimeout(() => {
+                        if (document.getElementById('userInput').value === finalTranscript) {
+                            sendMessage();
+                        }
+                    }, 1500);
+                }
+            };
+        }
+
+        function toggleVoice() {
+            if (!recognition) {
+                alert("Voice recognition not supported in this browser.");
+                return;
+            }
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
         }
 
         // Add message to UI
@@ -853,62 +1004,52 @@
         async function sendMessage() {
             const input = document.getElementById("userInput");
             const text = input.value.trim();
-            if (!text || isStreaming) return;
+            if (!text && attachedFiles.length === 0 || isStreaming) return;
 
             input.value = "";
             input.style.height = "auto";
             isStreaming = true;
             document.getElementById("sendBtn").disabled = true;
 
+            // Prepare context from attached files
+            const images = attachedFiles.filter(f => f.type === 'image').map(f => f.data);
+            const contexts = attachedFiles.filter(f => f.type === 'text').map(f => `[File: ${f.name}]\n${f.data}`).join('\n\n');
+
+            let displayMsg = text;
+            let apiPrompt = text;
+            if (contexts) {
+                apiPrompt = `Context from uploaded files:\n${contexts}\n\nUser request: ${text}`;
+            }
+            if (!text && attachedFiles.length > 0) displayMsg = "Analyzing uploaded assets...";
+
             // Add user message
-            addMessage("user", text);
-            messages.push({ role: "user", content: text });
+            addMessage("user", displayMsg);
+            messages.push({ role: "user", content: apiPrompt, images: images });
+
+            // Clear attachments
+            attachedFiles = [];
 
             // Show typing
             addTyping();
 
             try {
-                const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+                const res = await fetch("http://localhost:4000/api/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: MODEL,
-                        messages: [
-                            { role: "system", content: SYSTEM_PROMPT },
-                            ...messages
-                        ],
-                        stream: true
+                        messages: messages,
+                        system: SYSTEM_PROMPT
                     })
                 });
 
                 removeTyping();
+                const data = await res.json();
 
-                const msgEl = addMessage("assistant", "");
-                let fullResponse = "";
+                if (data.error) throw new Error(data.error);
 
-                const reader = res.body.getReader();
-                const decoder = new TextDecoder();
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split("\n").filter(l => l.trim());
-
-                    for (const line of lines) {
-                        try {
-                            const data = JSON.parse(line);
-                            if (data.message && data.message.content) {
-                                fullResponse += data.message.content;
-                                msgEl.innerHTML = renderMarkdown(fullResponse);
-
-                                const container = document.getElementById("messages");
-                                container.scrollTop = container.scrollHeight;
-                            }
-                        } catch { }
-                    }
-                }
+                const fullResponse = data.message.content;
+                const msgEl = addMessage("assistant", renderMarkdown(fullResponse));
 
                 messages.push({ role: "assistant", content: fullResponse });
 

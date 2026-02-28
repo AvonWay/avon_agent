@@ -100,7 +100,8 @@ async function startAgents() {
 Stack: ${template.stack.join(", ")}
 Required Files: ${template.structure.join(", ")}
 Placeholders: ${JSON.stringify(template.placeholders)}
-IMPORTANT: Generate ALL files listed above. Include mock data. Buttons must work. Cart/Filters must be functional.`;
+IMPORTANT: Generate ALL files listed above. Include mock data. Buttons must work. Cart/Filters must be functional.
+CRITICAL VIBE SYSTEM OVERRIDE: Generate a 'theme.css' file that overrides the Tailwind defaults. It must use the exact colors, mood, fonts, and dark/light modes requested in the user prompt. Import this theme into the main layout component.`;
     } else {
         console.log("\n⚡ No template match — entering generative mode...\n");
     }
@@ -117,7 +118,7 @@ IMPORTANT: Generate ALL files listed above. Include mock data. Buttons must work
             }
         ],
         attempts: [
-            { model: "Avon:latest", timeoutMs: 90_000 }
+            { model: "Avon:latest", timeoutMs: 300_000 }
         ]
     });
 

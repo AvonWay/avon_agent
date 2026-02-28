@@ -161,6 +161,28 @@ header {
     z-index: 200;
 }
 
+.dropdown-sm {
+    min-width: 200px;
+    left: 0;
+    padding: 16px;
+}
+
+.dropdown-sm a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.dropdown-sm a:hover {
+    background: var(--bg-alt);
+    color: var(--primary);
+}
+
 /* Display on hover for desktop */
 @media (min-width: 769px) {
     .dropdown:hover .dropdown-content {
@@ -1415,15 +1437,55 @@ footer {
 .chat-input button {
     width: 40px;
     height: 40px;
+    flex-shrink: 0;
     border-radius: 10px;
     border: none;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+#chat-send-btn {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+}
+
+.chat-extra-btn {
+    background: var(--bg-alt);
+    color: var(--fg-secondary);
+    border: 1px solid var(--border) !important;
+}
+
+.chat-extra-btn:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    border-color: var(--primary) !important;
+}
+
+.chat-extra-btn.recording {
+    background: var(--rose-light);
+    color: var(--rose);
+    border-color: var(--rose) !important;
+    animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4);
+    }
+
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+    }
 }
 
 .chat-input button:hover {

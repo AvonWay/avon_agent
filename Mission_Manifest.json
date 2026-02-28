@@ -1,0 +1,40 @@
+{
+    "version": "2.0.0",
+    "project": "Avon Industrial Agent",
+    "boot_timestamp": "2026-02-27T17:57:40Z",
+    "velocity_directive_id": "VD-2026-02-27-001",
+    "last_blueprint_timestamp": "2026-02-27T12:57:40-05:00",
+    "objectives": [
+        "Maintain sub-2s p95 API response latency",
+        "Zero CRITICAL or HIGH security vulnerabilities in source",
+        "Preserve Velocity brand constitution and design system",
+        "Maximize agent task success rate (target: >95%)",
+        "All Supabase RLS policies must remain active",
+        "All authentication middleware must remain intact"
+    ],
+    "forbidden": [
+        "Remove authentication middleware",
+        "Disable RLS policies",
+        "Delete user data",
+        "Hard-code secrets or tokens",
+        "Expose process.env credentials to client",
+        "eval() or new Function() with user input"
+    ],
+    "performance_thresholds": {
+        "api_latency_ms": 2000,
+        "heap_warning_mb": 512,
+        "max_evolution_cycles": 10
+    },
+    "swarm_assignments": {
+        "DS-001": "DeepSeek",
+        "DS-002": "DeepSeek",
+        "DS-003": "DeepSeek",
+        "CG-001": "CodeGemma",
+        "CG-002": "CodeGemma",
+        "CG-003": "CodeGemma",
+        "LM-001": "Llama/Phi-4",
+        "LM-002": "Llama/Phi-4",
+        "LM-003": "Llama/Phi-4"
+    },
+    "evolution_history": []
+}

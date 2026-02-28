@@ -52,16 +52,17 @@ function openModal(mode) {
 }
 
 // ---- Mobile Menu ----
-function toggleMobileMenu() {
-    const navLinks = document.getElementById('main-nav');
-    if (navLinks) {
-        navLinks.classList.toggle('active');
-    }
-}
 
-function toggleDropdown() {
-    const content = document.getElementById('blueprint-links');
+function toggleDropdown(id = 'blueprint-links') {
+    const content = document.getElementById(id);
     if (content) {
+        // Close other open dropdowns first
+        const dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+            if (dropdowns[i].id !== id && dropdowns[i].classList.contains('show')) {
+                dropdowns[i].classList.remove('show');
+            }
+        }
         content.classList.toggle('show');
     }
 }
@@ -135,6 +136,7 @@ function handleAuth(e) {
 // ---- Chat Widget ----
 let chatOpen = false;
 let lastBuild = null; // Track the most recent build for post-signup deploy
+let attachedFiles = []; // Storage for base64 images and file context
 
 function openChat() {
     chatOpen = true;
@@ -150,16 +152,34 @@ function closeChat() {
 }
 
 function sendMessage(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const input = document.getElementById('chat-input');
     const msg = input.value.trim();
-    if (!msg) return;
-    addMessage(msg, 'user');
+    if (!msg && attachedFiles.length === 0) return;
+
+    addMessage(msg || "Analyzing uploaded assets...", 'user');
     input.value = '';
     document.getElementById('chat-suggestions').style.display = 'none';
+
+    // Prepare context from attached files
+    let fullPrompt = msg;
+    const images = attachedFiles.filter(f => f.type === 'image').map(f => f.data);
+    const contexts = attachedFiles.filter(f => f.type === 'text').map(f => `[File: ${f.name}]\n${f.data}`).join('\n\n');
+
+    if (contexts) {
+        fullPrompt = `Context from uploaded files:\n${contexts}\n\nUser request: ${msg}`;
+    }
+
     setTimeout(() => {
-        const response = getAIResponse(msg);
-        addMessage(response, 'bot');
+        const response = getAIResponse(fullPrompt, images);
+        if (typeof response === 'string') {
+            addMessage(response, 'bot');
+        }
+        // attachedFiles is cleared inside triggerActualAIBuild if it's a custom build,
+        // but for safety we clear it here if it wasn't used in a custom build
+        if (!fullPrompt.includes('triggerActualAIBuild')) {
+            attachedFiles = [];
+        }
     }, 800 + Math.random() * 700);
 }
 
@@ -185,8 +205,126 @@ function addMessage(text, type) {
     container.scrollTop = container.scrollHeight;
 }
 
+// ---- Chat Actions: Attach & Voice ----
+document.addEventListener('DOMContentLoaded', () => {
+    const attachBtn = document.getElementById('chat-attach-btn');
+    const fileInput = document.getElementById('chat-file-input');
+    const voiceBtn = document.getElementById('chat-voice-btn');
+    const chatInput = document.getElementById('chat-input');
+
+    if (attachBtn && fileInput) {
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                const filenames = Array.from(files).map(f => f.name).join(', ');
+                addMessage(`📎 Preparing: ${filenames}`, 'user');
+
+                for (const file of files) {
+                    if (file.type.startsWith('image/')) {
+                        const base64 = await toBase64(file);
+                        attachedFiles.push({ type: 'image', name: file.name, data: base64.split(',')[1] });
+                    } else {
+                        const text = await file.text();
+                        attachedFiles.push({ type: 'text', name: file.name, data: text });
+                    }
+                }
+
+                setTimeout(() => {
+                    addMessage(`<strong>Analyzing ${files.length} file(s)...</strong><br>I've added the contents to my active memory. Ready for your instructions! 🚀`, 'bot');
+                }, 1000);
+            }
+        });
+    }
+
+    // Helper for vision
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    let isRecording = false;
+    let recognition = null;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true; // Stay on for multi-sentence planning
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            isRecording = true;
+            voiceBtn.classList.add('recording');
+            chatInput.placeholder = "Listening to your instructions...";
+            showNotification('Voice Architect mode active.', 'success');
+        };
+
+        recognition.onend = () => {
+            if (isRecording) {
+                // If it ended automatically but we want it on, restart
+                try { recognition.start(); } catch (e) { }
+            } else {
+                voiceBtn.classList.remove('recording');
+                chatInput.placeholder = "Describe what you want to build...";
+            }
+        };
+
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                }
+            }
+            if (finalTranscript) {
+                chatInput.value = finalTranscript;
+                // Add a small delay so user can see what was captured before sending
+                setTimeout(() => {
+                    if (chatInput.value === finalTranscript) {
+                        sendMessage();
+                    }
+                }, 1500);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            if (event.error === 'not-allowed') {
+                showNotification('Mic permission denied.', 'error');
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+            }
+        };
+    }
+
+    if (voiceBtn) {
+        voiceBtn.addEventListener('click', () => {
+            if (!recognition) {
+                showNotification('Voice control not supported in this browser.', 'error');
+                return;
+            }
+            if (isRecording) {
+                isRecording = false;
+                recognition.stop();
+                showNotification('Voice Architect mode disabled.', 'info');
+            } else {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Recognition start error:', e);
+                }
+            }
+        });
+    }
+});
+
 // ---- AI Responses — Action-first, no follow-up questions ----
-function getAIResponse(msg) {
+function getAIResponse(msg, images = []) {
     const lower = msg.toLowerCase();
 
     // Build requests — start building immediately
@@ -286,60 +424,78 @@ function getAIResponse(msg) {
     }
 
     // Default: treat ANY prompt as a custom build request to Ollama
-    triggerActualAIBuild(msg, 'Custom Site', 320);
-    return `\u26a1 <strong>Starting your AI build now.</strong><br><br>Generating a custom site based on: "<em>${msg}</em>"<br>Tokens: ~320 of 500 used<br><br>Summoning local Swarm agent to write HTML, CSS, and JS...`;
+    triggerActualAIBuild(msg, 'Custom Site', 320, images);
+    return `\u26a1 <strong>Starting your AI build now.</strong><br><br>Generating a custom site based on: "<em>${msg.substring(0, 100)}${msg.length > 100 ? '...' : ''}</em>"<br>Tokens: ~320 of 500 used<br><br>Summoning local Swarm agent to write HTML, CSS, and JS...`;
 }
 
-function triggerActualAIBuild(msg, blueprintName = 'Custom Site', tokensUsed = 320) {
-    const slug = 'custom-site'; // Always push to the AI custom html loader
+async function triggerActualAIBuild(msg, blueprintName = 'Custom Site', tokensUsed = 320, images = []) {
+    const API_URL = 'http://localhost:4000/api';
+    const slug = 'custom-site';
     lastBuild = { name: blueprintName, slug, tokensUsed };
+
+    attachedFiles = [];
 
     setTimeout(() => {
         addMessage(
             `\ud83d\udd28 <strong>Build Progress \u2014 ${blueprintName}</strong><br><br>` +
             '<div class="build-progress">' +
             '\u2705 Initializing Swarm Agents...<br>' +
-            '\u23f3 Writing code (this takes a few seconds)...' +
+            '\u23f3 Orchestrating swarm via REST API...' +
             '</div>', 'bot');
     }, 1500);
 
-    fetch('http://localhost:11434/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            model: 'Avon:latest',
-            prompt: `Write a complete, single-file HTML page with inline CSS and embedded JavaScript for the following request: "${msg}". You must include beautiful modern styling, responsive design with dark mode by default, and interactive elements. DO NOT explain your code. DO NOT wrap the code in markdown blocks like \`\`\`html. PROVIDE EXACTLY AND ONLY THE RAW HTML CODE starting with <!DOCTYPE html>.`,
-            stream: false
-        })
-    }).then(r => r.json()).then(data => {
-        let code = data.response || '';
-        const match = code.match(/```(?:html)?\s*([\s\S]*?)```/i);
-        if (match) {
-            code = match[1].trim();
-        } else if (code.includes('<!DOCTYPE html>')) {
-            code = code.substring(code.indexOf('<!DOCTYPE html>')).trim();
-        }
+    try {
+        // 1. Guest Auth
+        const loginRes = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: 'guest_user', role: 'explorer' })
+        });
+        const { token } = await loginRes.json();
 
-        localStorage.setItem('custom_build_html', code);
+        // 2. Trigger Build
+        const genRes = await fetch(`${API_URL}/generate-site`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ prompt: msg, theme: 'swarm' })
+        });
+        const { node_id } = await genRes.json();
 
-        setTimeout(() => {
-            const user = getUser();
-            if (user) {
-                deliverLiveLink(user.name, lastBuild);
+        // 3. Status Polling
+        const pollStatus = async () => {
+            const statusRes = await fetch(`${API_URL}/public/sites/${node_id}`);
+            const site = await statusRes.json();
+
+            if (site.status === 'Live' && site.html) {
+                localStorage.setItem('custom_build_html', site.html);
+                const user = getUser();
+                if (user) {
+                    deliverLiveLink(user.name, lastBuild);
+                } else {
+                    addMessage(
+                        `\ud83d\ude80 <strong>Build complete!</strong> Your ${blueprintName} is ready.<br><br>` +
+                        '<div class="build-result">' +
+                        '\ud83d\udcc1 Files: 1 generated (via Swarm)<br>' +
+                        '\ud83c\udfa8 Styles: Applied inline<br>' +
+                        `Tokens remaining: ${500 - tokensUsed} of 500<br><br>` +
+                        '<strong>\u2192 <a href="javascript:void(0)" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to get your live link</a></strong>' +
+                        '</div>', 'bot');
+                }
+            } else if (site.status.includes('Failed')) {
+                addMessage(`❌ Build Failed: ${site.ai_plan}`, 'bot');
             } else {
-                addMessage(
-                    `\ud83d\ude80 <strong>Build complete!</strong> Your ${blueprintName} is ready.<br><br>` +
-                    '<div class="build-result">' +
-                    '\ud83d\udcc1 Files: 1 generated<br>' +
-                    '\ud83c\udfa8 Styles: Applied inline<br>' +
-                    `Tokens remaining: ${500 - tokensUsed} of 500<br><br>` +
-                    '<strong>\u2192 <a href="javascript:void(0)" onclick="openModal(\'signup\')" class="build-deploy-link">Sign up to get your live link</a></strong>' +
-                    '</div>', 'bot');
+                setTimeout(pollStatus, 3000); // Poll every 3s
             }
-        }, 1000);
-    }).catch(err => {
-        addMessage(`⚠️ Failed to connect to local AI: ${err.message}. Make sure Ollama is running and model Avon:latest exists. Run \`ollama run Avon:latest\``, 'bot');
-    });
+        };
+
+        setTimeout(pollStatus, 5000); // Start polling after 5s
+
+    } catch (err) {
+        addMessage(`⚠️ System Error: ${err.message}. Ensure the Velocity Backend is running at http://localhost:4000`, 'bot');
+    }
 }
 
 function isLoggedIn() {

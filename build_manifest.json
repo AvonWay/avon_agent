@@ -1,0 +1,11 @@
+{
+    "project": "Avon Industrial Agent",
+    "version": "2.0.0",
+    "build_settings": {
+        "render_priority": "real-time-preview",
+        "enable_hmr": true,
+        "artifact_preview_mode": "Auto-Refresh on Change",
+        "preview_port": 3001,
+        "explicit_binding": true
+    }
+}

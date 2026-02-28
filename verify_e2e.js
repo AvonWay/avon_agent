@@ -9,6 +9,7 @@ async function testEndToEndBuild() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: 'avon_admin', role: 'industrial' })
         });
+        if (!loginRes.ok) throw new Error(`Login failed: ${loginRes.statusText}`);
         const { token } = await loginRes.json();
 
         // 2. Generate Site
@@ -20,14 +21,16 @@ async function testEndToEndBuild() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ prompt, templateId: 'vibe-03' })
+            body: JSON.stringify({ prompt, templateId: 'vibe-03', theme: 'swarm' })
         });
+
+        if (!genRes.ok) throw new Error(`Generation failed: ${genRes.statusText}`);
         const site = await genRes.json();
 
         console.log("✅ SITE GENERATED:");
-        console.log(`   ID: ${site.node_id}`);
+        console.log(`   ID: ${site.node_id || 'N/A'}`);
         console.log(`   URL: http://localhost:3001/?id=${site.node_id}`);
-        console.log(`   Plan: ${site.plan.substring(0, 100)}...`);
+        console.log(`   Plan: ${site.plan?.substring(0, 100) || 'N/A'}...`);
 
         console.log("\n✨ VELOCITY HANDSHAKE SUCCESS! You can now view this ID in the dashboard.");
     } catch (err) {

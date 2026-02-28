@@ -1,4 +1,6 @@
-import ollama from 'ollama';
+import { Ollama } from 'ollama';
+
+const ollama = new Ollama({ host: 'http://127.0.0.1:11434' });
 
 /**
  * Runs a chat completion using the local Ollama instance.
@@ -16,19 +18,18 @@ export async function runOllama({ model, messages, system, stream, signal }) {
         messages = [{ role: 'system', content: system }, ...messages];
     }
 
-    // Use the official Ollama JS library
+    // Use the official Ollama JS library with explicit client
     try {
+        console.log(`[Ollama] 📡 Requesting ${model} at ${ollama.config.host}...`);
         const response = await ollama.chat({
             model,
             messages,
-            stream,
+            stream: !!stream,
         });
-
-        // If we need to support abort signals with the library check if library supports it, 
-        // otherwise we might need to use fetch directly if cancellation is critical.
-        // For now, we return the standard response.
+        console.log(`[Ollama] ✅ ${model} responded.`);
         return response;
     } catch (error) {
+        console.error(`[Ollama] ❌ Error calling ${model}:`, error.message);
         if (signal?.aborted) {
             throw new Error('Request timed out');
         }

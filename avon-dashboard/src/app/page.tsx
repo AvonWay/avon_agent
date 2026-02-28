@@ -12,6 +12,8 @@ import {
     ChevronRight, ChevronDown, Terminal, Globe, Plus, Cpu, Shield,
     Sun, Moon, Box, Activity, User, Zap, Code, Send, RefreshCw, Folder, File, MessageSquare
 } from 'lucide-react';
+import ProfileSettings from '@/components/ProfileSettings';
+import TopNav from '@/components/TopNav';
 
 const TerminalComponent = ({ lines, onCommand, height, onClose, problems = [], onFixProblem }: any) => {
     const [input, setInput] = useState('');
@@ -187,30 +189,30 @@ export default function VelocityIDE() {
 
     const initIDE = async () => {
         try {
-            const auth = await login('avon_admin', 'industrial');
+            const auth = await login('avon_admin', 'explorer');
             setAuthToken(auth.token);
-            const [sites, ws] = await Promise.all([fetchSites(auth.token), fetchWorkspaces(auth.token)]);
-            setWebsites(sites);
-            setWorkspaces(ws);
-            setActiveWorkspace(ws[0]);
+            const [sites, ws] = await Promise.all([
+                fetchSites(auth.token).catch(() => []),
+                fetchWorkspaces(auth.token).catch(() => [])
+            ]);
+            setWebsites(Array.isArray(sites) ? sites.map((s: any) => ({
+                id: s.id,
+                name: s.site_name || s.name,
+                domain: s.domain || '',
+                status: s.status === 'active' ? 'Live' : s.status === 'pending' ? 'Building' : s.status
+            })) : []);
+            setWorkspaces(Array.isArray(ws) ? ws : []);
+            setActiveWorkspace(ws?.[0] || null);
             setLoading(false);
-
-            // Auto-initiate Swarm Build for the Betting App
-            setTimeout(() => {
-                const bettingPrompt = "Betting Scraper & Probability Engine (Top 5 Platforms)";
-                setChatMessages([
-                    { role: 'user', content: bettingPrompt },
-                    { role: 'velocity', content: "🔥 SWARM MODE INITIALIZED. Distributing tasks to specialized agents..." }
-                ]);
-                handleGenerate(bettingPrompt, "Industrial Blue");
-            }, 1000);
-
-            printTerminal("System Ready. Swarm Mode: ACTIVE.");
+            printTerminal("✅ System Ready. Connected to Supabase. Swarm Mode: ACTIVE.");
+            printTerminal("💡 Tip: Send !avon <task> via WhatsApp to trigger a build.");
         } catch (e) {
             console.error("Boot Failure", e);
-            printTerminal("Error: Failed to connect to Velocity Backend.");
+            setLoading(false);
+            printTerminal("⚠️ Could not connect to backend. Make sure 'node server.js' is running in avon-backend.");
         }
     };
+
 
     const printTerminal = (text: string) => {
         setTerminalLines(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${text}`]);
@@ -377,6 +379,10 @@ export default function VelocityIDE() {
 
                         <div className="mt-4 px-2">
                             <button onClick={() => setTerminalVisible(!terminalVisible)} className="w-full text-left text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded mb-2 border border-gray-200 transition-colors">Toggle Terminal</button>
+                            <button onClick={() => handleOpenTab('settings', 'Settings', 'page')} className="w-full text-left text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded mb-2 border border-gray-200 transition-colors flex items-center gap-2">
+                                <Settings size={14} />
+                                Settings
+                            </button>
                             <div className="bg-blue-50 p-3 rounded border border-blue-100">
                                 <p className="text-[10px] font-bold text-blue-800 uppercase mb-1">Status</p>
                                 <div className="flex items-center gap-2 text-xs text-blue-700">
@@ -391,6 +397,7 @@ export default function VelocityIDE() {
 
             {/* 2. Main Content (Center) */}
             <div className="flex-1 flex flex-col min-w-0 bg-[var(--ide-bg)] relative z-0">
+                <TopNav />
 
                 {/* Tabs */}
                 <div className="flex ide-header overflow-x-auto hide-scrollbar h-10 items-end px-2 gap-1 z-20 sticky top-0 bg-[var(--ide-header)]">
@@ -451,6 +458,12 @@ export default function VelocityIDE() {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'settings' && (
+                        <div className="h-full overflow-y-auto bg-white">
+                            <ProfileSettings />
                         </div>
                     )}
 

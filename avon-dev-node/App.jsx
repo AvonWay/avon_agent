@@ -211,14 +211,33 @@ function App() {
 
             {/* Velocity HUD */}
             <header className="fixed top-0 inset-x-0 h-20 bg-black/50 backdrop-blur-md border-b border-white/5 z-50 flex items-center justify-between px-8">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-600 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(37,99,235,0.5)]">
-                        <span className="font-black italic text-xl">V</span>
+                <div className="flex items-center gap-4 text-white">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-blue-600 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(37,99,235,0.5)] cursor-pointer" onClick={() => window.location.href = '/'}>
+                            <span className="font-black italic text-xl">V</span>
+                        </div>
+                        <div>
+                            <h1 className="font-black italic uppercase tracking-tighter text-lg leading-none">Velocity</h1>
+                            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Vibe Coding Terminal v2.0</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="font-black italic uppercase tracking-tighter text-lg leading-none">Velocity</h1>
-                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Vibe Coding Terminal v2.0</p>
-                    </div>
+
+                    <div className="h-4 w-px bg-white/10 mx-4 hidden md:block"></div>
+
+                    <nav className="hidden md:flex items-center gap-6">
+                        <div className="relative group">
+                            <button className="flex items-center gap-1.5 text-sm font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest">
+                                Developer
+                                <ChevronRight size={14} className="group-hover:rotate-90 transition-transform" />
+                            </button>
+                            <div className="absolute left-0 top-full mt-2 hidden group-hover:block w-48 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-2 z-50">
+                                <a href="/app/dashboard" className="flex items-center gap-2 px-3 py-2 text-[10px] font-bold text-gray-400 hover:bg-blue-600 hover:text-white rounded-lg transition-all uppercase tracking-widest">
+                                    <Layout size={12} />
+                                    Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full flex items-center gap-2">

@@ -24,7 +24,17 @@
           </a>
           <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
             <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/dashboard">Dashboard</a>
-            <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="http://localhost:3000" target="_blank" rel="noopener">Developer</a>
+            <div class="relative group">
+              <button class="flex items-center gap-1 transition-colors hover:text-foreground/80 text-foreground/60">
+                Developer
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="group-hover:rotate-180 transition-transform">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              <div class="absolute left-0 top-full mt-2 hidden group-hover:block min-w-[150px] bg-background border rounded-md shadow-lg p-2 z-50">
+                <a class="block px-3 py-2 text-xs rounded-sm hover:bg-muted transition-colors" href="/app/dashboard">Dashboard</a>
+              </div>
+            </div>
             <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/docs">Docs</a>
             <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/components">Components</a>
           </nav>

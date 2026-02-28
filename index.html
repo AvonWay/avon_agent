@@ -27,10 +27,24 @@
                 Velocity
             </a>
             <nav class="nav-links" id="main-nav">
+                <div class="dropdown" id="developer-dropdown">
+                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false"
+                        onclick="toggleDropdown('developer-links')">
+                        Developer
+                        <svg class="dropdown-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="dropdown-content dropdown-sm" id="developer-links">
+                        <a href="/app/dashboard">Dashboard</a>
+                    </div>
+                </div>
                 <a href="#features">Features</a>
                 <a href="#pricing">Pricing</a>
                 <div class="dropdown" id="blueprints-dropdown">
-                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false" onclick="toggleDropdown()">
+                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false"
+                        onclick="toggleDropdown('blueprint-links')">
                         Blueprints
                         <svg class="dropdown-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
@@ -501,8 +515,26 @@
             <button onclick="sendSuggestion('What blueprints are free?')">Free Blueprints?</button>
         </div>
         <form class="chat-input" id="chat-form" onsubmit="sendMessage(event)">
+            <button type="button" class="chat-extra-btn" id="chat-attach-btn" aria-label="Attach files"
+                title="Attach files">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+            <input type="file" id="chat-file-input" multiple class="hidden"
+                accept="image/*,video/*,.pdf,.doc,.docx,.txt" title="Select files to upload">
             <input type="text" id="chat-input" placeholder="Describe what you want to build..." autocomplete="off">
-            <button type="submit" id="chat-send-btn" aria-label="Send message">
+            <button type="button" class="chat-extra-btn" id="chat-voice-btn" aria-label="Voice control"
+                title="Voice control">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 01-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </button>
+            <button type="submit" id="chat-send-btn" aria-label="Send message" title="Send message">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                 </svg>

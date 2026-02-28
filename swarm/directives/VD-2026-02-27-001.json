@@ -1,0 +1,172 @@
+{
+    "directive_id": "VD-2026-02-27-001",
+    "status": "ACTIVE",
+    "generated_by": "Gemini (Velocity Lead Architect)",
+    "blueprint_ref": "VELOCITY_BLUEPRINT.md",
+    "timestamp": "2026-02-27T12:57:40-05:00",
+    "manifest_version_at_generation": "1.0.0",
+    "priority_order": [
+        "DS-001",
+        "DS-002",
+        "CG-001",
+        "LM-001",
+        "DS-003",
+        "CG-002",
+        "LM-002",
+        "CG-003",
+        "LM-003"
+    ],
+    "forbidden_checks": [
+        "No patch may disable authenticateJWT middleware",
+        "No patch may set RLS to false on any Supabase table",
+        "No patch may expose process.env to client-side code",
+        "No patch may use eval() or new Function() with user input"
+    ],
+    "tasks": {
+        "DS-001": {
+            "id": "DS-001",
+            "agent": "DeepSeek",
+            "lane": "Logic/Security/Complex API",
+            "status": "pending",
+            "title": "Sanitise /api/terminal/exec shell execution",
+            "description": "Wrap exec() with an allowlist of permitted commands. Reject shell metacharacters (; | && || > <). Return 403 with structured error if command is blocked.",
+            "target_files": [
+                "avon-backend/server.js"
+            ],
+            "target_lines": [
+                223,
+                228
+            ],
+            "priority": "critical",
+            "validation": "node --check avon-backend/server.js"
+        },
+        "DS-002": {
+            "id": "DS-002",
+            "agent": "DeepSeek",
+            "lane": "Logic/Security/Complex API",
+            "status": "pending",
+            "title": "Upgrade Supabase client to Service Role Key",
+            "description": "Replace SUPABASE_ANON_KEY with SUPABASE_SERVICE_ROLE_KEY for all server-to-Supabase calls. Add runtime assertion if key is missing.",
+            "target_files": [
+                "avon-backend/server.js",
+                ".env.example"
+            ],
+            "priority": "critical",
+            "validation": "grep -n 'SUPABASE_SERVICE_ROLE_KEY' avon-backend/server.js"
+        },
+        "DS-003": {
+            "id": "DS-003",
+            "agent": "DeepSeek",
+            "lane": "Logic/Security/Complex API",
+            "status": "pending",
+            "title": "Add rate limiting to evolution trigger endpoint",
+            "description": "Install and apply express-rate-limit (5 req/15 min) to POST /api/evolution/trigger to prevent abuse.",
+            "target_files": [
+                "avon-backend/server.js",
+                "avon-backend/package.json"
+            ],
+            "priority": "high",
+            "validation": "node --check avon-backend/server.js"
+        },
+        "CG-001": {
+            "id": "CG-001",
+            "agent": "CodeGemma",
+            "lane": "UI/Components/Boilerplate",
+            "status": "pending",
+            "title": "Evolution Engine Dashboard Widget",
+            "description": "Create EvolutionMonitor.tsx component. Live-polls GET /api/evolution/status every 10s. Shows engine state, cycle count, last evolution timestamp, telemetry sparkline. Dark glassmorphism card with animated pulse dot.",
+            "target_files": [
+                "avon-dashboard/src/components/EvolutionMonitor.tsx"
+            ],
+            "dependencies": [
+                "lucide-react"
+            ],
+            "priority": "high",
+            "validation": "npx tsc --noEmit (in avon-dashboard)"
+        },
+        "CG-002": {
+            "id": "CG-002",
+            "agent": "CodeGemma",
+            "lane": "UI/Components/Boilerplate",
+            "status": "pending",
+            "title": "Convert WebsiteOverview to live data",
+            "description": "Replace hardcoded static data array with async fetch from GET /api/sites using JWT from localStorage. Add loading skeleton and empty state.",
+            "target_files": [
+                "avon-dashboard/src/components/WebsiteOverview.tsx"
+            ],
+            "priority": "medium",
+            "validation": "npx tsc --noEmit (in avon-dashboard)"
+        },
+        "CG-003": {
+            "id": "CG-003",
+            "agent": "CodeGemma",
+            "lane": "UI/Components/Boilerplate",
+            "status": "pending",
+            "title": "Agent Activity Feed Component",
+            "description": "Create AgentActivityFeed.tsx. Reads from GET /api/evolution/history. Shows last 10 evolution events in timeline. Color-coded: CRITICAL=red, HIGH=amber, MEDIUM=blue, LOW=green.",
+            "target_files": [
+                "avon-dashboard/src/components/AgentActivityFeed.tsx"
+            ],
+            "dependencies": [
+                "lucide-react"
+            ],
+            "priority": "medium",
+            "validation": "npx tsc --noEmit (in avon-dashboard)"
+        },
+        "LM-001": {
+            "id": "LM-001",
+            "agent": "Llama/Phi-4",
+            "lane": "File I/O & Merging",
+            "status": "pending",
+            "title": "Create .env.example",
+            "description": "Create .env.example at project root documenting ALL required variables: PORT, JWT_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY, OPENAI_API_KEY, EVOLUTION_MODE.",
+            "target_files": [
+                ".env.example"
+            ],
+            "priority": "high",
+            "validation": "Test that all variables referenced in avon-backend/server.js are documented"
+        },
+        "LM-002": {
+            "id": "LM-002",
+            "agent": "Llama/Phi-4",
+            "lane": "File I/O & Merging",
+            "status": "pending",
+            "title": "Mission Manifest Upgrade to v2.0.0",
+            "description": "Bump version to 2.0.0. Add velocity_directive_id, swarm_assignments, last_blueprint_timestamp fields. Update boot_timestamp.",
+            "target_files": [
+                "Mission_Manifest.json"
+            ],
+            "priority": "medium",
+            "new_fields": {
+                "version": "2.0.0",
+                "velocity_directive_id": "VD-2026-02-27-001",
+                "last_blueprint_timestamp": "2026-02-27T12:57:40-05:00",
+                "swarm_assignments": {
+                    "DS-001": "DeepSeek",
+                    "DS-002": "DeepSeek",
+                    "DS-003": "DeepSeek",
+                    "CG-001": "CodeGemma",
+                    "CG-002": "CodeGemma",
+                    "CG-003": "CodeGemma",
+                    "LM-001": "Llama/Phi-4",
+                    "LM-002": "Llama/Phi-4",
+                    "LM-003": "Llama/Phi-4"
+                }
+            },
+            "validation": "node -e \"JSON.parse(require('fs').readFileSync('Mission_Manifest.json','utf8'))\""
+        },
+        "LM-003": {
+            "id": "LM-003",
+            "agent": "Llama/Phi-4",
+            "lane": "File I/O & Merging",
+            "status": "pending",
+            "title": "Evolution Log Archiver Script",
+            "description": "Create scripts/archiveEvolutionLog.js. If memory/evolution_log.jsonl > 1MB, rotate to dated backup. Print summary of total entries, cycles, most common patch target.",
+            "target_files": [
+                "scripts/archiveEvolutionLog.js"
+            ],
+            "priority": "low",
+            "validation": "node --check scripts/archiveEvolutionLog.js"
+        }
+    }
+}

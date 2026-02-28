@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Bell, Search, User, Cpu } from 'lucide-react';
+import { Bell, Search, User, Cpu, ChevronDown } from 'lucide-react';
 
 const AVAILABLE_MODELS = [
     {
@@ -30,10 +30,27 @@ function ModelDropdown() {
 export default function TopNav() {
     return (
         <div className="h-16 bg-white border-b border-gray-100 px-8 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span className="hover:text-primary cursor-pointer">Websites</span>
-                <span className="text-gray-300">/</span>
-                <span className="text-gray-900 font-medium">Dashboard</span>
+            <div className="flex items-center gap-6 text-sm">
+                <div className="flex items-center gap-4 text-gray-500">
+                    <span className="hover:text-primary cursor-pointer">Websites</span>
+                    <span className="text-gray-300">/</span>
+                    <span className="text-gray-900 font-medium">Dashboard</span>
+                </div>
+
+                <div className="h-4 w-px bg-gray-200 mx-2"></div>
+
+                <div className="relative group">
+                    <button className="flex items-center gap-1.5 text-gray-600 hover:text-primary transition-colors font-medium">
+                        Developer
+                        <ChevronDown size={14} className="group-hover:rotate-180 transition-transform" />
+                    </button>
+                    <div className="absolute left-0 top-full mt-2 hidden group-hover:block w-48 bg-white border border-gray-100 rounded-lg shadow-xl p-2 z-50">
+                        <a href="/app/dashboard" className="flex items-center gap-2 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-all">
+                            <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
             </div>
 
             <div className="flex items-center gap-6">
