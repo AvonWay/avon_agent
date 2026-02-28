@@ -184,6 +184,8 @@ export default function VelocityIDE() {
         { id: 'p2', source: 'Accessibility', severity: 'warning', message: 'Image missing alt text', path: 'src/components/WebsiteOverview.tsx', line: 32 }
     ]);
     const [isSwarmMode, setIsSwarmMode] = useState(true);
+    const [explorerMode, setExplorerMode] = useState<'nodes' | 'files'>('nodes');
+    const [workspaceFiles, setWorkspaceFiles] = useState<any[]>([]);
 
     useEffect(() => { initIDE(); }, []);
 
@@ -206,10 +208,20 @@ export default function VelocityIDE() {
             setLoading(false);
             printTerminal("✅ System Ready. Connected to Supabase. Swarm Mode: ACTIVE.");
             printTerminal("💡 Tip: Send !avon <task> via WhatsApp to trigger a build.");
+            loadFiles(auth.token);
         } catch (e) {
             console.error("Boot Failure", e);
             setLoading(false);
             printTerminal("⚠️ Could not connect to backend. Make sure 'node server.js' is running in avon-backend.");
+        }
+    };
+
+    const loadFiles = async (token: string, path = '.') => {
+        try {
+            const files = await listFiles(token, path);
+            setWorkspaceFiles(files);
+        } catch (e) {
+            console.error("File Load Error", e);
         }
     };
 
@@ -359,22 +371,51 @@ export default function VelocityIDE() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto px-2 space-y-1">
-                        <div className="flex items-center gap-1 px-2 py-1 font-bold text-xs text-[var(--ide-fg)] cursor-pointer hover:bg-[var(--ide-hover)] rounded">
-                            <ChevronDown size={14} />
-                            <span className="uppercase tracking-wide">{activeWorkspace?.name || 'Workspace'}</span>
-                        </div>
-                        <div className="ml-2 pl-2 border-l border-gray-200 space-y-1">
-                            {websites.map(site => (
-                                <div
-                                    key={site.id}
-                                    onClick={() => handleOpenTab(`preview:${site.id}`, site.name, 'preview')}
-                                    className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded text-xs select-none group transition-colors
-                                    ${activeTab === `preview:${site.id}` ? 'bg-[var(--ide-selection)] text-[var(--ide-selection-text)] font-medium border border-blue-100' : 'hover:bg-[var(--ide-hover)] text-gray-600'}`}
+                        <div className="flex items-center justify-between gap-1 px-2 py-1 font-bold text-[10px] text-[var(--ide-fg)] cursor-pointer hover:bg-[var(--ide-hover)] rounded uppercase tracking-wider opacity-60">
+                            <span>{explorerMode === 'nodes' ? 'Project Nodes' : 'Workspace Files'}</span>
+                            <div className="flex bg-gray-100 rounded p-0.5" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    onClick={() => setExplorerMode('nodes')}
+                                    className={`px-1.5 py-0.5 rounded ${explorerMode === 'nodes' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}
                                 >
-                                    <Globe size={14} className={activeTab === `preview:${site.id}` ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500'} />
-                                    <span className="truncate">{site.name}</span>
-                                </div>
-                            ))}
+                                    NODES
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setExplorerMode('files');
+                                        if (authToken) loadFiles(authToken);
+                                    }}
+                                    className={`px-1.5 py-0.5 rounded ${explorerMode === 'files' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}
+                                >
+                                    FILES
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="ml-2 pl-2 border-l border-gray-200 mt-2 space-y-1">
+                            {explorerMode === 'nodes' ? (
+                                websites.map(site => (
+                                    <div
+                                        key={site.id}
+                                        onClick={() => handleOpenTab(`preview:${site.id}`, site.name, 'preview')}
+                                        className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer rounded text-xs select-none group transition-colors
+                                        ${activeTab === `preview:${site.id}` ? 'bg-[var(--ide-selection)] text-[var(--ide-selection-text)] font-medium border border-blue-100' : 'hover:bg-[var(--ide-hover)] text-gray-600'}`}
+                                    >
+                                        <Globe size={14} className={activeTab === `preview:${site.id}` ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500'} />
+                                        <span className="truncate">{site.name}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                workspaceFiles.map(file => (
+                                    <div
+                                        key={file.path}
+                                        className="flex items-center gap-2 px-2 py-1 cursor-pointer hover:bg-[var(--ide-hover)] rounded text-xs text-gray-600 select-none group"
+                                    >
+                                        {file.isDirectory ? <Folder size={14} className="text-blue-400" /> : <File size={14} className="text-gray-400" />}
+                                        <span className="truncate">{file.name}</span>
+                                    </div>
+                                ))
+                            )}
                         </div>
 
                         <div className="mt-4 px-2">

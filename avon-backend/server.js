@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
+import fse from 'fs-extra';
 
 dotenv.config();
 
@@ -22,13 +23,17 @@ if (!JWT_SECRET) {
 
 // --- Supabase (Service Role for server-side trust) ---
 // DS-002: Use SUPABASE_SERVICE_ROLE_KEY — never the anon key — for all server→Supabase calls.
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.error('❌ FATAL: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in environment.');
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+if (!process.env.SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('❌ FATAL: SUPABASE_URL and a valid Supabase key (SERVICE_ROLE or ANON) must be set in environment.');
     process.exit(1);
+}
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn('⚠️ WARNING: Using SUPABASE_ANON_KEY. Server-side actions may be limited by RLS policies.');
 }
 const supabase = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY  // DS-002: service role key for trusted server-side access
+    SUPABASE_KEY
 );
 
 app.use(cors({ origin: '*' }));
@@ -238,11 +243,16 @@ const TERMINAL_ALLOWED_COMMANDS = [
     'git log',
     'git diff',
     'ls',
+    'ls -R',
     'dir',
     'echo',
     'cat',
     'type',
     'pwd',
+    'touch',
+    'mkdir',
+    'rm',
+    'rm -rf',
 ];
 
 const SHELL_METACHARACTERS = /[;&|><`$(){}\[\]!#~]/;
@@ -276,6 +286,64 @@ app.post('/api/terminal/exec', authenticateJWT, (req, res) => {
     exec(command, { cwd: cwd || process.cwd(), timeout: 30_000 }, (error, stdout, stderr) => {
         res.json({ stdout: stdout || '', stderr: stderr || '', error: error ? error.message : null });
     });
+});
+
+// --- FS ---
+
+/** GET /api/fs/list — list a directory */
+app.get('/api/fs/list', authenticateJWT, async (req, res) => {
+    const queryPath = req.query.path || '.';
+    try {
+        const root = path.resolve(__dirname, '..');
+        const target = path.resolve(root, String(queryPath));
+
+        if (!target.startsWith(root)) {
+            return res.status(403).json({ error: 'Out of bounds' });
+        }
+
+        const items = await fse.readdir(target, { withFileTypes: true });
+        const result = items.map(item => ({
+            name: item.name,
+            isDirectory: item.isDirectory(),
+            path: path.relative(root, path.join(target, item.name)).replace(/\\/g, '/')
+        }));
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** GET /api/fs/read — read a file */
+app.get('/api/fs/read', authenticateJWT, async (req, res) => {
+    const queryPath = req.query.path;
+    if (!queryPath) return res.status(400).json({ error: 'path is required' });
+    try {
+        const root = path.resolve(__dirname, '..');
+        const target = path.resolve(root, String(queryPath));
+        if (!target.startsWith(root)) return res.status(403).json({ error: 'Out of bounds' });
+
+        const content = await fse.readFile(target, 'utf8');
+        res.json({ content });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** POST /api/fs/write — write a file */
+app.post('/api/fs/write', authenticateJWT, async (req, res) => {
+    const { path: queryPath, content } = req.body;
+    if (!queryPath) return res.status(400).json({ error: 'path is required' });
+    try {
+        const root = path.resolve(__dirname, '..');
+        const target = path.resolve(root, String(queryPath));
+        if (!target.startsWith(root)) return res.status(403).json({ error: 'Out of bounds' });
+
+        await fse.ensureDir(path.dirname(target));
+        await fse.writeFile(target, content, 'utf8');
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // --- CHAT ---
