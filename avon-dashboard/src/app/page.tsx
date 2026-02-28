@@ -5,12 +5,12 @@ import { supabase } from '@/lib/supabase';
 import {
     fetchSites, generateSite, login, fetchTemplates, fetchWorkspaces,
     switchWorkspace, fetchMembers, fetchActivity, deleteSite, checkConfig, updateConfig,
-    executeCommand, listFiles, readFile, writeFile
+    executeCommand, listFiles, readFile, writeFile, publishFile
 } from '@/lib/api';
 import {
     Files, Search, GitGraph, Play, Settings, MoreHorizontal, X,
     ChevronRight, ChevronDown, Terminal, Globe, Plus, Cpu, Shield,
-    Sun, Moon, Box, Activity, User, Zap, Code, Send, RefreshCw, Folder, File, MessageSquare
+    Sun, Moon, Box, Activity, User, Zap, Code, Send, RefreshCw, Folder, File, MessageSquare, Rocket, ExternalLink
 } from 'lucide-react';
 import ProfileSettings from '@/components/ProfileSettings';
 import TopNav from '@/components/TopNav';
@@ -202,6 +202,7 @@ export default function VelocityIDE() {
     const [fileContents, setFileContents] = useState<Record<string, string>>({});
     const [editedContents, setEditedContents] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
 
     useEffect(() => { initIDE(); }, []);
 
@@ -405,6 +406,34 @@ export default function VelocityIDE() {
         }
     };
 
+    const handlePublish = async () => {
+        if (!authToken || !activeTab) return;
+        const type = openTabs.find(t => t.id === activeTab)?.type;
+        if (type !== 'file') return;
+
+        setIsPublishing(true);
+        printTerminal(`🚀 Publishing: ${activeTab}...`);
+        try {
+            const res = await publishFile(authToken, activeTab);
+            if (res.success) {
+                printTerminal(`✅ Success! Site LIVE at: ${res.url}`);
+                setChatMessages(prev => [...prev, {
+                    role: 'velocity',
+                    content: `I've successfully published your site! You can view it live here: [${res.url}](${res.url})`
+                }]);
+                // Automatically open the live URL in a new window
+                window.open(res.url, '_blank');
+            } else {
+                printTerminal(`❌ Publish Failed: ${res.error || 'Unknown error'}`);
+            }
+        } catch (e: any) {
+            console.error("Publish Error", e);
+            printTerminal(`❌ Internal Error: ${e.message}`);
+        } finally {
+            setIsPublishing(false);
+        }
+    };
+
     // Keyboard Shortcuts
     useEffect(() => {
         const handleKeys = (e: KeyboardEvent) => {
@@ -585,18 +614,32 @@ export default function VelocityIDE() {
                         <div className="flex-1 flex flex-col relative h-full overflow-hidden bg-white text-gray-800 font-mono text-xs">
                             {/* Editor Toolbar */}
                             <div className="h-8 px-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/50">
-                                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{activeTab}</div>
-                                <button
-                                    onClick={handleSave}
-                                    disabled={isSaving || editedContents[activeTab] === fileContents[activeTab]}
-                                    className={`flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-bold transition-all
-                                    ${editedContents[activeTab] !== fileContents[activeTab]
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
-                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-                                >
-                                    <RefreshCw size={10} className={isSaving ? 'animate-spin' : ''} />
-                                    {isSaving ? 'SAVING...' : 'SAVE'}
-                                </button>
+                                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                                    <File size={10} />
+                                    {activeTab}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={isSaving || editedContents[activeTab] === fileContents[activeTab]}
+                                        className={`flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-bold transition-all
+                                        ${editedContents[activeTab] !== fileContents[activeTab]
+                                                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                                    >
+                                        <RefreshCw size={10} className={isSaving ? 'animate-spin' : ''} />
+                                        {isSaving ? 'SAVING...' : 'SAVE'}
+                                    </button>
+                                    <button
+                                        onClick={handlePublish}
+                                        disabled={isPublishing}
+                                        className={`flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-bold transition-all bg-green-600 text-white hover:bg-green-700 shadow-sm
+                                        ${isPublishing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        <Rocket size={10} className={isPublishing ? 'animate-bounce' : ''} />
+                                        {isPublishing ? 'PUBLISHING...' : 'PUBLISH'}
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="flex-1 relative h-full overflow-hidden">

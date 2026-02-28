@@ -346,6 +346,49 @@ app.post('/api/fs/write', authenticateJWT, async (req, res) => {
     }
 });
 
+/** POST /api/fs/publish — push a path to GitHub */
+app.post('/api/fs/publish', authenticateJWT, async (req, res) => {
+    const { path: queryPath } = req.body;
+    if (!queryPath) return res.status(400).json({ error: 'path is required' });
+    try {
+        const root = path.resolve(__dirname, '..');
+        const target = path.resolve(root, String(queryPath));
+        if (!target.startsWith(root)) return res.status(403).json({ error: 'Out of bounds' });
+
+        // Git commands
+        // 1. Add
+        await new Promise((resolve, reject) => {
+            exec(`git add "${queryPath}"`, { cwd: root }, (err) => err ? reject(err) : resolve());
+        });
+        // 2. Commit
+        await new Promise((resolve, reject) => {
+            exec(`git commit -m "chore: publish ${queryPath} at ${new Date().toISOString()}"`, { cwd: root }, (err) => {
+                // Ignore "nothing to commit" errors
+                resolve();
+            });
+        });
+        // 3. Push
+        await new Promise((resolve, reject) => {
+            exec(`git push origin main`, { cwd: root }, (err, stdout, stderr) => {
+                if (err) {
+                    console.error("Push failed", stderr);
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        const repoName = 'avon_agent';
+        const userName = 'avonway';
+        const liveUrl = `https://${userName}.github.io/${repoName}/${queryPath.replace(/\\/g, '/')}`;
+
+        res.json({ success: true, url: liveUrl });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // --- CHAT ---
 app.post('/api/chat', async (req, res) => {
     const { messages, model, profile, system } = req.body;

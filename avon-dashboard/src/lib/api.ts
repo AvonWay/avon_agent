@@ -160,3 +160,15 @@ export const writeFile = async (token: string, path: string, content: string) =>
     });
     return res.json();
 };
+
+export const publishFile = async (token: string, path: string) => {
+    const res = await fetch(`${API_URL}/fs/publish`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ path })
+    });
+    return res.json();
+};
