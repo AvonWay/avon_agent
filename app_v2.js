@@ -488,6 +488,77 @@ async function triggerActualAIBuild(msg, blueprintName = 'Custom Site', tokensUs
 
     // Simulated build steps (used for remote deploy or backend fallback)
     const runSimulatedBuild = () => {
+        // Prepare a "vibe" template for the preview
+        const vibeHtml = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Velocity Build: ${blueprintName}</title>
+                <script src="https://cdn.tailwindcss.com"></script>
+                <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Outfit', sans-serif; background: #050505; color: white; }
+                    .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+                    .gradient-text { background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+                </style>
+            </head>
+            <body class="min-h-screen">
+                <nav class="p-6 flex justify-between items-center glass sticky top-0 z-50">
+                    <div class="text-2xl font-bold italic tracking-tighter">VELOCITY <span class="text-indigo-500">SWARM</span></div>
+                    <div class="space-x-8 text-sm font-medium text-gray-400">
+                        <a href="#" class="hover:text-white transition">Features</a>
+                        <a href="#" class="hover:text-white transition">Showcase</a>
+                        <a href="#" class="px-5 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Get Started</a>
+                    </div>
+                </nav>
+                
+                <section class="relative py-32 px-6 overflow-hidden">
+                    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-600/20 blur-[120px] rounded-full"></div>
+                    <div class="max-w-5xl mx-auto text-center relative z-10">
+                        <span class="px-4 py-1.5 rounded-full glass text-xs font-bold tracking-widest text-indigo-400 uppercase mb-8 inline-block">SWARM GEN-2 ACTIVE</span>
+                        <h1 class="text-7xl font-extrabold tracking-tight mb-8">
+                            Built with <span class="gradient-text">Velocity AI</span><br>
+                            <span class="text-gray-400">${blueprintName} Interface</span>
+                        </h1>
+                        <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-12">
+                            This high-fidelity interface was generated based on your prompt: 
+                            <span class="text-white italic">"${msg}"</span>
+                        </p>
+                    </div>
+                </section>
+
+                <section class="max-w-6xl mx-auto px-6 py-20">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="p-8 rounded-3xl glass hover:border-indigo-500/40 transition-all group">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 flex items-center justify-center mb-6 text-indigo-400 group-hover:scale-110 transition">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">Smart Logic</h3>
+                            <p class="text-gray-400 leading-relaxed">Generated backend controllers with pre-built schema validation and persistent storage hooks.</p>
+                        </div>
+                        <div class="p-8 rounded-3xl glass hover:border-indigo-500/40 transition-all group border-indigo-500/20 shadow-2xl shadow-indigo-500/10">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 flex items-center justify-center mb-6 text-indigo-400 group-hover:scale-110 transition">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">Edge Performance</h3>
+                            <p class="text-gray-400 leading-relaxed">Automated Lighthouse optimization with zero-runtime CSS and critical path delivery.</p>
+                        </div>
+                        <div class="p-8 rounded-3xl glass hover:border-indigo-500/40 transition-all group">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 flex items-center justify-center mb-6 text-indigo-400 group-hover:scale-110 transition">
+                                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">Visual Precision</h3>
+                            <p class="text-gray-400 leading-relaxed">Pixel-perfect component architecture mapped to the Velocity design constitution.</p>
+                        </div>
+                    </div>
+                </section>
+            </body>
+            </html>
+        `;
+        localStorage.setItem('custom_build_html', vibeHtml);
+
         const steps = [
             { delay: 400,  text: '$ velocity swarm --init', type: 'cmd' },
             { delay: 900,  text: '  ✔ Swarm agents initialized (Architect, Builder, Guardian)', type: 'success' },
@@ -696,9 +767,7 @@ function getPreviewPages() {
 }
 
 function getIDEUrl() {
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const host = isLocalhost ? 'localhost' : window.location.hostname;
-    return `http://${host}:3000`;
+    return `http://localhost:3000`;
 }
 
 function streamBuildSteps(termId, steps) {
