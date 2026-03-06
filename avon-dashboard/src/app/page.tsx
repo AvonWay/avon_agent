@@ -648,14 +648,7 @@ export default function VelocityIDE() {
                                     id="code-editor"
                                     title="Code Editor"
                                     aria-label="Code Editor"
-                                    className="absolute inset-0 w-full h-full p-[24px] bg-transparent text-transparent caret-blue-600 outline-none resize-none z-20 font-mono"
-                                    style={{
-                                        fontSize: '13px',
-                                        lineHeight: '1.6',
-                                        whiteSpace: 'pre',
-                                        overflowWrap: 'normal',
-                                        tabSize: 4,
-                                    }}
+                                    className="absolute inset-0 w-full h-full p-[24px] bg-transparent text-transparent caret-blue-600 outline-none resize-none z-20 font-mono text-[13px] leading-[1.6] whitespace-pre [word-wrap:normal] [tab-size:4]"
                                     value={editedContents[activeTab] || ''}
                                     onChange={(e) => setEditedContents(prev => ({ ...prev, [activeTab]: e.target.value }))}
                                     onScroll={(e: any) => {

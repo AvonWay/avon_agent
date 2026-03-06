@@ -151,7 +151,7 @@
                     <div class="term-line">> Waiting for prompt... <span class="blink">_</span></div>
                 </div>
                 <div class="hero-interactive">
-                    <input type="text" id="demo-prompt" placeholder="Build a gym landing page...">
+                    <input type="text" id="demo-prompt" placeholder="Build a gym landing page..." onkeydown="if(event.key==='Enter'){event.preventDefault();runHeroDemo()}">
                     <button onclick="runHeroDemo()">Deploy</button>
                 </div>
             </div>

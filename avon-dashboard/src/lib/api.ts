@@ -1,4 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const getApiUrl = () => {
+    if (typeof window !== 'undefined') {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        return process.env.NEXT_PUBLIC_API_URL || `http://${isLocalhost ? 'localhost' : window.location.hostname}:4000/api`;
+    }
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+};
+
+const API_URL = getApiUrl();
 
 export const login = async (username: string, role?: string) => {
     const res = await fetch(`${API_URL}/auth/login`, {

@@ -12,11 +12,13 @@
 
 import { runOllama } from "../providers/ollama.js";
 import { runOpenAI } from "../providers/openai.js";
+import { runGemini } from "../providers/gemini.js";
 import { MODEL_PROFILES } from "./config.js";
 
 const providers = {
     ollama: runOllama,
     openai: runOpenAI,
+    gemini: runGemini,
 };
 
 // Fallback chain: if primary model errors, try these in order
