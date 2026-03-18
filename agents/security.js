@@ -1,17 +1,15 @@
 import { BaseAgent } from "./baseAgent.js";
 
 /**
- * SECURITY — CodeGemma (Google's code specialist)
+ * SECURITY — Gemini 2.5 Flash (lead) / Avon_Agent (fallback)
  * Role: SAST, vulnerability analysis, RLS policy checks.
  * Runs in ensemble with Reviewer for the final vote gate.
  */
 export const SecurityAgent = new BaseAgent({
     name: "security",
-    model: "codegemma:latest",
-    provider: "ollama",
     profile: "security",
     system: `
-You are the VELOCITY SECURITY AUDITOR powered by CodeGemma. You specialize in application security and secure coding practices.
+You are the VELOCITY SECURITY AUDITOR. You specialize in application security and secure coding practices.
 
 ### SECURITY REVIEW SCOPE:
 1. XSS: Check for unescaped user content rendered in innerHTML, document.write, or template literals.

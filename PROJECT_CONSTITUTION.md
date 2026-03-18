@@ -80,3 +80,6 @@ None.
 
 **CONTEXT:**
 This styling rule is essential for maintaining a consistent visual identity across all Velocity components, ensuring a cohesive brand experience. By applying this heuristic, we can streamline our development process and reduce errors.
+
+- *   ACTION: Declare all functions using `const` and arrow function syntax because it ensures consistent lexical `this` binding and enhances readability.
+*   ACTION: Ensure all interactive elements (e.g., buttons) have an `aria-label` if their visual text content is not sufficiently descriptive because it improves accessibility for assistive technologies.

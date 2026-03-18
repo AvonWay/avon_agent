@@ -118,7 +118,7 @@ CRITICAL VIBE SYSTEM OVERRIDE: Generate a 'theme.css' file that overrides the Ta
             }
         ],
         attempts: [
-            { model: "Avon:latest", timeoutMs: 300_000 }
+            { model: "Avon_Agent", timeoutMs: 300_000 }
         ]
     });
 

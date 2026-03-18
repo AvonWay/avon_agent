@@ -21,11 +21,9 @@ const providers = {
     gemini: runGemini,
 };
 
-// Fallback chain: if primary model errors, try these in order
+// Fallback chain: if primary model errors, try Avon_Agent (sole local model)
 const FALLBACK_CHAIN = [
-    'llama3:8b',
-    'llama3.2:latest',
-    'Avon:latest'
+    'Avon_Agent'
 ];
 
 /**
@@ -38,13 +36,13 @@ export async function runModel({
     messages,
     system,
     stream = false,
-    timeoutMs = 300_000
+    timeoutMs = 1_200_000
 }) {
     const config = MODEL_PROFILES[profile] || MODEL_PROFILES.standard;
 
     // Priority: Explicit arg > Env override (already in config) > Profile default
     const finalProvider = provider || config.provider;
-    const finalModel = (customModel && customModel !== 'Avon:latest')
+    const finalModel = (customModel && customModel !== 'Avon_Agent')
         ? customModel
         : config.model;
 
@@ -64,19 +62,29 @@ export async function runModel({
 
         // Attempt fallback chain
         for (const fallbackModel of FALLBACK_CHAIN) {
-            if (fallbackModel === finalModel) continue; // skip if same
-            console.warn(`[Router] ⚡ Primary ${finalModel} failed. Falling back to ${fallbackModel}...`);
+            if (fallbackModel === finalModel) continue; 
+            console.warn(`[Router] ⚡ Primary ${finalModel} failed (${err.message}). Falling back to local ${fallbackModel}...`);
+            
             try {
+                // Fallback models are ALWAYS local (Ollama) in the current architecture
                 const fController = new AbortController();
                 const fTimeout = setTimeout(() => fController.abort(), timeoutMs);
-                const result = await runner({
-                    model: fallbackModel, messages, system, stream,
+                
+                const result = await runOllama({ // Force Ollama for Avon_Agent fallback
+                    model: fallbackModel, 
+                    messages, 
+                    system, 
+                    stream,
                     signal: fController.signal
                 });
+                
                 clearTimeout(fTimeout);
                 console.log(`[Router] ✅ Fallback ${fallbackModel} succeeded.`);
                 return result;
-            } catch { /* try next fallback */ }
+            } catch (fallbackErr) {
+                console.error(`[Router] ❌ Fallback to ${fallbackModel} failed:`, fallbackErr.message);
+                /* try next fallback if any */
+            }
         }
         throw err; // all fallbacks exhausted
     } finally {
@@ -93,7 +101,7 @@ export async function runModel({
  * @param {string}   [system] - Optional system prompt
  * @returns {{ consensus: string, votes: object[], passed: boolean }}
  */
-export async function runEnsemble({ profiles, messages, system }) {
+async function runEnsemble({ profiles, messages, system }) {
     console.log(`[Router] 🗳️  Ensemble vote: [${profiles.join(', ')}]`);
 
     const votes = await Promise.allSettled(

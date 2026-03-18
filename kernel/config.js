@@ -1,19 +1,28 @@
 /**
  * ============================================================
- *  kernel/config.js  — Velocity Multi-Model Intelligence Layer
+ *  kernel/config.js  — Velocity Tiered Intelligence Layer
  *
- *  MODEL ROSTER (all local, no cloud required):
+ *  MODEL ROSTER:
  *  ─────────────────────────────────────────────────────────
- *  Avon:latest           — Master Architect & Orchestrator
- *  deepseek-coder-v2     — Primary Code Builder (purpose-built)
- *  codegemma             — Code Reviewer & Security Auditor
- *  llama3:8b             — Logic, Reasoning & Planning
- *  llama3.2              — Fast QC, Distillation, Summaries
+ *  TIER 1 — STRATEGIST (Gemini 3.1 Pro):
+ *      Architect, Synthesis, Reflection, Evolution
+ *      Deep reasoning, complex planning, multi-page coherence
+ *
+ *  TIER 2 — WORKHORSE (Gemini 2.5 Flash):
+ *      Builder, Guardian, Reviewer, Security, Scaffold
+ *      Fast parallel execution, code generation, audits
+ *
+ *  TIER 3 — UNDERSTUDY (Avon_Agent):
+ *      Universal local fallback — learning from Tiers 1 & 2
  * ============================================================
  */
 
+// ⚠️ CRITICAL: Load .env BEFORE any process.env reads.
+import dotenv from 'dotenv';
+dotenv.config();
+
 export const RSI_LIMITS = {
-    maxRetriesPerTask: 3,       // bumped from 2 — more attempts with better models
+    maxRetriesPerTask: 3,
     maxWebSearches: 3,
     confidenceThreshold: 0.85
 };
@@ -22,134 +31,170 @@ export const RSI_LIMITS = {
 const HAS_GEMINI = !!(process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY);
 const HAS_OPENAI = !!process.env.OPENAI_API_KEY;
 
-// If we are NOT on localhost, we MUST use a cloud provider (Gemini preferred)
 const IS_REMOTE = process.env.NODE_ENV === 'production' || process.env.REMOTE_DEPLOY === 'true';
 
-const P = (IS_REMOTE || HAS_GEMINI) ? 'gemini' 
-          : HAS_OPENAI ? 'openai' 
-          : 'ollama';
+// ─── Three-tier intelligence ────────────────────────────────
+const CLOUD = HAS_GEMINI ? 'gemini' : (HAS_OPENAI ? 'openai' : 'ollama');
 
-const DEFAULT_CLOUD_MODEL = HAS_GEMINI ? 'gemini-1.5-pro' : 'gpt-4o';
-const DEFAULT_LITE_MODEL = HAS_GEMINI ? 'gemini-1.5-flash' : 'gpt-4o-mini';
+const LOCAL = 'ollama'; // Avon_Agent — sole local model
+
+// Tier 1: Pro for strategic/reasoning tasks
+const STRATEGIST_MODEL = HAS_GEMINI ? 'gemini-2.5-pro' : 'gpt-4o';
+// Tier 2: Flash for fast execution tasks  
+const WORKHORSE_MODEL  = HAS_GEMINI ? 'gemini-2.5-flash' : 'gpt-4o-mini';
+const LOCAL_MODEL = 'Avon_Agent';
 
 /**
- * MODEL PROFILES — each role mapped to the best available model.
+ * MODEL PROFILES — Three-Tier Intelligence
  *
- * Design rationale:
- *  - architect:   Avon (custom fine-tune) writes the strategic plan & JSON task graph
- *  - builder:     deepseek-coder-v2 produces the actual code — it's a dedicated code model
- *  - techlead:    deepseek-coder-v2 as well — it excels at component-level HTML/CSS/JS
- *  - guardian:    codegemma performs the visual hardening pass — Google's code specialist
- *  - reviewer:    codegemma reviews and audits — same specialist, different prompt
- *  - security:    codegemma is trained on secure coding patterns
- *  - logic:       llama3:8b reasons through business logic and data structures
- *  - planner:     llama3:8b plans tasks and dependency graphs
- *  - reflection:  llama3:8b reflects on failures (it reasons well)
- *  - distiller:   llama3.2 is fast and cheap for summarisation/extraction
- *  - standard:    llama3.2 for general-purpose lightweight tasks
- *  - evolution:   deepseek-coder-v2 for self-patching (it writes code, not Avon)
+ * ┌──────────────────────────────────────────────────────────────────────────┐
+ * │  TIER 1: STRATEGIST            │  TIER 2: WORKHORSE                    │
+ * │  Gemini 3.1 Pro                 │  Gemini 2.5 Flash                     │
+ * │  Deep reasoning & planning      │  Fast execution & review              │
+ * ├────────────────────────────────┼───────────────────────────────────────┤
+ * │  architect  → gemini-3.1-pro    │  builder    → gemini-2.5-flash       │
+ * │  evolution  → gemini-3.1-pro    │  techlead   → gemini-2.5-flash       │
+ * │  reflection → gemini-3.1-pro    │  logic      → gemini-2.5-flash       │
+ * │  planner    → gemini-3.1-pro    │  guardian   → gemini-2.5-flash       │
+ * │                                │  reviewer   → gemini-2.5-flash       │
+ * │                                │  security   → gemini-2.5-flash       │
+ * │                                │  distiller  → gemini-2.5-flash       │
+ * │                                │  standard   → gemini-2.5-flash       │
+ * │                                │  avon_bot   → gemini-2.5-flash       │
+ * └────────────────────────────────┴───────────────────────────────────────┘
+ * │  TIER 3: UNDERSTUDY — Avon_Agent (universal local fallback)           │
+ * └───────────────────────────────────────────────────────────────────────┘
+ *
+ * WHY THIS SPLIT:
+ * • Pro excels at complex multi-step reasoning — perfect for designing
+ *   5-page architectures, weaving synthesis, and analyzing failures.
+ * • Flash excels at fast, high-quality code generation — perfect for
+ *   building individual pages in parallel, running security audits,
+ *   and hardening UI at speed.
+ * • Together they're 10x more effective than either alone.
+ * • Avon_Agent observes ALL outputs from both tiers to learn.
  */
 export const MODEL_PROFILES = {
-    // ── Strategic Layer ──────────────────────────────────────
-    architect: {
-        provider: P,
-        model: process.env.MODEL_ARCHITECT
-            || (P !== 'ollama' ? DEFAULT_CLOUD_MODEL : 'Avon:latest'),
-        description: 'Master Orchestrator — Avon designs the full task graph & brand DNA'
-    },
+    // ══════════════════════════════════════════════════════════
+    //  TIER 1: STRATEGIST (Gemini 2.5 Pro)
+    //  Tasks that need deep reasoning, planning, coherence
+    // ══════════════════════════════════════════════════════════
 
-    // ── Code Generation Layer ─────────────────────────────────
-    builder: {
-        provider: P,
-        model: process.env.MODEL_BUILDER
-            || (P !== 'ollama' ? DEFAULT_CLOUD_MODEL : 'deepseek-coder-v2:latest'),
-        description: 'Primary Code Synthesizer — DeepSeek Coder builds production HTML/CSS/JS'
-    },
-    techlead: {
-        provider: P,
-        model: process.env.MODEL_TECHLEAD
-            || (P !== 'ollama' ? DEFAULT_CLOUD_MODEL : 'deepseek-coder-v2:latest'),
-        description: 'Tech Lead — DeepSeek Coder architects components and implements features'
+    architect: {
+        provider: CLOUD,
+        model: process.env.MODEL_ARCHITECT
+            || (CLOUD !== 'ollama' ? STRATEGIST_MODEL : LOCAL_MODEL),
+        description: 'TIER 1 — Master Orchestrator: designs 5-page task graphs, brand DNA, and architecture plans'
     },
     evolution: {
-        provider: P,
+        provider: CLOUD,
         model: process.env.MODEL_EVOLUTION
-            || (P !== 'ollama' ? DEFAULT_CLOUD_MODEL : 'deepseek-coder-v2:latest'),
-        description: 'Self-Patcher — DeepSeek Coder writes its own evolution patches'
-    },
-
-    // ── Review & Hardening Layer ──────────────────────────────
-    guardian: {
-        provider: P,
-        model: process.env.MODEL_GUARDIAN
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'codegemma:latest'),
-        description: 'Visual Guardian — CodeGemma hardens UI fidelity and accessibility'
-    },
-    reviewer: {
-        provider: P,
-        model: process.env.MODEL_REVIEWER
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'codegemma:latest'),
-        description: 'Quality Reviewer — CodeGemma audits correctness, security, aesthetics'
-    },
-    security: {
-        provider: P,
-        model: process.env.MODEL_SECURITY
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'codegemma:latest'),
-        description: 'Security Auditor — CodeGemma performs SAST and vulnerability analysis'
-    },
-
-    // ── Reasoning & Logic Layer ───────────────────────────────
-    logic: {
-        provider: P,
-        model: process.env.MODEL_LOGIC
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'llama3:8b'),
-        description: 'Logic Engine — LLaMA 3 handles data structures and business logic'
-    },
-    planner: {
-        provider: P,
-        model: process.env.MODEL_PLANNER
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'llama3:8b'),
-        description: 'Task Planner — LLaMA 3 decomposes goals and resolves dependencies'
+            || (CLOUD !== 'ollama' ? STRATEGIST_MODEL : LOCAL_MODEL),
+        description: 'TIER 1 — Self-Patcher: writes evolution patches requiring deep codebase understanding'
     },
     reflection: {
-        provider: P,
+        provider: CLOUD,
         model: process.env.MODEL_REFLECTION
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'llama3:8b'),
-        description: 'Reflector — LLaMA 3 analyzes failures and proposes strategy pivots'
+            || (CLOUD !== 'ollama' ? STRATEGIST_MODEL : LOCAL_MODEL),
+        description: 'TIER 1 — Reflector: analyzes failures with multi-step reasoning and proposes strategy pivots'
+    },
+    planner: {
+        provider: CLOUD,
+        model: process.env.MODEL_PLANNER
+            || (CLOUD !== 'ollama' ? STRATEGIST_MODEL : LOCAL_MODEL),
+        description: 'TIER 1 — Task Planner: decomposes complex goals into ordered dependency graphs'
     },
 
-    // ── Lightweight / Fast Layer ──────────────────────────────
+    // ══════════════════════════════════════════════════════════
+    //  TIER 2: WORKHORSE (Gemini 2.5 Flash)
+    //  Tasks that need speed, parallel execution, code output
+    // ══════════════════════════════════════════════════════════
+
+    builder: {
+        provider: CLOUD,
+        model: process.env.MODEL_BUILDER
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Code Synthesizer: builds production HTML/CSS/JS pages at speed'
+    },
+    techlead: {
+        provider: CLOUD,
+        model: process.env.MODEL_TECHLEAD
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Tech Lead: architects components and implements features'
+    },
+    logic: {
+        provider: CLOUD,
+        model: process.env.MODEL_LOGIC
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Logic Engine: handles data structures, state management, business logic'
+    },
+    guardian: {
+        provider: CLOUD,
+        model: process.env.MODEL_GUARDIAN
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Visual Guardian: hardens UI fidelity, accessibility, cross-page consistency'
+    },
+    reviewer: {
+        provider: CLOUD,
+        model: process.env.MODEL_REVIEWER
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Quality Reviewer: audits correctness, security, aesthetics'
+    },
+    security: {
+        provider: CLOUD,
+        model: process.env.MODEL_SECURITY
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Security Auditor: performs SAST and vulnerability analysis'
+    },
     distiller: {
-        provider: P,
+        provider: CLOUD,
         model: process.env.MODEL_DISTILLER
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'llama3.2:latest'),
-        description: 'Distiller — LLaMA 3.2 summarizes learnings into constitution patterns'
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Distiller: summarizes learnings into constitution patterns'
     },
     standard: {
-        provider: P,
+        provider: CLOUD,
         model: process.env.MODEL_STANDARD
-            || (P !== 'ollama' ? DEFAULT_LITE_MODEL : 'llama3.2:latest'),
-        description: 'General Purpose — LLaMA 3.2 handles lightweight tasks and QC checks'
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — General Purpose: handles lightweight tasks and QC checks'
     },
     avon_bot: {
-        provider: P,
+        provider: CLOUD,
         model: process.env.MODEL_AVON_BOT
-            || (P !== 'ollama' ? DEFAULT_CLOUD_MODEL : 'Avon:latest'),
-        description: 'Avon Bot scaffold — Avon builds the initial high-fidelity HTML scaffold'
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Avon_Agent scaffold: builds high-fidelity HTML scaffolds with brand memory'
+    },
+    designer: {
+        provider: CLOUD,
+        model: process.env.MODEL_DESIGNER
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Designer: handles UI/UX, aesthetics, and theme generation'
+    },
+    researcher: {
+        provider: CLOUD,
+        model: process.env.MODEL_RESEARCHER
+            || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
+        description: 'TIER 2 — Researcher: knowledge distillation and technical analysis'
     }
 };
 
 // ─── Helper: print routing table to console on boot ─────────
 export function logModelRouting() {
-    const source = P === 'gemini' ? '✨ Gemini (cloud)' 
-                 : P === 'openai' ? '☁️  OpenAI (cloud)' 
-                 : '🖥️  Ollama (local)';
-    console.log(`\n[Config] Intelligence Layer — Provider: ${source}`);
+    const cloudSource = CLOUD === 'gemini' ? '✨ Gemini (cloud)'
+                      : CLOUD === 'openai' ? '☁️  OpenAI (cloud)'
+                      : '🤖 Avon_Agent (solo — no cloud key)';
+    console.log(`\n[Config] ══ VELOCITY THREE-TIER INTELLIGENCE ══`);
+    console.log(`[Config] Tier 1 (Strategist): ${CLOUD === 'gemini' ? '🧠 Gemini 3.1 Pro' : cloudSource}`);
+    console.log(`[Config] Tier 2 (Workhorse):  ${CLOUD === 'gemini' ? '⚡ Gemini 2.5 Flash' : cloudSource}`);
+    console.log(`[Config] Tier 3 (Understudy): 🤖 Avon_Agent (local — learning)`);
     console.log('[Config] Role → Model assignments:');
     const roles = Object.entries(MODEL_PROFILES);
     const maxRole = Math.max(...roles.map(([r]) => r.length));
-    roles.forEach(([role, { model }]) => {
-        console.log(`  ${role.padEnd(maxRole)}  →  ${model}`);
+    roles.forEach(([role, { model, provider, description }]) => {
+        const tier = description.startsWith('TIER 1') ? '🧠' 
+                   : description.startsWith('TIER 2') ? '⚡' 
+                   : '🤖';
+        console.log(`  ${tier} ${role.padEnd(maxRole)}  →  ${model}`);
     });
     console.log('');
 }

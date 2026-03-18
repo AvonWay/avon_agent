@@ -20,6 +20,7 @@ import path from 'path';
 import { execSync, exec } from 'child_process';
 import { EventEmitter } from 'events';
 import { fileURLToPath } from 'url';
+import { VerifyAgent } from '../agents/verify.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -368,7 +369,7 @@ Keep patches minimal and surgical. Only fix what is actually broken or risky.
 // ══════════════════════════════════════════════════════════
 //  MODULE 4 — SHADOW OPERATOR (Clone → Patch → Build)
 // ══════════════════════════════════════════════════════════
-export class ShadowOperator {
+class ShadowOperator {
     constructor() {
         this.shadowPath = SHADOW_ROOT;
     }
@@ -439,7 +440,7 @@ export class ShadowOperator {
         console.log('[Operator] 🏗️  Compiling shadow build (syntax check)...');
         const errors = [];
 
-        const files = await this._walkJS(this.shadowPath);
+        const files = await walkJS(this.shadowPath);
         for (const file of files) {
             try {
                 execSync(`node --check "${file}"`, { stdio: 'pipe' });
@@ -456,23 +457,24 @@ export class ShadowOperator {
             return { success: false, errors };
         }
     }
+}
 
-    async _walkJS(dir) {
-        const out = [];
-        const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
-        for (const e of entries) {
-            const full = path.join(dir, e.name);
-            if (e.isDirectory() && e.name !== 'node_modules') out.push(...await this._walkJS(full));
-            else if (e.isFile() && e.name.endsWith('.js')) out.push(full);
-        }
-        return out;
+/** Standalone JS File Walker Helper */
+async function walkJS(dir) {
+    const out = [];
+    const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
+    for (const e of entries) {
+        const full = path.join(dir, e.name);
+        if (e.isDirectory() && e.name !== 'node_modules') out.push(...await walkJS(full));
+        else if (e.isFile() && e.name.endsWith('.js')) out.push(full);
     }
+    return out;
 }
 
 // ══════════════════════════════════════════════════════════
 //  MODULE 5 — VALIDATION GATE
 // ══════════════════════════════════════════════════════════
-export class ValidationGate {
+class ValidationGate {
     /** Run quick smoke tests against the shadow build */
     async runUnitTests(shadowPath) {
         console.log('[Validator] 🧪 Running unit tests...');
@@ -524,20 +526,53 @@ export class ValidationGate {
         return { velocity, agentsShadow, agentsCurrent };
     }
 
+    /** AI-Driven Vibe Audit for shadow build */
+    async runVibeAudit(shadowPath) {
+        console.log('[Validator] 🎨 Running AI Vibe Audit on shadow artifacts...');
+        const constitution = await fs.readJson(path.join(PROJECT_ROOT, '.velocity_constitution.json')).catch(() => ({ rules: [] }));
+        const rules = constitution.rules || [];
+
+        // Focus on files that were likely modified (agents, kernel, backend)
+        const checkDirs = ['agents', 'kernel', 'avon-backend'].map(d => path.join(shadowPath, d));
+        let allAuditResults = [];
+
+        for (const dir of checkDirs) {
+            if (!await fs.pathExists(dir)) continue;
+            const files = await walkJS(dir);
+            for (const file of files) {
+                const code = await fs.readFile(file, 'utf8');
+                const result = await VerifyAgent.checkVibeAI(code, rules);
+                if (!result.success) {
+                    allAuditResults.push({ file: path.relative(shadowPath, file), violations: result.violations });
+                }
+            }
+        }
+
+        const passed = allAuditResults.length === 0;
+        return { passed, details: allAuditResults };
+    }
+
     async validate(shadowPath) {
         const testResults = await this.runUnitTests(shadowPath);
         const benchResults = await this.runBenchmarks(shadowPath);
+        const vibeResults = await this.runVibeAudit(shadowPath);
 
-        const passGate = testResults.passed && benchResults.velocity >= 1.0;
-        console.log('[Validator] Gate result:', passGate ? '✅ APPROVED' : '❌ REJECTED');
-        return { passed: passGate, testResults, benchResults };
+        const passGate = testResults.passed && benchResults.velocity >= 1.0 && vibeResults.passed;
+        
+        console.log('[Validator] Gate results:');
+        console.log(`  Tests: ${testResults.passed ? '✅' : '❌'}`);
+        console.log(`  Bench: ${benchResults.velocity >= 1.0 ? '✅' : '❌'} (${benchResults.velocity.toFixed(2)})`);
+        console.log(`  Vibe:  ${vibeResults.passed ? '✅' : '❌'}`);
+        
+        console.log('[Validator] Final result:', passGate ? '✅ APPROVED' : '❌ REJECTED');
+        return { passed: passGate, testResults, benchResults, vibeResults };
     }
 }
 
 // ══════════════════════════════════════════════════════════
 //  MODULE 6 — ATOMIC SWAP (Hot Handover)
 // ══════════════════════════════════════════════════════════
-export class AtomicSwap {
+class AtomicSwap {
     constructor({ manifest, sessionState }) {
         this.manifest = manifest;
         this.sessionState = sessionState;
@@ -752,4 +787,4 @@ export class AvonEvolutionEngine {
 }
 
 // ─── Singleton export ───────────────────────────────────────
-export const EvolutionEngine = new AvonEvolutionEngine();
+const EvolutionEngine = new AvonEvolutionEngine();

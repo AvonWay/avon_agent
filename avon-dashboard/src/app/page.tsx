@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
-    fetchSites, generateSite, login, fetchTemplates, fetchWorkspaces,
+    fetchSites, generateSite, login, fetchWorkspaces,
     switchWorkspace, fetchMembers, fetchActivity, deleteSite, checkConfig, updateConfig,
     executeCommand, listFiles, readFile, writeFile, publishFile
 } from '@/lib/api';
@@ -319,15 +319,19 @@ export default function VelocityIDE() {
 
         if (isSwarmMode) {
             printTerminal("🚀 [Swarm Intelligence] Initializing Multi-Agent Pipeline...");
-            printTerminal("🤖 [ARCHITECT] Drafting architectural blueprint...");
-            await new Promise(r => setTimeout(r, 1000));
-            printTerminal("👷 [BUILDER] Executing component synthesis...");
+            printTerminal("🤖 [ARCHITECT] Analyzing request and synthesizing digital DNA...");
+            await new Promise(r => setTimeout(r, 1200));
+            printTerminal("📐 [ENGINEER] Optimizing technical design patterns...");
             await new Promise(r => setTimeout(r, 800));
-            printTerminal("🛡️ [GUARDIAN] Performing security and linting audit...");
+            printTerminal("👷 [BUILDER] Executing high-density component synthesis...");
+            await new Promise(r => setTimeout(r, 1500));
+            printTerminal("🧬 [SYNTHESIZER] Weaving architectural master-file...");
+            await new Promise(r => setTimeout(r, 1200));
+            printTerminal("🛡️ [GUARDIAN] Performing security and brand fidelity audit...");
         }
 
         try {
-            const res = await generateSite(authToken!, prompt, 'vibe-01', tone, isSwarmMode ? 'swarm' : 'light');
+            const res = await generateSite(authToken!, prompt, tone);
             if (res.node_id) {
                 printTerminal(`Build Initiated: Node ID #${res.node_id}`);
                 setChatMessages(prev => [...prev, { role: 'velocity', content: `Building project: "${prompt}". Status is active in terminal.` }]);

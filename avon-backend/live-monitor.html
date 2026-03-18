@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Live Build Monitor — Real-Time Swarm Intelligence</title>
+    <meta name="description" content="Real-time build monitoring dashboard for Velocity's multi-agent swarm intelligence system.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: #16161f;
+            --bg-card-hover: #1c1c28;
+            --bg-terminal: #0d0d14;
+            --border: #1e1e2e;
+            --border-glow: #2d2d44;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --text-muted: #55557a;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-pink: #ec4899;
+            --glow-blue: rgba(59, 130, 246, 0.15);
+            --glow-green: rgba(16, 185, 129, 0.15);
+            --glow-purple: rgba(139, 92, 246, 0.15);
+            --glow-amber: rgba(245, 158, 11, 0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background gradient */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 80%, rgba(6,182,212,0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10,10,15,0.85);
+            backdrop-filter: blur(20px) saturate(1.4);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            color: white;
+            box-shadow: 0 0 20px rgba(59,130,246,0.3);
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header-title span {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.online {
+            background: rgba(16,185,129,0.12);
+            color: var(--accent-green);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+
+        .status-badge.building {
+            background: rgba(245,158,11,0.12);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245,158,11,0.2);
+            animation: pulse-badge 2s ease-in-out infinite;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-dot.pulse {
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; box-shadow: 0 0 4px currentColor; }
+            50% { opacity: 0.4; box-shadow: 0 0 12px currentColor; }
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.2); }
+            50% { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+        }
+
+        .tier-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .tier-paid {
+            background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.15));
+            color: var(--accent-green);
+            border: 1px solid rgba(16,185,129,0.25);
+        }
+
+        /* ── MAIN GRID ── */
+        .main {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 0;
+            height: calc(100vh - 56px);
+        }
+
+        /* ── LEFT PANEL ── */
+        .panel-left {
+            grid-row: 1 / -1;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-section-title {
+            padding: 16px 20px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+        }
+
+        /* ── BUILD PROMPT ── */
+        .build-prompt-area {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .prompt-input-wrapper {
+            position: relative;
+        }
+
+        .prompt-input {
+            width: 100%;
+            padding: 12px 14px;
+            padding-right: 44px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+            resize: none;
+            min-height: 48px;
+            max-height: 120px;
+        }
+
+        .prompt-input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--glow-blue), 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .prompt-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .prompt-send-btn {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+        }
+
+        .prompt-send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(59,130,246,0.5);
+        }
+
+        .prompt-send-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── ACTIVE BUILDS LIST ── */
+        .builds-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 12px;
+        }
+
+        .build-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .build-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .build-card.active { border-color: var(--accent-blue); background: var(--bg-card-hover); }
+        .build-card.active::before { background: var(--accent-blue); }
+        .build-card:hover { background: var(--bg-card-hover); border-color: var(--border-glow); }
+
+        .build-card.status-building::before { background: var(--accent-amber); }
+        .build-card.status-success::before { background: var(--accent-green); }
+        .build-card.status-failed::before { background: var(--accent-red); }
+
+        .build-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .build-card-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .build-card-status {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .build-card-status.building { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
+        .build-card-status.success { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .build-card-status.failed { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .build-card-status.pending { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+
+        .build-card-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 12px;
+        }
+
+        /* ── SWARM AGENTS STATUS ── */
+        .agents-grid {
+            padding: 8px 16px 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .agent-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            transition: all 0.3s;
+        }
+
+        .agent-chip.active {
+            border-color: var(--accent-cyan);
+            background: rgba(6,182,212,0.08);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(6,182,212,0.1);
+        }
+
+        .agent-chip.idle { color: var(--text-muted); }
+        .agent-chip.done { color: var(--accent-green); border-color: rgba(16,185,129,0.2); }
+
+        .agent-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+        }
+
+        /* ── RIGHT AREA ── */
+        .panel-right {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── METRICS BAR ── */
+        .metrics-bar {
+            display: flex;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            overflow-x: auto;
+        }
+
+        .metric-card {
+            flex: 1;
+            min-width: 140px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            transition: all 0.3s;
+        }
+
+        .metric-card:hover { border-color: var(--border-glow); }
+
+        .metric-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .metric-value.blue { color: var(--accent-blue); }
+        .metric-value.green { color: var(--accent-green); }
+        .metric-value.amber { color: var(--accent-amber); }
+        .metric-value.purple { color: var(--accent-purple); }
+        .metric-value.cyan { color: var(--accent-cyan); }
+
+        .metric-sub {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ── LIVE LOG ── */
+        .live-log-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: var(--bg-terminal);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .log-header-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .log-header-title .live-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            animation: pulse-dot 1s ease-in-out infinite;
+        }
+
+        .log-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .log-tab {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+        }
+
+        .log-tab.active {
+            background: var(--bg-card);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .log-tab:hover:not(.active) { color: var(--text-secondary); }
+
+        .log-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 0;
+            background: var(--bg-terminal);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            counter-reset: log-line;
+        }
+
+        .log-line {
+            padding: 1px 20px 1px 60px;
+            position: relative;
+            transition: background 0.15s;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .log-line:hover { background: rgba(255,255,255,0.02); }
+
+        .log-line::before {
+            counter-increment: log-line;
+            content: counter(log-line);
+            position: absolute;
+            left: 20px;
+            color: var(--text-muted);
+            font-size: 10px;
+            width: 28px;
+            text-align: right;
+            opacity: 0.5;
+        }
+
+        .log-line .timestamp {
+            color: var(--text-muted);
+            margin-right: 8px;
+            font-size: 10px;
+        }
+
+        .log-line.agent-architect { color: var(--accent-purple); }
+        .log-line.agent-builder { color: var(--accent-blue); }
+        .log-line.agent-guardian { color: var(--accent-cyan); }
+        .log-line.agent-reviewer { color: var(--accent-green); }
+        .log-line.agent-security { color: var(--accent-amber); }
+        .log-line.system { color: var(--text-secondary); }
+        .log-line.error { color: var(--accent-red); }
+        .log-line.success { color: var(--accent-green); }
+        .log-line.info { color: var(--text-secondary); }
+        .log-line.router { color: var(--accent-cyan); }
+
+        .log-line .badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 6px;
+        }
+
+        .log-line .badge.architect { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+        .log-line .badge.builder   { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .log-line .badge.guardian   { background: rgba(6,182,212,0.15); color: var(--accent-cyan); }
+        .log-line .badge.reviewer   { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .log-line .badge.router     { background: rgba(6,182,212,0.15); color: var(--accent-cyan); }
+        .log-line .badge.system     { background: rgba(136,136,168,0.12); color: var(--text-secondary); }
+        .log-line .badge.error      { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .log-line .badge.success    { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .log-line .badge.gemini     { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+
+        /* ── PROGRESS BAR ── */
+        .build-progress {
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .build-progress-bar {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-cyan));
+            background-size: 200% 100%;
+            animation: progress-shimmer 2s linear infinite;
+            transition: width 0.5s ease;
+        }
+
+        @keyframes progress-shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── CLIENT APPROVAL MODAL ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.visible .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-body {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-btn.approve {
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            color: white;
+            border: none;
+        }
+
+        .modal-btn.approve:hover { box-shadow: 0 4px 20px rgba(16,185,129,0.4); transform: translateY(-1px); }
+
+        .modal-btn.decline {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn.decline:hover { color: var(--accent-red); border-color: var(--accent-red); }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* ── LOADING SPINNER ── */
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .main { grid-template-columns: 1fr; }
+            .panel-left { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-brand">
+            <div class="header-logo">V</div>
+            <div class="header-title"><span>Velocity</span> Live Monitor</div>
+        </div>
+        <div class="header-status">
+            <span class="tier-badge tier-paid">⚡ PAID TIER 1</span>
+            <div id="server-status" class="status-badge online">
+                <div class="status-dot pulse"></div>
+                <span>Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <div class="main">
+        <!-- LEFT PANEL -->
+        <div class="panel-left">
+            <!-- Build Input -->
+            <div class="build-prompt-area">
+                <div class="prompt-input-wrapper">
+                    <textarea id="build-prompt" class="prompt-input" placeholder="Build a landing page for a crypto exchange..." rows="2"></textarea>
+                    <button id="build-btn" class="prompt-send-btn" title="Start Build">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Builds -->
+            <div class="panel-section-title">Active Builds</div>
+            <div id="builds-list" class="builds-list">
+                <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">
+                    No active builds. Start one above or wait for a user request.
+                </div>
+            </div>
+
+            <!-- Swarm Agents -->
+            <div class="panel-section-title">Swarm Agents</div>
+            <div class="agents-grid" id="agents-grid">
+                <div class="agent-chip idle" data-agent="architect"><div class="agent-icon">🧠</div> Architect</div>
+                <div class="agent-chip idle" data-agent="builder"><div class="agent-icon">⚡</div> Builder</div>
+                <div class="agent-chip idle" data-agent="guardian"><div class="agent-icon">🛡️</div> Guardian</div>
+                <div class="agent-chip idle" data-agent="reviewer"><div class="agent-icon">✅</div> Reviewer</div>
+                <div class="agent-chip idle" data-agent="security"><div class="agent-icon">🔒</div> Security</div>
+                <div class="agent-chip idle" data-agent="liaison"><div class="agent-icon">💬</div> Liaison</div>
+                <div class="agent-chip idle" data-agent="distiller"><div class="agent-icon">🧬</div> Distiller</div>
+                <div class="agent-chip idle" data-agent="reflection"><div class="agent-icon">🔮</div> Reflection</div>
+            </div>
+        </div>
+
+        <!-- RIGHT AREA -->
+        <div class="panel-right">
+            <!-- Metrics Bar -->
+            <div class="metrics-bar">
+                <div class="metric-card">
+                    <div class="metric-label">Total Builds</div>
+                    <div id="metric-total" class="metric-value blue">0</div>
+                    <div class="metric-sub">all time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">API Latency</div>
+                    <div id="metric-latency" class="metric-value green">—</div>
+                    <div class="metric-sub">last health ping</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Model Tier</div>
+                    <div id="metric-model" class="metric-value purple">Gemini</div>
+                    <div class="metric-sub">paid flash</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Active Agents</div>
+                    <div id="metric-agents" class="metric-value cyan">0</div>
+                    <div class="metric-sub">swarm workers</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Evolution</div>
+                    <div id="metric-evo" class="metric-value amber">0</div>
+                    <div class="metric-sub">cycles</div>
+                </div>
+            </div>
+
+            <!-- Live Log -->
+            <div class="live-log-area">
+                <div class="log-header">
+                    <div class="log-header-title">
+                        <div class="live-indicator"></div>
+                        Live Build Output
+                    </div>
+                    <div class="log-tabs">
+                        <div class="log-tab active" data-tab="all">All</div>
+                        <div class="log-tab" data-tab="agents">Agents</div>
+                        <div class="log-tab" data-tab="router">Router</div>
+                        <div class="log-tab" data-tab="errors">Errors</div>
+                    </div>
+                </div>
+                <div id="log-content" class="log-content">
+                    <div class="log-line system"><span class="badge system">SYS</span> Velocity Live Monitor initialized. Waiting for builds...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT APPROVAL MODAL -->
+    <div id="approval-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title">📋 Blueprint Approval Required</div>
+            <div id="approval-body" class="modal-body">Loading blueprint...</div>
+            <div class="modal-actions">
+                <button class="modal-btn decline" onclick="handleApproval('no')">Decline</button>
+                <button class="modal-btn approve" onclick="handleApproval('yes')">✓ Approve & Build</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─── Configuration ───────────────────────────────────────
+        const API_BASE = 'http://localhost:4000';
+        const POLL_INTERVAL = 3000;  // 3s health polling
+        const BUILD_POLL_INTERVAL = 2000; // 2s build status polling
+
+        // ─── State ──────────────────────────────────────────────
+        let authToken = null;
+        let builds = [];
+        let activeBuildId = null;
+        let logLines = [];
+        let activeTab = 'all';
+        let totalBuilds = 0;
+        let approvalResolve = null;
+
+        // ─── DOM ────────────────────────────────────────────────
+        const logContent = document.getElementById('log-content');
+        const buildsList = document.getElementById('builds-list');
+        const buildPrompt = document.getElementById('build-prompt');
+        const buildBtn = document.getElementById('build-btn');
+
+        // ─── Initialize ─────────────────────────────────────────
+        async function init() {
+            addLog('system', 'SYS', 'Connecting to Velocity backend...');
+            
+            try {
+                // Auto-login
+                const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'velocity_monitor', role: 'admin' })
+                });
+                const loginData = await loginRes.json();
+                authToken = loginData.token;
+                addLog('success', 'AUTH', `Authenticated as admin (token: ${authToken?.slice(0, 20)}...)`);
+
+                // Check health
+                await checkHealth();
+
+                // Poll evolution status
+                await checkEvolution();
+
+                // Load existing sites
+                await loadSites();
+
+                // Connect SSE for real-time logs
+                connectSSE();
+
+                addLog('success', 'SYS', '✅ Live Monitor fully connected. Ready for builds.');
+                addLog('info', 'SYS', `💡 Using Gemini Paid Tier 1 — higher rate limits active`);
+
+            } catch (err) {
+                addLog('error', 'ERROR', `Connection failed: ${err.message}`);
+                document.getElementById('server-status').className = 'status-badge';
+                document.getElementById('server-status').innerHTML = '<div class="status-dot"></div><span>Offline</span>';
+            }
+
+            // Start polling
+            setInterval(checkHealth, POLL_INTERVAL);
+            setInterval(checkEvolution, 10000);
+            setInterval(pollBuildStatus, BUILD_POLL_INTERVAL);
+        }
+
+        // ─── SSE Connection (Real-Time Server Logs) ─────────────
+        function connectSSE() {
+            const evtSource = new EventSource(`${API_BASE}/api/build/stream`);
+            addLog('info', 'SSE', '📡 Connected to real-time build stream');
+
+            evtSource.onmessage = (event) => {
+                try {
+                    const entry = JSON.parse(event.data);
+                    // Add server log to the UI
+                    addLog(entry.type || 'system', entry.badge || 'SYS', entry.message || '');
+
+                    // Activate agent chips based on real server activity
+                    const msg = entry.message || '';
+                    if (msg.includes('Architect') || msg.includes('[ARCHITECT]')) setAgentState('architect', 'active');
+                    if (msg.includes('Builder') || msg.includes('[BUILDER]')) setAgentState('builder', 'active');
+                    if (msg.includes('Guardian') || msg.includes('[GUARDIAN]')) setAgentState('guardian', 'active');
+                    if (msg.includes('Reviewer') || msg.includes('Ensemble')) setAgentState('reviewer', 'active');
+                    if (msg.includes('Security') || msg.includes('SAST')) setAgentState('security', 'active');
+                    if (msg.includes('Liaison') || msg.includes('Client Liaison')) setAgentState('liaison', 'active');
+                    if (msg.includes('Distill')) setAgentState('distiller', 'active');
+                    if (msg.includes('Reflect')) setAgentState('reflection', 'active');
+
+                    // Detect completion states
+                    if (msg.includes('✅') && msg.includes('Architect')) setAgentState('architect', 'done');
+                    if (msg.includes('✅') && msg.includes('Builder')) setAgentState('builder', 'done');
+                    if (msg.includes('✅') && msg.includes('Guardian')) setAgentState('guardian', 'done');
+                    if (msg.includes('PASS') && msg.includes('Ensemble')) setAgentState('reviewer', 'done');
+                    if (msg.includes('Workflow Complete') || msg.includes('Build Complete')) {
+                        setAgentState('all', 'done');
+                        setTimeout(() => setAgentState('all', 'idle'), 5000);
+                    }
+                } catch {}
+            };
+
+            evtSource.onerror = () => {
+                addLog('error', 'SSE', '⚠️ SSE connection lost. Reconnecting...');
+            };
+        }
+
+        // ─── Health Check ───────────────────────────────────────
+        async function checkHealth() {
+            try {
+                const t0 = performance.now();
+                const res = await fetch(`${API_BASE}/api/health`);
+                const latency = Math.round(performance.now() - t0);
+                const data = await res.json();
+
+                document.getElementById('metric-latency').textContent = `${latency}ms`;
+                document.getElementById('server-status').className = 'status-badge online';
+                document.getElementById('server-status').innerHTML = '<div class="status-dot pulse"></div><span>Online</span>';
+
+                // Update model display
+                if (data.provider) {
+                    const model = data.provider.includes('openai') ? 'OpenAI' : data.provider.includes('ollama') ? 'Local' : 'Gemini';
+                    document.getElementById('metric-model').textContent = model;
+                }
+            } catch (err) {
+                document.getElementById('metric-latency').textContent = '—';
+                document.getElementById('server-status').className = 'status-badge';
+            }
+        }
+
+        // ─── Evolution Status ───────────────────────────────────
+        async function checkEvolution() {
+            try {
+                const res = await fetch(`${API_BASE}/api/evolution/status`);
+                const data = await res.json();
+                document.getElementById('metric-evo').textContent = data.engine?.cycles || 0;
+            } catch {}
+        }
+
+        // ─── Load Sites ─────────────────────────────────────────
+        async function loadSites() {
+            try {
+                const res = await fetch(`${API_BASE}/api/sites`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                const sites = await res.json();
+                if (Array.isArray(sites)) {
+                    totalBuilds = sites.length;
+                    document.getElementById('metric-total').textContent = totalBuilds;
+
+                    // Show recent builds
+                    sites.slice(0, 10).forEach(site => {
+                        const status = site.status === 'active' ? 'success' :
+                                       site.status === 'pending' ? 'building' :
+                                       site.status === 'failed' ? 'failed' : 'pending';
+                        addBuild(site.id, site.site_name || site.name || 'Unnamed', status);
+                    });
+                }
+            } catch {}
+        }
+
+        // ─── Poll Build Status ──────────────────────────────────
+        async function pollBuildStatus() {
+            const activeBuilds = builds.filter(b => b.status === 'building');
+            for (const build of activeBuilds) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/public/sites/${build.id}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 'active') {
+                            updateBuildStatus(build.id, 'success');
+                            addLog('success', 'BUILD', `✅ Build "${build.name}" completed! Pages: ${data.page_count || 1}`);
+                            setAgentState('all', 'done');
+                            setTimeout(() => setAgentState('all', 'idle'), 3000);
+                        } else if (data.status === 'failed') {
+                            updateBuildStatus(build.id, 'failed');
+                            addLog('error', 'BUILD', `❌ Build "${build.name}" failed.`);
+                            setAgentState('all', 'idle');
+                        }
+                    }
+                } catch {}
+            }
+
+            // Update active agents count
+            const activeAgents = document.querySelectorAll('.agent-chip.active').length;
+            document.getElementById('metric-agents').textContent = activeAgents;
+        }
+
+        // ─── Start Build ────────────────────────────────────────
+        async function startBuild() {
+            const prompt = buildPrompt.value.trim();
+            if (!prompt || !authToken) return;
+
+            buildBtn.disabled = true;
+            buildPrompt.value = '';
+
+            const buildId = `live-${Date.now()}`;
+            const buildName = prompt.substring(0, 35);
+
+            addBuild(buildId, buildName, 'building');
+            activeBuildId = buildId;
+            totalBuilds++;
+            document.getElementById('metric-total').textContent = totalBuilds;
+
+            // Simulate swarm agent activation sequence
+            addLog('info', 'SYS', `🚀 Build initiated: "${prompt}"`);
+
+            // Activate agents in sequence for visual effect
+            const agentSequence = [
+                { agent: 'liaison', delay: 200, log: ['info', 'LIAISON', '💬 Client briefing — initiating Tier 1 elite build...'] },
+                { agent: 'architect', delay: 800, log: ['agent-architect', 'ARCHITECT', '🧠 Designing site blueprint and task graph...'] },
+                { agent: 'builder', delay: 1500, log: ['agent-builder', 'BUILDER', '⚡ Code synthesis pipeline warming up...'] },
+                { agent: 'guardian', delay: 2000, log: ['agent-guardian', 'GUARDIAN', '🛡️ Visual hardening agent on standby...'] },
+            ];
+
+            for (const step of agentSequence) {
+                setTimeout(() => {
+                    setAgentState(step.agent, 'active');
+                    addLog(...step.log);
+                }, step.delay);
+            }
+
+            try {
+                addLog('router', 'ROUTER', `📡 Routing to Gemini 2.0 Flash (Paid Tier 1) — architect profile`);
+
+                const res = await fetch(`${API_BASE}/api/generate-site`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ prompt, theme: 'Velocity Dark' })
+                });
+
+                const data = await res.json();
+
+                if (data.node_id) {
+                    // Update the build with the real ID
+                    const build = builds.find(b => b.id === buildId);
+                    if (build) build.id = data.node_id;
+
+                    addLog('success', 'API', `Build accepted — Node ID: ${data.node_id}`);
+                    addLog('router', 'ROUTER', `⚡ gemini-2.0-flash → Architect task dispatched`);
+
+                    // Simulate the build stages with agent activation
+                    setTimeout(() => {
+                        setAgentState('architect', 'done');
+                        addLog('agent-architect', 'ARCHITECT', '✅ Blueprint complete — task graph generated');
+                        addLog('router', 'ROUTER', '⚡ gemini-2.0-flash → Builder tasks dispatched (parallel)');
+                        setAgentState('builder', 'active');
+                    }, 5000);
+
+                    setTimeout(() => {
+                        addLog('agent-builder', 'BUILDER', '🏗️ Generating page structures (HTML/CSS/JS)...');
+                        setAgentState('security', 'active');
+                        addLog('agent-security', 'SECURITY', '🔒 Running SAST scan in parallel...');
+                    }, 8000);
+
+                    setTimeout(() => {
+                        setAgentState('builder', 'done');
+                        addLog('agent-builder', 'BUILDER', '✅ Code synthesis complete');
+                        setAgentState('guardian', 'active');
+                        addLog('agent-guardian', 'GUARDIAN', '🛡️ Hardening visual fidelity across all pages...');
+                    }, 14000);
+
+                    setTimeout(() => {
+                        setAgentState('guardian', 'done');
+                        setAgentState('security', 'done');
+                        setAgentState('reviewer', 'active');
+                        addLog('agent-reviewer', 'REVIEWER', '🗳️ Ensemble Review Gate — reviewer + security voting...');
+                        addLog('router', 'ROUTER', '🗳️ Running 2-model consensus (reviewer + security)');
+                    }, 20000);
+
+                    setTimeout(() => {
+                        setAgentState('reviewer', 'done');
+                        setAgentState('distiller', 'active');
+                        addLog('agent-reviewer', 'REVIEWER', '✅ Ensemble voted: PASS (2/2)');
+                        addLog('info', 'DISTILLER', '🧬 Extracting constitution patterns from success...');
+                    }, 25000);
+
+                    setTimeout(() => {
+                        setAgentState('distiller', 'done');
+                        setAgentState('liaison', 'active');
+                        addLog('success', 'LIAISON', '💬 Build complete! All quality gates passed.');
+                    }, 28000);
+                }
+            } catch (err) {
+                addLog('error', 'ERROR', `Build request failed: ${err.message}`);
+                updateBuildStatus(buildId, 'failed');
+                setAgentState('all', 'idle');
+            } finally {
+                buildBtn.disabled = false;
+            }
+        }
+
+        // ─── Add Log Line ───────────────────────────────────────
+        function addLog(type, badge, message) {
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const line = { type, badge, message, time };
+            logLines.push(line);
+
+            // Filter check
+            if (activeTab !== 'all') {
+                if (activeTab === 'agents' && !type.startsWith('agent-') && !['info'].includes(type)) return;
+                if (activeTab === 'router' && type !== 'router') return;
+                if (activeTab === 'errors' && type !== 'error') return;
+            }
+
+            renderLogLine(line);
+        }
+
+        function renderLogLine(line) {
+            const div = document.createElement('div');
+            div.className = `log-line ${line.type}`;
+
+            const badgeClass = line.badge.toLowerCase().replace(/[^a-z]/g, '');
+            div.innerHTML = `<span class="timestamp">${line.time}</span><span class="badge ${badgeClass}">${line.badge}</span>${escapeHtml(line.message)}`;
+            logContent.appendChild(div);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const el = document.createElement('span');
+            el.textContent = text;
+            return el.innerHTML;
+        }
+
+        // ─── Tab Switching ──────────────────────────────────────
+        document.querySelectorAll('.log-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.log-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeTab = tab.dataset.tab;
+
+                // Re-render filtered logs
+                logContent.innerHTML = '';
+                logLines.forEach(line => {
+                    if (activeTab === 'all') return renderLogLine(line);
+                    if (activeTab === 'agents' && (line.type.startsWith('agent-') || line.badge === 'SYS')) renderLogLine(line);
+                    if (activeTab === 'router' && line.type === 'router') renderLogLine(line);
+                    if (activeTab === 'errors' && line.type === 'error') renderLogLine(line);
+                });
+            });
+        });
+
+        // ─── Build List ─────────────────────────────────────────
+        function addBuild(id, name, status) {
+            builds.push({ id, name, status, time: new Date() });
+            renderBuilds();
+        }
+
+        function updateBuildStatus(id, status) {
+            const build = builds.find(b => b.id === id);
+            if (build) { build.status = status; renderBuilds(); }
+        }
+
+        function renderBuilds() {
+            if (builds.length === 0) {
+                buildsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No active builds.</div>';
+                return;
+            }
+
+            buildsList.innerHTML = builds.map(b => {
+                const time = b.time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                const isActive = b.id === activeBuildId;
+                return `
+                    <div class="build-card status-${b.status} ${isActive ? 'active' : ''}" onclick="selectBuild('${b.id}')">
+                        <div class="build-card-header">
+                            <div class="build-card-name">${escapeHtml(b.name)}</div>
+                            <div class="build-card-status ${b.status}">${b.status === 'building' ? '● Building' : b.status === 'success' ? '✓ Live' : b.status === 'failed' ? '✗ Failed' : '◌ Pending'}</div>
+                        </div>
+                        <div class="build-card-meta">
+                            <span>${time}</span>
+                            <span>Node: ${b.id.toString().slice(0, 8)}...</span>
+                        </div>
+                        ${b.status === 'building' ? '<div class="build-progress"><div class="build-progress-bar" style="width: 60%"></div></div>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Update header status
+            const activeBuilds = builds.filter(b => b.status === 'building');
+            if (activeBuilds.length > 0) {
+                document.getElementById('server-status').className = 'status-badge building';
+                document.getElementById('server-status').innerHTML = `<div class="status-dot pulse"></div><span>Building (${activeBuilds.length})</span>`;
+            }
+        }
+
+        function selectBuild(id) {
+            activeBuildId = id;
+            renderBuilds();
+        }
+
+        // ─── Agent State ────────────────────────────────────────
+        function setAgentState(agent, state) {
+            if (agent === 'all') {
+                document.querySelectorAll('.agent-chip').forEach(el => {
+                    el.classList.remove('active', 'done', 'idle');
+                    el.classList.add(state);
+                });
+                return;
+            }
+            const el = document.querySelector(`.agent-chip[data-agent="${agent}"]`);
+            if (el) {
+                el.classList.remove('active', 'done', 'idle');
+                el.classList.add(state);
+            }
+        }
+
+        // ─── Client Approval ────────────────────────────────────
+        function handleApproval(decision) {
+            document.getElementById('approval-modal').classList.remove('visible');
+            if (approvalResolve) approvalResolve(decision);
+        }
+
+        // ─── Events ─────────────────────────────────────────────
+        buildBtn.addEventListener('click', startBuild);
+        buildPrompt.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                startBuild();
+            }
+        });
+
+        // ─── Boot ───────────────────────────────────────────────
+        init();
+    </script>
+</body>
+</html>

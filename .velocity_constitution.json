@@ -15,6 +15,10 @@
         {
             "timestamp": "2026-02-27T15:28:50.305Z",
             "summary": "**ACTION:**\n\n* Update all Velocity components to use arrow functions for definition.\n* Enforce consistent styling by applying the same background color (`bg-industrial-dark`) and border-radius (`2xl`) to all Velocity containers.\n\n**HEURISTIC:**\n\n* Use arrow functions as the default syntax for defining Velocity components.\n\n**CONTEXT:**\nThis styling rule is essential for maintaining a consistent visual identity across all Velocity components, ensuring a cohesive brand experience. By applying this heuristic, we can streamline our development process and reduce errors."
+        },
+        {
+            "timestamp": "2026-03-13T23:29:17.365Z",
+            "summary": "*   ACTION: Declare all functions using `const` and arrow function syntax because it ensures consistent lexical `this` binding and enhances readability.\n*   ACTION: Ensure all interactive elements (e.g., buttons) have an `aria-label` if their visual text content is not sufficiently descriptive because it improves accessibility for assistive technologies."
         }
     ],
     "rules": [

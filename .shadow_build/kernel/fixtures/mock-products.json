@@ -1,0 +1,74 @@
+[
+    {
+        "id": "prod_001",
+        "name": "Midnight Chronograph",
+        "price": 249.99,
+        "category": "Watches",
+        "image": "/images/products/watch-01.jpg",
+        "description": "Premium stainless steel chronograph with luminous hands and sapphire crystal.",
+        "stock": 14,
+        "rating": 4.8,
+        "reviews": 127,
+        "badge": "Best Seller"
+    },
+    {
+        "id": "prod_002",
+        "name": "Obsidian Leather Backpack",
+        "price": 189.00,
+        "category": "Bags",
+        "image": "/images/products/bag-01.jpg",
+        "description": "Full-grain leather backpack with laptop compartment and magnetic closures.",
+        "stock": 8,
+        "rating": 4.6,
+        "reviews": 84,
+        "badge": null
+    },
+    {
+        "id": "prod_003",
+        "name": "Eclipse Wireless Headphones",
+        "price": 349.99,
+        "category": "Electronics",
+        "image": "/images/products/headphones-01.jpg",
+        "description": "Active noise cancellation, 40-hour battery life, and spatial audio support.",
+        "stock": 22,
+        "rating": 4.9,
+        "reviews": 312,
+        "badge": "New"
+    },
+    {
+        "id": "prod_004",
+        "name": "Titanium Travel Mug",
+        "price": 49.99,
+        "category": "Accessories",
+        "image": "/images/products/mug-01.jpg",
+        "description": "Double-walled titanium mug. Keeps drinks hot for 12 hours, cold for 24.",
+        "stock": 45,
+        "rating": 4.7,
+        "reviews": 203,
+        "badge": null
+    },
+    {
+        "id": "prod_005",
+        "name": "Carbon Fiber Sunglasses",
+        "price": 179.99,
+        "category": "Accessories",
+        "image": "/images/products/sunglasses-01.jpg",
+        "description": "Ultra-light carbon fiber frame with polarized UV400 lenses.",
+        "stock": 19,
+        "rating": 4.5,
+        "reviews": 67,
+        "badge": "Limited"
+    },
+    {
+        "id": "prod_006",
+        "name": "Velocity Running Shoes",
+        "price": 134.99,
+        "category": "Footwear",
+        "image": "/images/products/shoes-01.jpg",
+        "description": "Energy-return foam sole with breathable knit upper. Race-day ready.",
+        "stock": 31,
+        "rating": 4.8,
+        "reviews": 189,
+        "badge": "Best Seller"
+    }
+]

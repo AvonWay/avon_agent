@@ -25,22 +25,14 @@ export const fetchSites = async (token: string) => {
     return res.json();
 };
 
-export const fetchTemplates = async (token: string) => {
-    const res = await fetch(`${API_URL}/templates`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch templates');
-    return res.json();
-};
-
-export const generateSite = async (token: string, prompt: string, templateId: string, tone?: string, theme?: string) => {
+export const generateSite = async (token: string, prompt: string, theme?: string) => {
     const res = await fetch(`${API_URL}/generate-site`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ prompt, templateId, tone, theme })
+        body: JSON.stringify({ prompt, theme })
     });
     return res.json();
 };

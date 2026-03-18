@@ -204,19 +204,33 @@ app.post('/api/generate-site', authenticateJWT, async (req, res) => {
             const result = await Supervisor.execute(prompt);
             const status = result.status === 'success' ? 'active' : 'failed';
 
+            // Multi-page build: save individual page files to disk
+            const pages = result.pages || {};
+            const pageCount = Object.keys(pages).length;
+            if (pageCount > 0) {
+                const buildDir = path.resolve(__dirname, '..', '.shadow_build', String(siteId));
+                await fse.ensureDir(buildDir);
+                for (const [filename, content] of Object.entries(pages)) {
+                    await fse.writeFile(path.join(buildDir, filename), content, 'utf8');
+                }
+                console.log(`📄 [Multi-Page] Saved ${pageCount} files to ${buildDir}`);
+            }
+
             if (!error) {
                 await supabase.from('sites').update({
                     status,
                     config: {
                         prompt, theme,
                         ai_plan: result.plan || '',
-                        build_artifact: result.artifact || ''
+                        build_artifact: result.artifact || '',
+                        pages: Object.keys(pages),
+                        page_count: pageCount
                     },
                     updated_at: new Date().toISOString()
                 }).eq('id', siteId);
-                console.log(`✅ [Supabase] Site ${siteId} updated. Status: ${status}`);
+                console.log(`✅ [Supabase] Site ${siteId} updated. Status: ${status}, Pages: ${pageCount}`);
             } else {
-                console.log(`✅ [Local] Site ${siteId} built successfully. Status: ${status}`);
+                console.log(`✅ [Local] Site ${siteId} built successfully. Status: ${status}, Pages: ${pageCount}`);
             }
         } catch (err) {
             console.error('❌ Swarm error:', err.message);
@@ -240,8 +254,33 @@ app.get('/api/public/sites/:id', async (req, res) => {
         name: data.site_name,
         status: data.status,
         html: data.config?.build_artifact || '',
-        ai_plan: data.config?.ai_plan || ''
+        ai_plan: data.config?.ai_plan || '',
+        pages: data.config?.pages || [],
+        page_count: data.config?.page_count || 1
     });
+});
+
+// --- PUBLIC SITE PAGE LOOKUP (Multi-Page Builds) ---
+app.get('/api/public/sites/:id/:page', async (req, res) => {
+    const { id, page } = req.params;
+    // Sanitize page name — only allow alphanumeric, hyphens, underscores, and dots
+    if (!/^[\w\-.]+\.html$/.test(page)) {
+        return res.status(400).json({ error: 'Invalid page name' });
+    }
+    try {
+        const buildDir = path.resolve(__dirname, '..', '.shadow_build', String(id));
+        const filePath = path.join(buildDir, page);
+        // Ensure the final path is within the build directory (prevent traversal)
+        if (!filePath.startsWith(buildDir)) {
+            return res.status(403).json({ error: 'Path traversal detected' });
+        }
+        const exists = await fse.pathExists(filePath);
+        if (!exists) return res.status(404).json({ error: `Page '${page}' not found for site ${id}` });
+        const content = await fse.readFile(filePath, 'utf8');
+        res.type('html').send(content);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // --- TERMINAL EXEC (DS-001: Allowlist + metacharacter guard) ---
@@ -407,7 +446,7 @@ app.post('/api/chat', async (req, res) => {
         const { runModel } = await import('../kernel/modelRouter.js');
         const response = await runModel({
             provider: 'ollama',
-            model: model || 'Avon:latest',
+            model: model || 'Avon_Agent',
             profile: profile || 'standard',
             messages,
             system
@@ -570,10 +609,101 @@ app.post('/api/evolution/stop', authenticateJWT, async (req, res) => {
     }
 });
 
+// ─── LIVE BUILD MONITOR ────────────────────────────────────
+
+// SSE: Live build log stream — clients subscribe to real-time build events
+const sseClients = new Set();
+const buildLogs = [];   // in-memory ring buffer (last 500 lines)
+const MAX_LOG_LINES = 500;
+
+function broadcastLog(entry) {
+    const logEntry = { ...entry, timestamp: new Date().toISOString() };
+    buildLogs.push(logEntry);
+    if (buildLogs.length > MAX_LOG_LINES) buildLogs.shift();
+
+    const data = JSON.stringify(logEntry);
+    for (const client of sseClients) {
+        try { client.write(`data: ${data}\n\n`); } catch { sseClients.delete(client); }
+    }
+}
+
+// Monkey-patch console.log to capture swarm output for SSE streaming
+const _origLog = console.log;
+const _origWarn = console.warn;
+const _origErr = console.error;
+
+function classifyLog(msg) {
+    if (typeof msg !== 'string') return { type: 'system', badge: 'SYS' };
+    if (msg.includes('[Router]')) return { type: 'router', badge: 'ROUTER' };
+    if (msg.includes('[Architect]') || msg.includes('ARCHITECT')) return { type: 'agent-architect', badge: 'ARCH' };
+    if (msg.includes('Builder') || msg.includes('BUILDER')) return { type: 'agent-builder', badge: 'BUILD' };
+    if (msg.includes('Guardian') || msg.includes('GUARDIAN')) return { type: 'agent-guardian', badge: 'GUARD' };
+    if (msg.includes('Reviewer') || msg.includes('REVIEWER') || msg.includes('Ensemble')) return { type: 'agent-reviewer', badge: 'REVIEW' };
+    if (msg.includes('Security') || msg.includes('SECURITY') || msg.includes('SAST')) return { type: 'agent-security', badge: 'SEC' };
+    if (msg.includes('Liaison') || msg.includes('Client Liaison')) return { type: 'info', badge: 'LIAISON' };
+    if (msg.includes('Distill') || msg.includes('DISTILL')) return { type: 'info', badge: 'DISTILL' };
+    if (msg.includes('Supervisor')) return { type: 'system', badge: 'SUPER' };
+    if (msg.includes('[Monitor]')) return { type: 'system', badge: 'MON' };
+    if (msg.includes('[Engine]')) return { type: 'system', badge: 'ENGINE' };
+    if (msg.includes('✅') || msg.includes('PASS') || msg.includes('Complete')) return { type: 'success', badge: 'OK' };
+    if (msg.includes('❌') || msg.includes('FAIL') || msg.includes('Error')) return { type: 'error', badge: 'ERR' };
+    return { type: 'system', badge: 'SYS' };
+}
+
+console.log = (...args) => {
+    _origLog(...args);
+    const msg = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+    const { type, badge } = classifyLog(msg);
+    broadcastLog({ type, badge, message: msg });
+};
+
+console.warn = (...args) => {
+    _origWarn(...args);
+    const msg = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+    broadcastLog({ type: 'error', badge: 'WARN', message: msg });
+};
+
+console.error = (...args) => {
+    _origErr(...args);
+    const msg = args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ');
+    broadcastLog({ type: 'error', badge: 'ERR', message: msg });
+};
+
+/** GET /api/build/stream — SSE endpoint for live log streaming */
+app.get('/api/build/stream', (req, res) => {
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*'
+    });
+
+    // Send recent log history as initial burst
+    for (const entry of buildLogs.slice(-50)) {
+        res.write(`data: ${JSON.stringify(entry)}\n\n`);
+    }
+
+    sseClients.add(res);
+    req.on('close', () => sseClients.delete(res));
+});
+
+/** GET /api/build/logs — fetch recent build log lines (REST alternative) */
+app.get('/api/build/logs', (req, res) => {
+    const count = Math.min(parseInt(req.query.count) || 100, MAX_LOG_LINES);
+    res.json(buildLogs.slice(-count));
+});
+
+/** GET /monitor — serve the live monitor dashboard */
+app.get('/monitor', (req, res) => {
+    const monitorPath = path.resolve(__dirname, 'live-monitor.html');
+    res.sendFile(monitorPath);
+});
+
 app.listen(PORT, async () => {
     console.log(`🚀 Avon Backend live at http://localhost:${PORT}`);
+    console.log(`📺 Live Monitor at http://localhost:${PORT}/monitor`);
     console.log(`🗄️  Database: Supabase (${process.env.SUPABASE_URL})`);
-    console.log(`🧠 AI Provider: ${process.env.OPENAI_API_KEY ? 'OpenAI' : 'Ollama'}`);
+    console.log(`🧠 AI Provider: ${process.env.GEMINI_API_KEY ? 'Gemini (Paid Tier 1)' : (process.env.OPENAI_API_KEY ? 'OpenAI' : 'Ollama')}`);
     console.log(`🧬 Evolution Engine: booting...`);
 
     // Auto-boot the evolution engine if EVOLUTION_MODE=auto in env
