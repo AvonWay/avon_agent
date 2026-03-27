@@ -29,7 +29,7 @@ export class VerifyAgent {
 
     /**
      * AI-Driven Vibe Audit
-     * Sends the code and constitution rules to codegemma for a nuanced check.
+     * Sends the code and constitution rules to the Guardian profile for a nuanced check.
      */
     static async checkVibeAI(code, rules) {
         console.log(`[Auditor] Initiating AI-Driven Vibe Audit...`);

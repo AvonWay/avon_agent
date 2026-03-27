@@ -22,8 +22,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const DEV_PREVIEW_URL = 'http://localhost:3001';
-const BACKEND_API = 'http://localhost:4000/api';
+const DEV_PREVIEW_URL = process.env.PUBLIC_URL || 'http://localhost:3001';
+const BACKEND_API = process.env.BACKEND_API_URL || 'https://avonagent-production.up.railway.app/api';
 
 // ---------------------------------------------------------------------------
 // Data helpers

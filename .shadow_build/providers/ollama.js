@@ -5,7 +5,7 @@ const ollama = new Ollama({ host: 'http://127.0.0.1:11434' });
 /**
  * Runs a chat completion using the local Ollama instance.
  * @param {Object} options - The completion options.
- * @param {string} options.model - The model name (e.g., 'Avon:latest').
+ * @param {string} options.model - The model name (e.g., 'Avon_Agent').
  * @param {Array} options.messages - The conversation history.
  * @param {string} [options.system] - Optional system prompt override.
  * @param {boolean} [options.stream] - Whether to stream the response.

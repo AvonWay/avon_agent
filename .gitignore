@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 .env*.local
+.env.railway
 !.env.example
 avon-backend/.env
 avon-dashboard/.env.local

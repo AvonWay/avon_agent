@@ -150,10 +150,10 @@ export class PerformanceMonitor extends EventEmitter {
     /** Static Application Security Testing — walks source files for risk patterns */
     async runSAST() {
         const riskPatterns = [
-            { pattern: /eval\s*\(/, severity: 'CRITICAL', label: '/* CRITICAL: eval() removed. Refactor to eliminate dynamic code execution and prevent injection. */) injection risk' },
-            { pattern: /new Function\(/, severity: 'CRITICAL', label: '/* CRITICAL: new Function() removed. Refactor to eliminate dynamic function creation and prevent injection. */) injection' },
+            { pattern: /eval\s*\(/, severity: 'CRITICAL', label: 'eval() injection risk' },
+            { pattern: /new Function\(/, severity: 'CRITICAL', label: 'new Function() injection' },
             { pattern: /process\.env\.\w+\s*=/, severity: 'HIGH', label: 'env var mutation' },
-            { pattern: /child_process.*exec\b(?!Sync)/, severity: 'HIGH', label: 'unsanitised /* HIGH: exec() call replaced with safer child_process.spawn() and arguments sanitized to prevent injection. */)' },
+            { pattern: /child_process.*exec\b(?!Sync)/, severity: 'HIGH', label: 'unsanitised exec()' },
             { pattern: /password|secret|token/i, severity: 'MEDIUM', label: 'plaintext credential hint' },
         ];
 
@@ -369,7 +369,7 @@ Keep patches minimal and surgical. Only fix what is actually broken or risky.
 // ══════════════════════════════════════════════════════════
 //  MODULE 4 — SHADOW OPERATOR (Clone → Patch → Build)
 // ══════════════════════════════════════════════════════════
-export class ShadowOperator {
+class ShadowOperator {
     constructor() {
         this.shadowPath = SHADOW_ROOT;
     }
@@ -474,7 +474,7 @@ async function walkJS(dir) {
 // ══════════════════════════════════════════════════════════
 //  MODULE 5 — VALIDATION GATE
 // ══════════════════════════════════════════════════════════
-export class ValidationGate {
+class ValidationGate {
     /** Run quick smoke tests against the shadow build */
     async runUnitTests(shadowPath) {
         console.log('[Validator] 🧪 Running unit tests...');
@@ -572,7 +572,7 @@ export class ValidationGate {
 // ══════════════════════════════════════════════════════════
 //  MODULE 6 — ATOMIC SWAP (Hot Handover)
 // ══════════════════════════════════════════════════════════
-export class AtomicSwap {
+class AtomicSwap {
     constructor({ manifest, sessionState }) {
         this.manifest = manifest;
         this.sessionState = sessionState;
@@ -787,4 +787,4 @@ export class AvonEvolutionEngine {
 }
 
 // ─── Singleton export ───────────────────────────────────────
-export const EvolutionEngine = new AvonEvolutionEngine();
+const EvolutionEngine = new AvonEvolutionEngine();

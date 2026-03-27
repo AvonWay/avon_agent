@@ -58,7 +58,7 @@
               <td class="p-4 align-middle text-muted-foreground">$!{site.template}</td>
               <td class="p-4 align-middle text-muted-foreground">$!{site.deployed}</td>
               <td class="p-4 align-middle">
-                <a href="http://localhost:3001/?id=$!{site.id}" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
+                <a href="$!{site.previewUrl}" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
               </td>
             </tr>
             #end
@@ -80,7 +80,7 @@
               <td class="p-4 align-middle text-muted-foreground">E-Commerce Core</td>
               <td class="p-4 align-middle text-muted-foreground">2 hours ago</td>
               <td class="p-4 align-middle">
-                <a href="http://localhost:3001/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
+                <a href="$!{devPreviewUrl}/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
               </td>
             </tr>
             <tr class="border-b transition-colors hover:bg-muted/50">
@@ -89,7 +89,7 @@
               <td class="p-4 align-middle text-muted-foreground">Custom Build</td>
               <td class="p-4 align-middle text-muted-foreground">1 day ago</td>
               <td class="p-4 align-middle">
-                <a href="http://localhost:3001/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
+                <a href="$!{devPreviewUrl}/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
               </td>
             </tr>
             <tr class="border-b transition-colors hover:bg-muted/50">
@@ -98,7 +98,7 @@
               <td class="p-4 align-middle text-muted-foreground">Real Estate Core</td>
               <td class="p-4 align-middle text-muted-foreground">3 days ago</td>
               <td class="p-4 align-middle">
-                <a href="http://localhost:3001/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
+                <a href="$!{devPreviewUrl}/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
               </td>
             </tr>
             <tr class="border-b transition-colors hover:bg-muted/50">
@@ -107,7 +107,7 @@
               <td class="p-4 align-middle text-muted-foreground">Custom Build</td>
               <td class="p-4 align-middle text-muted-foreground">1 week ago</td>
               <td class="p-4 align-middle">
-                <a href="http://localhost:3001/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
+                <a href="$!{devPreviewUrl}/" target="_blank" rel="noopener">#button("View", "ghost", "h-8 px-3 text-xs", "")</a>
               </td>
             </tr>
             #end
