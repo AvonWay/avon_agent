@@ -56,6 +56,11 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
+// --- STATUS ---
+app.get('/', (req, res) => {
+    res.json({ status: "Avon Backend Online", engine: process.env.EVOLUTION_MODE || "standby", docs: "/monitor" });
+});
+
 // --- HEALTH ---
 app.get('/api/health', (req, res) => {
     res.json({
@@ -699,7 +704,7 @@ app.get('/monitor', (req, res) => {
     res.sendFile(monitorPath);
 });
 
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', async () => {
     console.log(`🚀 Avon Backend live at http://localhost:${PORT}`);
     console.log(`📺 Live Monitor at http://localhost:${PORT}/monitor`);
     console.log(`🗄️  Database: Supabase (${process.env.SUPABASE_URL})`);
