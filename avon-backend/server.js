@@ -8,7 +8,11 @@ import path from 'path';
 import dotenv from 'dotenv';
 import fse from 'fs-extra';
 import { rateLimit } from 'express-rate-limit';
+import Stripe from 'stripe';
 
+const stripe = process.env.STRIPE_SECRET_KEY 
+    ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' }) 
+    : null;
 
 dotenv.config();
 
@@ -459,6 +463,42 @@ app.post('/api/chat', async (req, res) => {
         res.json(response);
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// --- STRIPE & CONFIG ---
+app.get('/api/config/check', authenticateJWT, (req, res) => {
+    res.json({
+        stripe: !!process.env.STRIPE_SECRET_KEY,
+        openai: !!process.env.OPENAI_API_KEY,
+        gemini: !!process.env.GEMINI_API_KEY,
+        mode: process.env.EVOLUTION_MODE || 'standby'
+    });
+});
+
+app.post('/api/stripe/create-checkout-session', authenticateJWT, async (req, res) => {
+    if (!stripe) return res.status(400).json({ error: 'Stripe is not configured on this node.' });
+    
+    try {
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                price_data: {
+                    currency: 'usd',
+                    product_data: { name: 'Velocity Professional Tier' },
+                    unit_amount: 4900,
+                },
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${req.headers.origin || 'http://localhost:3000'}/profile?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${req.headers.origin || 'http://localhost:3000'}/profile`,
+            client_reference_id: req.user.id,
+            customer_email: req.user.email,
+        });
+        res.json({ url: session.url });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 

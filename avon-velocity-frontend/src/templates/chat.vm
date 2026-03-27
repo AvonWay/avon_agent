@@ -267,35 +267,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const runTask = async (prompt, images = []) => {
         updateStatus('Thinking', 'Avon is analyzing the industrial requirements...', 'yellow');
         
-        // Mocking the "abstracted" experience
-        setTimeout(() => {
-            updatePlan([
-                { text: 'Analyze project scope', done: true },
-                { text: 'Synthesize industrial logic', done: false },
-                { text: 'Deploy to containment', done: false }
-            ]);
-            updateStatus('Planning', 'Generating architectural blueprint...', 'purple');
-            
-            setTimeout(() => {
-                updateStatus('Executing', 'Building components in background...', 'green');
-                updatePlan([
-                    { text: 'Analyze project scope', done: true },
-                    { text: 'Synthesize industrial logic', done: true },
-                    { text: 'Deploy to containment', done: false }
-                ]);
+        try {
+            const apiPath = window.location.hostname.includes('railway') 
+                ? 'https://avonagent-production.up.railway.app/api' 
+                : 'http://localhost:4000/api';
                 
-                setTimeout(() => {
-                    addMessage('ai', "Task complete. I have synthesized the requested node and initialized the containment field. You can review the output in the Development IDE.");
-                    updateStatus('Complete', 'All industrial processes finalized.', 'green');
-                     updatePlan([
-                        { text: 'Analyze project scope', done: true },
-                        { text: 'Synthesize industrial logic', done: true },
-                        { text: 'Deploy to containment', done: true }
-                    ]);
-                }, 2000);
-            }, 1500);
-        }, 1000);
+            const res = await fetch(`${apiPath}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
+            });
+            
+            if (!res.ok) throw new Error('API reported status ' + res.status);
+            
+            const data = await res.json();
+            // Try common text response locations from LLMs
+            const aiText = data.content || data.response || (data.message && data.message.content) || (data.choices && data.choices[0] && data.choices[0].message.content) || JSON.stringify(data);
+            
+            addMessage('ai', aiText);
+            updateStatus('Complete', 'Industrial processes finalized.', 'green');
+             updatePlan([
+                { text: 'Analyze project scope', done: true },
+                { text: 'Synthesize industrial logic', done: true },
+                { text: 'Deploy to containment', done: true }
+            ]);
+        } catch (err) {
+            addMessage('ai', `⚠️ Connection Error: Unable to reach the Velocity Cortex. (${err.message})`);
+            updateStatus('Error', 'Task failed. Neural link severed.', 'red');
+        }
     };
+
 
     sendBtn.addEventListener('click', () => {
         const text = chatInput.value.trim();
