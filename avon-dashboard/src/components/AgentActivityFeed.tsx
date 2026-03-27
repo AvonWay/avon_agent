@@ -21,7 +21,7 @@ import {
     RefreshCw, FileCode, Zap, Bug, GitMerge
 } from 'lucide-react';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://avonagent-production.up.railway.app';
 
 // ─── Types ───────────────────────────────────────────────────
 interface EvolutionEntry {

@@ -1,9 +1,12 @@
+const PRODUCTION_API = 'https://avonagent-production.up.railway.app/api';
+
 const getApiUrl = () => {
     if (typeof window !== 'undefined') {
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        return process.env.NEXT_PUBLIC_API_URL || `http://${isLocalhost ? 'localhost' : window.location.hostname}:4000/api`;
+        if (isLocalhost) return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+        return process.env.NEXT_PUBLIC_API_URL || PRODUCTION_API;
     }
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+    return process.env.NEXT_PUBLIC_API_URL || PRODUCTION_API;
 };
 
 const API_URL = getApiUrl();
