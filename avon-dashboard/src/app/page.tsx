@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import {
-    fetchSites, generateSite, login, fetchWorkspaces,
+    fetchSites, generateSite, login, fetchWorkspaces, sendChat,
     switchWorkspace, fetchMembers, fetchActivity, deleteSite, checkConfig, updateConfig,
     executeCommand, listFiles, readFile, writeFile, publishFile
 } from '@/lib/api';
@@ -365,12 +365,26 @@ export default function VelocityIDE() {
         const msg = chatInput;
         setChatInput('');
         setChatMessages(prev => [...prev, { role: 'user', content: msg }]);
+        
         if (msg.toLowerCase().includes('build') || msg.toLowerCase().includes('create')) {
             handleGenerate(msg, 'Light Theme');
         } else {
-            setTimeout(() => {
-                setChatMessages(prev => [...prev, { role: 'velocity', content: `Understood. Use the new button styles to trigger actions directly.` }]);
-            }, 1000);
+            try {
+                setChatMessages(prev => [...prev, { role: 'velocity', content: '...' }]); // Loading state
+                const res = await sendChat([{ role: 'user', content: msg }]);
+                const aiText = res.content || res.response || (res.message && res.message.content) || (res.choices && res.choices[0] && res.choices[0].message.content) || JSON.stringify(res);
+                setChatMessages(prev => {
+                    const newMessages = [...prev];
+                    newMessages[newMessages.length - 1] = { role: 'velocity', content: aiText };
+                    return newMessages;
+                });
+            } catch (err: any) {
+                setChatMessages(prev => {
+                    const newMessages = [...prev];
+                    newMessages[newMessages.length - 1] = { role: 'velocity', content: `⚠️ Connection Error: Unable to reach Velocity Cortex. (${err.message})` };
+                    return newMessages;
+                });
+            }
         }
     };
 

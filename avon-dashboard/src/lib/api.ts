@@ -40,6 +40,17 @@ export const generateSite = async (token: string, prompt: string, theme?: string
     return res.json();
 };
 
+export const sendChat = async (messages: any[], model?: string) => {
+    const res = await fetch(`${API_URL}/chat`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ messages, model })
+    });
+    return res.json();
+};
+
 export const upgradeAccount = async (token: string, role: string) => {
     const res = await fetch(`${API_URL}/upgrade`, {
         method: 'POST',
