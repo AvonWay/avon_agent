@@ -6,6 +6,8 @@ import { createClient } from '@supabase/supabase-js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
+dotenv.config();
+
 import fse from 'fs-extra';
 import { rateLimit } from 'express-rate-limit';
 import Stripe from 'stripe';
@@ -13,8 +15,6 @@ import Stripe from 'stripe';
 const stripe = process.env.STRIPE_SECRET_KEY 
     ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' }) 
     : null;
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -744,7 +744,7 @@ app.get('/monitor', (req, res) => {
     res.sendFile(monitorPath);
 });
 
-app.listen(PORT, '0.0.0.0', async () => {
+app.listen(PORT, async () => {
     console.log(`🚀 Avon Backend live at http://localhost:${PORT}`);
     console.log(`📺 Live Monitor at http://localhost:${PORT}/monitor`);
     console.log(`🗄️  Database: Supabase (${process.env.SUPABASE_URL})`);
