@@ -10,9 +10,10 @@ import {
 import {
     Files, Search, GitGraph, Play, Settings, MoreHorizontal, X,
     ChevronRight, ChevronDown, Terminal, Globe, Plus, Cpu, Shield,
-    Sun, Moon, Box, Activity, User, Zap, Code, Send, RefreshCw, Folder, File, MessageSquare, Rocket, ExternalLink
+    Sun, Moon, Box, Activity, User, Zap, Code, Send, RefreshCw, Folder, File, MessageSquare, Rocket, ExternalLink, TrendingUp
 } from 'lucide-react';
 import ProfileSettings from '@/components/ProfileSettings';
+import EngineConfig from '@/components/EngineConfig';
 import TopNav from '@/components/TopNav';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -183,19 +184,16 @@ export default function VelocityIDE() {
     const [activeTab, setActiveTab] = useState('welcome');
     const [openTabs, setOpenTabs] = useState<any[]>([{ id: 'welcome', title: 'Dashboard', type: 'page' }]);
     const [sidebarVisible, setSidebarVisible] = useState(true);
-    const [terminalVisible, setTerminalVisible] = useState(true);
+    const [terminalVisible, setTerminalVisible] = useState(false);
     const [terminalHeight, setTerminalHeight] = useState(250);
-    const [rightPanelVisible, setRightPanelVisible] = useState(true);
+    const [rightPanelVisible, setRightPanelVisible] = useState(false);
 
     // Data
     const [terminalLines, setTerminalLines] = useState<string[]>(['Velocity Shell v2.1 (Light Blue Theme)', 'Type "help" to start.']);
     const [chatMessages, setChatMessages] = useState<{ role: string, content: string }[]>([]);
     const [chatInput, setChatInput] = useState('');
     const [isBuilding, setIsBuilding] = useState(false);
-    const [problems, setProblems] = useState<any[]>([
-        { id: 'p1', source: 'Compiler', severity: 'error', message: 'Potential hydration mismatch in main layout', path: 'src/app/layout.tsx', line: 12 },
-        { id: 'p2', source: 'Accessibility', severity: 'warning', message: 'Image missing alt text', path: 'src/components/WebsiteOverview.tsx', line: 32 }
-    ]);
+    const [problems, setProblems] = useState<any[]>([]);
     const [isSwarmMode, setIsSwarmMode] = useState(true);
     const [explorerMode, setExplorerMode] = useState<'nodes' | 'files'>('nodes');
     const [workspaceFiles, setWorkspaceFiles] = useState<any[]>([]);
@@ -203,6 +201,20 @@ export default function VelocityIDE() {
     const [editedContents, setEditedContents] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
+    const [previewHtml, setPreviewHtml] = useState<Record<string, string>>({});
+
+    // Model Selection
+    const [selectedModel, setSelectedModel] = useState('gemini-2.0-flash');
+    const [modelMenuOpen, setModelMenuOpen] = useState(false);
+    const [availableModels] = useState([
+        { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', type: 'frontier' },
+        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', type: 'frontier' },
+        { id: 'gpt-4o', name: 'GPT-4o', type: 'frontier' },
+        { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', type: 'frontier' },
+        { id: 'llama3', name: 'Llama 3 (Local)', type: 'local' },
+        { id: 'phi4', name: 'Phi-4 (Local)', type: 'local' },
+    ]);
 
     useEffect(() => { initIDE(); }, []);
 
@@ -331,28 +343,51 @@ export default function VelocityIDE() {
         }
 
         try {
-            const res = await generateSite(authToken!, prompt, tone);
-            if (res.node_id) {
-                printTerminal(`Build Initiated: Node ID #${res.node_id}`);
-                setChatMessages(prev => [...prev, { role: 'velocity', content: `Building project: "${prompt}". Status is active in terminal.` }]);
+            // FIRE LOCAL VELOCITY CLI SWARM
+            const response = await fetch('/api/velocity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ goal: prompt })
+            });
+            const res = await response.json();
 
+            if (res.status === 'success') {
+                printTerminal(`Build Initiated: Swarm PID #${res.pid}`);
+                setChatMessages(prev => [...prev, { role: 'velocity', content: `Swarm deployed! I am actively building "${prompt}". Check the terminal or Artifacts panel to watch my progress live.` }]);
+
+                const siteId = `swarm_${res.pid}`;
                 // Replace temp site with real site info in websites list
-                setWebsites(prev => prev.map(s => s.id === tempId ? { ...s, id: res.node_id, status: 'Compiling' } : s));
+                setWebsites(prev => prev.map(s => s.id === tempId ? { ...s, id: siteId, status: 'Compiling' } : s));
+                setOpenTabs(prev => prev.map(t => t.id === `preview:${tempId}` ? { ...t, id: `preview:${siteId}`, title: tempName } : t));
+                setActiveTab(prev => prev === `preview:${tempId}` ? `preview:${siteId}` : prev);
 
-                // Update the tab ID in openTabs to the real node ID
-                setOpenTabs(prev => prev.map(t => t.id === `preview:${tempId}` ? { ...t, id: `preview:${res.node_id}`, title: tempName } : t));
-
-                // If the user is still on the temporary tab, switch active tab to the real one
-                setActiveTab(prev => prev === `preview:${tempId}` ? `preview:${res.node_id}` : prev);
-
-                setTimeout(async () => {
-                    if (authToken) {
-                        const sites = await fetchSites(authToken);
-                        setWebsites(sites);
-                        loadFiles(authToken); // Refresh file list after build
+                // Poll for build completion and auto-load preview
+                const pollForBuild = async (attempt = 0) => {
+                    if (attempt > 20) {
+                        printTerminal(`⏳ Build taking longer than expected. Check terminal for status.`);
+                        return;
                     }
-                    printTerminal(`Build Complete: ${prompt}`);
-                }, 4000);
+                    try {
+                        const buildsRes = await fetch(`http://localhost:4000/api/preview`, {
+                            headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {}
+                        });
+                        const builds = await buildsRes.json();
+                        if (Array.isArray(builds) && builds.length > 0) {
+                            // Find the most recent build
+                            const latestBuild = builds[builds.length - 1];
+                            const previewUrl = `http://localhost:4000${latestBuild.previewUrl}`;
+                            setPreviewUrls(prev => ({ ...prev, [`preview:${siteId}`]: previewUrl }));
+                            setWebsites(prev => prev.map(s => s.id === siteId ? { ...s, status: 'Live', domain: latestBuild.name } : s));
+                            printTerminal(`✅ Build Complete! Preview loaded for: ${latestBuild.name}`);
+                            if (authToken) loadFiles(authToken);
+                            return;
+                        }
+                    } catch { /* retry */ }
+                    setTimeout(() => pollForBuild(attempt + 1), 10000);
+                };
+                pollForBuild();
+            } else {
+                 throw new Error(res.error || "Unknown Swarm Error");
             }
         } catch (e: any) {
             printTerminal(`Build Failed: ${e.message}`);
@@ -371,7 +406,7 @@ export default function VelocityIDE() {
         } else {
             try {
                 setChatMessages(prev => [...prev, { role: 'velocity', content: '...' }]); // Loading state
-                const res = await sendChat([{ role: 'user', content: msg }]);
+                const res = await sendChat([{ role: 'user', content: msg }], selectedModel);
                 const aiText = res.content || res.response || (res.message && res.message.content) || (res.choices && res.choices[0] && res.choices[0].message.content) || JSON.stringify(res);
                 setChatMessages(prev => {
                     const newMessages = [...prev];
@@ -469,7 +504,7 @@ export default function VelocityIDE() {
 
             {/* 1. Side Bar (Project Explorer) */}
             {sidebarVisible && (
-                <div className="w-64 bg-[var(--ide-sidebar)] border-r border-[var(--ide-border)] flex flex-col shrink-0 z-30 shadow-sm">
+                <div className="w-56 bg-[var(--ide-sidebar)] border-r border-[var(--ide-border)] flex flex-col shrink-0 z-30 shadow-sm">
                     <div className="h-10 px-4 flex items-center justify-between ide-header mb-2">
                         <span className="text-xs font-bold uppercase tracking-wider text-[var(--ide-fg)]">Explorer</span>
                         <MoreHorizontal size={16} className="cursor-pointer text-gray-400 hover:text-blue-500" />
@@ -527,6 +562,34 @@ export default function VelocityIDE() {
 
                         <div className="mt-4 px-2">
                             <button onClick={() => setTerminalVisible(!terminalVisible)} className="w-full text-left text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded mb-2 border border-gray-200 transition-colors">Toggle Terminal</button>
+                            <button onClick={() => handleOpenTab('engine', 'AI Engine', 'page')} className="w-full text-left text-xs bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 text-blue-700 px-3 py-2 rounded mb-2 border border-blue-200 transition-colors flex items-center gap-2 font-medium">
+                                <Cpu size={14} />
+                                AI Engine
+                            </button>
+                            <button onClick={() => handleOpenTab('trade', 'Velocity Trade', 'page')} className="w-full text-left text-xs bg-gradient-to-r from-green-50 to-blue-50 hover:from-green-100 hover:to-blue-100 text-green-700 px-3 py-2 rounded mb-2 border border-green-200 transition-colors flex items-center justify-between font-medium group">
+                                <div className="flex items-center gap-2">
+                                    <TrendingUp size={14} />
+                                    Velocity Trade
+                                </div>
+                                <span className="flex h-2 w-2 relative">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                            </button>
+                            <button onClick={() => handleOpenTab('opencode', 'OpenCode', 'page')} className="w-full text-left text-xs bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-700 px-3 py-2 rounded mb-2 border border-amber-200 transition-colors flex items-center justify-between font-medium group">
+                                <div className="flex items-center gap-2">
+                                    <Code size={14} />
+                                    OpenCode
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-[9px] font-bold text-amber-600 bg-amber-100 px-1 rounded">LOCAL</span>
+                                    <span className="flex h-1.5 w-1.5 rounded-full bg-amber-400"></span>
+                                </div>
+                            </button>
+                            <button onClick={() => handleOpenTab('blueprints', 'Blueprints', 'page')} className="w-full text-left text-xs bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 text-purple-700 px-3 py-2 rounded mb-2 border border-purple-200 transition-colors flex items-center gap-2 font-medium">
+                                <Box size={14} />
+                                Blueprints
+                            </button>
                             <button onClick={() => handleOpenTab('settings', 'Settings', 'page')} className="w-full text-left text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-2 rounded mb-2 border border-gray-200 transition-colors flex items-center gap-2">
                                 <Settings size={14} />
                                 Settings
@@ -581,6 +644,61 @@ export default function VelocityIDE() {
                             <h1 className="text-3xl font-light text-gray-800 mb-2">My Projects</h1>
                             <p className="text-gray-500 mb-8">Select a project to edit or create a new node.</p>
 
+                            {/* What's New Banner */}
+                            <div className="mb-10 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest">New Update</span>
+                                        <span className="text-blue-100 text-xs font-medium">Velocity v2.5 is here</span>
+                                    </div>
+                                    <h2 className="text-3xl font-black mb-4 tracking-tight">The Agnostic AI Engine is Live.</h2>
+                                    <p className="text-blue-100/80 text-sm mb-6 max-w-2xl font-medium">
+                                        Velocity is now fully model-agnostic. Connect your local Ollama instance, link your OpenAI/Gemini keys, or use our industrial frontier swarm. Own your compute, own your intelligence.
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                                        <div className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">
+                                            <div className="w-10 h-10 bg-amber-400 rounded-xl flex items-center justify-center text-amber-900 shadow-lg shrink-0">
+                                                <TrendingUp size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm">Velocity Trade</h4>
+                                                <p className="text-xs text-blue-100 mt-1 opacity-80">AI-powered Pine Script & TradingView MCP.</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">
+                                            <div className="w-10 h-10 bg-green-400 rounded-xl flex items-center justify-center text-green-900 shadow-lg shrink-0">
+                                                <Cpu size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm">Agnostic Engine</h4>
+                                                <p className="text-xs text-blue-100 mt-1 opacity-80">Switch between Gemini, OpenAI, and Ollama.</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">
+                                            <div className="w-10 h-10 bg-rose-400 rounded-xl flex items-center justify-center text-rose-900 shadow-lg shrink-0">
+                                                <Zap size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm">Evolution Loop</h4>
+                                                <p className="text-xs text-blue-100 mt-1 opacity-80">Autonomous self-patching & monitoring.</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/10">
+                                            <div className="w-10 h-10 bg-purple-400 rounded-xl flex items-center justify-center text-purple-900 shadow-lg shrink-0">
+                                                <Box size={20} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-sm">Music Blueprints</h4>
+                                                <p className="text-xs text-blue-100 mt-1 opacity-80">High-fidelity designs for artists & labels.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Decorative Glows */}
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full blur-[100px] opacity-20 -mr-32 -mt-32"></div>
+                                <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400 rounded-full blur-[100px] opacity-20 -ml-32 -mb-32"></div>
+                            </div>
+
                             <div className="container-custom">
                                 {/* Create New Card */}
                                 <div onClick={() => runCommand('build New Project')} className="card border-2 border-dashed border-blue-200 hover:border-blue-500 flex flex-col items-center justify-center bg-blue-50/50 group">
@@ -618,13 +736,260 @@ export default function VelocityIDE() {
                         </div>
                     )}
 
+                    {activeTab === 'engine' && (
+                        <div className="h-full overflow-y-auto">
+                            <EngineConfig />
+                        </div>
+                    )}
+
+                    {activeTab === 'trade' && (
+                        <div className="h-full overflow-y-auto p-8 bg-gray-50">
+                            <div className="max-w-4xl mx-auto">
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                                        <TrendingUp size={24} />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Velocity Trade</h1>
+                                        <p className="text-gray-500">Autonomous TradingView Intelligence Swarm</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Core Orchestrator</h3>
+                                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                                                <span className="text-sm font-medium text-gray-700">Trading Agent v3</span>
+                                            </div>
+                                            <button 
+                                                onClick={() => runCommand('npm run trade')}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-all shadow-md active:scale-95"
+                                            >
+                                                START AGENT
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-gray-400 leading-relaxed">
+                                            The Velocity Trade agent connects to your TradingView Desktop instance via MCP to execute strategies and perform real-time market analysis.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Active Strategies</h3>
+                                        <div className="space-y-2">
+                                            {['Momentum', 'Crypto SuperTrend', 'Forex Mean Reversion', 'Mutual Fund Golden Cross', 'Volatility Squeeze'].map(s => (
+                                                <div key={s} className="flex items-center gap-2 text-xs text-gray-600 px-3 py-2 bg-gray-50 rounded-lg border border-gray-100">
+                                                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
+                                                    {s}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-800">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-2 text-green-400 text-xs font-mono">
+                                            <Terminal size={14} />
+                                            <span>TRADING_AGENT_OUTPUT</span>
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                                            <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
+                                            <div className="w-2 h-2 rounded-full bg-green-500/50" />
+                                        </div>
+                                    </div>
+                                    <div className="font-mono text-xs text-gray-300 space-y-1 h-64 overflow-y-auto custom-scrollbar opacity-80">
+                                        <div>[SYSTEM] Velocity Trade Swarm initializing...</div>
+                                        <div>[MCP] Connecting to TradingView Desktop (CDP: 9222)...</div>
+                                        <div>[LLM] Ollama (Llama-3) standby.</div>
+                                        <div className="text-gray-500 italic">Click "START AGENT" to begin live execution.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'opencode' && (
+                        <div className="h-full overflow-y-auto p-8 bg-slate-50">
+                            <div className="max-w-6xl mx-auto">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-4 bg-amber-500 text-white rounded-3xl shadow-lg shadow-amber-200">
+                                            <Code size={32} />
+                                        </div>
+                                        <div>
+                                            <h1 className="text-4xl font-black text-slate-900 tracking-tighter">OpenCode</h1>
+                                            <p className="text-slate-500 font-medium">Autonomous Terminal Agent — Local Swarm Intelligence</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black rounded-2xl transition-all shadow-lg shadow-amber-200 uppercase tracking-widest">Deploy Local Node</button>
+                                        <button className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 text-xs font-black rounded-2xl hover:bg-slate-50 transition-all uppercase tracking-widest">Logs</button>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Agent Health</h3>
+                                            <span className="px-2 py-1 bg-green-100 text-green-600 text-[10px] font-bold rounded-lg uppercase">Optimal</span>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-slate-500 font-medium">Local Model</span>
+                                                <span className="text-slate-900 font-bold">Qwen 2.5 Coder (7B)</span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-slate-500 font-medium">Latency</span>
+                                                <span className="text-slate-900 font-bold">12ms (Ollama)</span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-slate-500 font-medium">Memory Usage</span>
+                                                <span className="text-slate-900 font-bold">4.7 GB VRAM</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                                        <div>
+                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Core Orchestrator</h3>
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-10 h-10 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600">
+                                                    <Cpu size={20} />
+                                                </div>
+                                                <div>
+                                                    <div className="text-sm font-bold text-slate-800 tracking-tight">Coding Agent v1.2</div>
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-green-500 font-bold uppercase tracking-wider">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                                        Connected
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-slate-400 leading-relaxed">
+                                            OpenCode performs autonomous file-system operations and shell execution locally without external data leakage.
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Autonomous Stats</h3>
+                                        <div className="space-y-2">
+                                            {[
+                                                { label: 'Files Refactored', val: '42' },
+                                                { label: 'Shell Commands', val: '189' },
+                                                { label: 'Context Length', val: '128k' }
+                                            ].map(s => (
+                                                <div key={s.label} className="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                                                    <span className="text-slate-500 font-medium">{s.label}</span>
+                                                    <span className="text-slate-900 font-black">{s.val}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl border border-slate-800">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-3 text-amber-400 text-xs font-bold uppercase tracking-widest">
+                                            <Terminal size={16} />
+                                            <span>OpenCode_Terminal_Feed</span>
+                                        </div>
+                                        <div className="flex gap-1.5">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-red-500/30" />
+                                            <div className="w-2.5 h-2.5 rounded-full bg-amber-500/30" />
+                                            <div className="w-2.5 h-2.5 rounded-full bg-green-500/30" />
+                                        </div>
+                                    </div>
+                                    <div className="font-mono text-xs text-slate-300 space-y-2 h-80 overflow-y-auto custom-scrollbar leading-relaxed">
+                                        <div className="flex gap-2"><span className="text-amber-500/50">[BOOT]</span> <span>Velocity OpenCode Agent v1.2.0 initialized.</span></div>
+                                        <div className="flex gap-2"><span className="text-amber-500/50">[LLM]</span> <span>Connected to Ollama: qwen2.5-coder:7b</span></div>
+                                        <div className="flex gap-2"><span className="text-amber-500/50">[FS]</span> <span>Context mapped: 147 files in /avon-dashboard</span></div>
+                                        <div className="flex gap-2"><span className="text-amber-500/50">[SWARM]</span> <span>Registered as 'coder' in Supervisor profileMap.</span></div>
+                                        <div className="flex gap-2"><span className="text-green-500/50">[READY]</span> <span className="animate-pulse">OpenCode active. Executing storefront mission...</span></div>
+                                        <div className="mt-4 text-slate-500 italic border-t border-slate-800 pt-4">Currently building: High-fidelity storefront components.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'blueprints' && (
+                        <div className="h-full overflow-y-auto p-8 bg-slate-50">
+                            <div className="max-w-6xl mx-auto">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div>
+                                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">AI Blueprints</h1>
+                                        <p className="text-slate-500">High-fidelity industry-specific architectural patterns</p>
+                                    </div>
+                                    <span className="px-4 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-black uppercase tracking-widest border border-purple-200">Pro Feature</span>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group cursor-pointer" onClick={() => handleOpenTab('preview:music', 'Music Blueprint', 'preview')}>
+                                        <div className="h-48 bg-slate-200 relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent z-10" />
+                                            <img src="assets/images/img_014.jpg" alt="Music" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                            <div className="absolute bottom-4 left-4 z-20">
+                                                <span className="px-2 py-1 bg-purple-600 text-white text-[10px] font-bold rounded uppercase">Featured</span>
+                                            </div>
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="font-bold text-lg text-slate-800 mb-2">Music & Label Hub</h3>
+                                            <p className="text-sm text-slate-500 mb-4">Optimized for artist releases, tour management, and rich media delivery.</p>
+                                            <button className="w-full py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-purple-600 transition-colors">LAUNCH BLUEPRINT</button>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 opacity-60 grayscale hover:grayscale-0 transition-all cursor-not-allowed">
+                                        <div className="h-48 bg-slate-100 flex items-center justify-center">
+                                            <Globe size={48} className="text-slate-300" />
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="font-bold text-lg text-slate-800 mb-2">SaaS Enterprise</h3>
+                                            <p className="text-sm text-slate-500 mb-4">Complex multi-page application with auth and billing pre-integrated.</p>
+                                            <button className="w-full py-2 bg-slate-200 text-slate-500 text-xs font-bold rounded-xl cursor-not-allowed">COMING SOON</button>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 opacity-60 grayscale hover:grayscale-0 transition-all cursor-not-allowed">
+                                        <div className="h-48 bg-slate-100 flex items-center justify-center">
+                                            <Zap size={48} className="text-slate-300" />
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="font-bold text-lg text-slate-800 mb-2">Web3 Dashboard</h3>
+                                            <p className="text-sm text-slate-500 mb-4">Real-time crypto metrics and wallet integration components.</p>
+                                            <button className="w-full py-2 bg-slate-200 text-slate-500 text-xs font-bold rounded-xl cursor-not-allowed">COMING SOON</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {openTabs.find(t => t.id === activeTab)?.type === 'preview' && (
                         <div className="flex-1 flex flex-col relative h-full">
-                            <iframe
-                                src={`${process.env.NEXT_PUBLIC_PREVIEW_URL || 'http://localhost:3001'}/?id=${activeTab.split(':')[1]}`}
-                                className="w-full h-full border-none bg-white"
-                                title="Preview"
-                            />
+                            {previewUrls[activeTab] ? (
+                                <iframe
+                                    src={previewUrls[activeTab]}
+                                    className="w-full h-full border-none bg-white"
+                                    title="Site Preview"
+                                    sandbox="allow-scripts allow-same-origin allow-popups"
+                                />
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 text-gray-500">
+                                    <div className="relative mb-6">
+                                        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-700 mb-2">Building Your Site...</h3>
+                                    <p className="text-sm text-gray-400 max-w-md text-center">The Velocity Swarm is constructing your site. Watch the terminal below for real-time progress updates.</p>
+                                    <div className="mt-6 flex items-center gap-2 text-xs text-blue-600 font-mono">
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                                        <span>Multi-Agent Pipeline Active</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -723,8 +1088,52 @@ export default function VelocityIDE() {
             {/* 3. Helper Agent (Right) */}
             {rightPanelVisible && (
                 <div className="w-80 bg-white border-l border-[var(--ide-border)] flex flex-col shrink-0 shadow-2xl z-50 relative">
-                    <div className="h-10 px-4 flex items-center justify-between ide-header bg-gray-50">
-                        <span className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-2"><MessageSquare size={14} /> Velocity Assistant</span>
+                    <div className="h-10 px-4 flex items-center justify-between ide-header bg-gray-50 border-b border-gray-100">
+                        <div className="flex items-center gap-2">
+                            <MessageSquare size={14} className="text-blue-600" />
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setModelMenuOpen(!modelMenuOpen)}
+                                    className="text-xs font-bold uppercase tracking-wider text-gray-700 hover:text-blue-600 transition-colors flex items-center gap-1 group"
+                                >
+                                    {availableModels.find(m => m.id === selectedModel)?.name || 'Velocity Assistant'}
+                                    <ChevronDown size={12} className={`transition-transform ${modelMenuOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                
+                                {modelMenuOpen && (
+                                    <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-[60] overflow-hidden py-1">
+                                        <div className="px-3 py-1.5 text-[9px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">Frontier Models</div>
+                                        {availableModels.filter(m => m.type === 'frontier').map(model => (
+                                            <button
+                                                key={model.id}
+                                                onClick={() => {
+                                                    setSelectedModel(model.id);
+                                                    setModelMenuOpen(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-blue-50 flex items-center justify-between ${selectedModel === model.id ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-600'}`}
+                                            >
+                                                {model.name}
+                                                {selectedModel === model.id && <Zap size={10} fill="currentColor" />}
+                                            </button>
+                                        ))}
+                                        <div className="px-3 py-1.5 text-[9px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 border-y border-gray-100">Local Engines</div>
+                                        {availableModels.filter(m => m.type === 'local').map(model => (
+                                            <button
+                                                key={model.id}
+                                                onClick={() => {
+                                                    setSelectedModel(model.id);
+                                                    setModelMenuOpen(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-xs transition-colors hover:bg-amber-50 flex items-center justify-between ${selectedModel === model.id ? 'text-amber-600 font-bold bg-amber-50/50' : 'text-gray-600'}`}
+                                            >
+                                                {model.name}
+                                                {selectedModel === model.id && <Cpu size={10} />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         <div className="flex items-center gap-2">
                             <div
                                 onClick={() => setIsSwarmMode(!isSwarmMode)}

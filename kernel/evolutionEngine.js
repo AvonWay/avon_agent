@@ -38,11 +38,22 @@ const LATENCY_THRESHOLD_MS = 2000;   // p95 latency ceiling
 const MONITOR_INTERVAL_MS = 60_000; // 1-minute heartbeat
 const MAX_EVOLUTION_CYCLES = 10;     // safety cap
 
-// ─── runtime state (in-process session buffer) ─────────────
+// ─── runtime state (Persistent session buffer) ─────────────
+const SESSION_STATE_PATH = path.join(PROJECT_ROOT, 'memory', 'session_state.json');
 const SESSION_STATE = {
-    context: {},
-    save(ctx) { this.context = { ...this.context, ...ctx }; return this.context; },
-    load() { return this.context; }
+    async save(ctx) {
+        const current = await this.load();
+        const updated = { ...current, ...ctx, lastUpdate: new Date().toISOString() };
+        await fs.writeJson(SESSION_STATE_PATH, updated, { spaces: 2 });
+        return updated;
+    },
+    async load() {
+        try {
+            return await fs.readJson(SESSION_STATE_PATH);
+        } catch {
+            return {};
+        }
+    }
 };
 
 // ══════════════════════════════════════════════════════════
@@ -586,7 +597,7 @@ class AtomicSwap {
         console.log(`\n[AtomicSwap] ⚡ Initiating atomic swap #${this._cycleCount}...`);
 
         // 1. Snapshot session state
-        const snapshot = this.sessionState.save({
+        const snapshot = await this.sessionState.save({
             swapCycle: this._cycleCount,
             swapTime: new Date().toISOString(),
             patchPlan

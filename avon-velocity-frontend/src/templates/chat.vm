@@ -107,7 +107,7 @@
                 <div id="active-plan" class="space-y-3">
                     <div class="p-3 rounded border border-dashed text-xs text-muted-foreground flex flex-col items-center justify-center h-40">
                         <p>No active plan to display.</p>
-                        <p>Describe a task to generate a blueprint.</p>
+                        <p>Describe a task to generate a custom site.</p>
                     </div>
                 </div>
             </div>

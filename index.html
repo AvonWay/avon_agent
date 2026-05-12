@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Velocity — AI-Powered Site Builder</title>
     <meta name="description"
-        content="Build production websites with swarm intelligence. Start free with all 20+ blueprints and enough tokens for your first build.">
+        content="Build production websites with swarm intelligence. Start free with 100% custom generated sites and enough tokens for your first build.">
     <meta property="og:title" content="Velocity — AI-Powered Site Builder">
     <meta property="og:description" content="Build production websites with swarm intelligence. Start free.">
     <meta property="og:type" content="website">
@@ -43,52 +43,6 @@
                 </div>
                 <a href="#features">Features</a>
                 <a href="#pricing">Pricing</a>
-                <div class="dropdown" id="blueprints-dropdown">
-                    <button class="dropbtn" aria-haspopup="true" aria-expanded="false"
-                        onclick="toggleDropdown('blueprint-links')">
-                        Blueprints
-                        <svg class="dropdown-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path d="M6 9l6 6 6-6" />
-                        </svg>
-                    </button>
-                    <div class="dropdown-content" id="blueprint-links">
-                        <div class="dropdown-grid">
-                            <div class="dropdown-col">
-                                <span class="dropdown-heading">Business</span>
-                                <a href="previews/saas-landing.html">SaaS Landing</a>
-                                <a href="previews/admin-dashboard.html">Admin Dashboard</a>
-                                <a href="previews/consulting.html">Consulting Hub</a>
-                                <a href="previews/agency.html">Agency Hub</a>
-                                <a href="previews/law-firm.html">Law Firm Hub</a>
-                            </div>
-                            <div class="dropdown-col">
-                                <span class="dropdown-heading">Commerce & Tech</span>
-                                <a href="previews/storefront-pro.html">Storefront Pro</a>
-                                <a href="previews/crypto.html">Crypto Hub</a>
-                                <a href="previews/fintech.html">Fintech Hub</a>
-                                <a href="previews/real-estate.html">Real Estate Hub</a>
-                                <a href="previews/healthcare.html">Healthcare Hub</a>
-                            </div>
-                            <div class="dropdown-col">
-                                <span class="dropdown-heading">Creative & Lifestyle</span>
-                                <a href="previews/portfolio.html">Portfolio</a>
-                                <a href="previews/restaurant.html">Restaurant</a>
-                                <a href="previews/photography.html">Photography Hub</a>
-                                <a href="previews/music.html">Music Hub</a>
-                                <a href="previews/travel.html">Travel Hub</a>
-                            </div>
-                            <div class="dropdown-col">
-                                <span class="dropdown-heading">Community & Content</span>
-                                <a href="previews/blog.html">Blog</a>
-                                <a href="previews/education.html">Education Hub</a>
-                                <a href="previews/event.html">Event Hub</a>
-                                <a href="previews/fitness.html">Fitness Hub</a>
-                                <a href="previews/nonprofit.html">Nonprofit Hub</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <a href="#architecture">Architecture</a>
             </nav>
             <div class="header-actions">
@@ -111,7 +65,7 @@
                 </div>
                 <h1>Build Websites with<br><span class="gradient-text">Swarm Intelligence</span></h1>
                 <p class="hero-desc">Velocity uses multi-agent AI to generate, deploy, and scale production sites. Start
-                    free with all 20+ blueprints! (500 tokens = 1 Production-Ready Site).</p>
+                    free with custom, unique builds! (500 tokens = 1 Production-Ready Site).</p>
                 <div class="hero-actions">
                     <button class="btn-primary" id="hero-cta" onclick="openModal('signup')">
                         Start Building Free
@@ -129,7 +83,7 @@
                     </button>
                 </div>
                 <div class="hero-metrics">
-                    <div class="metric"><span class="metric-val">20+</span><span class="metric-label">Blueprints</span>
+                    <div class="metric"><span class="metric-val">100%</span><span class="metric-label">Custom Code</span>
                     </div>
                     <div class="metric-divider"></div>
                     <div class="metric"><span class="metric-val">3</span><span class="metric-label">AI Agents</span>
@@ -168,13 +122,29 @@
                 <p>From AI generation to one-click deploy — Velocity handles the entire pipeline.</p>
             </div>
             <div class="features-grid">
-                <div class="feature-card" id="feat-blueprints">
-                    <div class="feature-icon icon-blue">🏗️</div>
-                    <h3>20+ Premium Blueprints</h3>
-                    <p>Pre-built, production-ready templates for SaaS, e-commerce, portfolios, dashboards, and more. All
-                        20+
-                        included free.</p>
-                    <span class="feature-tag tag-free">All 20+ Free</span>
+                <div class="feature-card" id="feat-trade">
+                    <div class="feature-icon icon-amber">📈</div>
+                    <h3>Velocity Trade</h3>
+                    <p>Autonomous TradingView Intelligence Swarm. Deploy Pine Script strategies and execute trades directly from the IDE.</p>
+                    <span class="feature-tag tag-pro">Live Agent</span>
+                </div>
+                <div class="feature-card" id="feat-music">
+                    <div class="feature-icon icon-rose">🎵</div>
+                    <h3>Music Blueprints</h3>
+                    <p>High-fidelity, design-first blueprints for artists and labels. Optimized for high conversion and rich media.</p>
+                    <span class="feature-tag tag-pro">New</span>
+                </div>
+                <div class="feature-card" id="feat-agnostic">
+                    <div class="feature-icon icon-blue">🧬</div>
+                    <h3>Agnostic AI Engine</h3>
+                    <p>Switch between Gemini 3.1, OpenAI, and local Ollama engines. Your compute, your data, your choice.</p>
+                    <span class="feature-tag tag-free">100% Agnostic</span>
+                </div>
+                <div class="feature-card" id="feat-custom">
+                    <div class="feature-icon icon-blue">✨</div>
+                    <h3>100% Custom Builds</h3>
+                    <p>Unique sites generated for your specific needs. Bespoke design and code for every user.</p>
+                    <span class="feature-tag tag-free">Unique</span>
                 </div>
                 <div class="feature-card" id="feat-swarm">
                     <div class="feature-icon icon-purple">🐝</div>
@@ -182,13 +152,6 @@
                     <p>Three specialized AI agents — Architect, Builder, and Guardian — orchestrate your builds with
                         industrial precision.</p>
                     <span class="feature-tag tag-pro">Pro</span>
-                </div>
-                <div class="feature-card" id="feat-tokens">
-                    <div class="feature-icon icon-green">🪙</div>
-                    <h3>Token System</h3>
-                    <p>Start with enough tokens for your first complete build. Upgrade for unlimited generation and
-                        advanced features.</p>
-                    <span class="feature-tag tag-free">Free Starter</span>
                 </div>
                 <div class="feature-card" id="feat-deploy">
                     <div class="feature-icon icon-amber">🚀</div>
@@ -209,6 +172,12 @@
                     <p>Conversational AI that understands your vision. Describe what you want and watch it build in
                         real-time.</p>
                     <span class="feature-tag tag-free">Included</span>
+                </div>
+                <div class="feature-card" id="feat-evolution">
+                    <div class="feature-icon icon-green">⚙️</div>
+                    <h3>Evolution Engine</h3>
+                    <p>Autonomous self-patching and performance monitoring. Your site gets better while you sleep.</p>
+                    <span class="feature-tag tag-pro">Pro</span>
                 </div>
             </div>
         </div>
@@ -234,7 +203,7 @@
                         <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="3">
                                 <path d="M20 6L9 17l-5-5" />
-                            </svg>All 20+ Blueprints</li>
+                            </svg>100% Custom Builds</li>
                         <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="3">
                                 <path d="M20 6L9 17l-5-5" />
@@ -279,7 +248,7 @@
                         <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="3">
                                 <path d="M20 6L9 17l-5-5" />
-                            </svg>All 20+ Blueprints</li>
+                            </svg>100% Custom Builds</li>
                         <li class="included"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="3">
                                 <path d="M20 6L9 17l-5-5" />
@@ -364,7 +333,7 @@
         <div class="section-header">
             <span class="section-tag">Architecture</span>
             <h2>Industrial-Grade Platform</h2>
-            <p>Four microservices working in concert to deliver production-ready sites.</p>
+            <p>A resilient multi-agent architecture powered by the Velocity Evolution Engine.</p>
         </div>
 
         <div class="arch-flow">
@@ -372,32 +341,32 @@
             <div class="arch-flow-diagram">
                 <div class="arch-card arch-flow-node">
                     <div class="arch-icon icon-blue">🔧</div>
-                    <h3>Backend API</h3><span class="arch-port">:4000</span>
-                    <p>Express 5 REST API — auth, node generation, workspace config</p>
+                    <h3>Swarm Core</h3><span class="arch-port">:4000</span>
+                    <p>Express 5 API + Agnostic Engine (Gemini/OpenAI/Ollama)</p>
                 </div>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     class="arch-flow-arrow">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
                 <div class="arch-card arch-flow-node">
-                    <div class="arch-icon icon-green">⚡</div>
-                    <h3>Velocity Renderer</h3><span class="arch-port">:8080</span>
-                    <p>Go-based VTL template & Tailwind CSS processor</p>
+                    <div class="arch-icon icon-green">🧬</div>
+                    <h3>Evolution Engine</h3>
+                    <p>Autonomous monitoring, security audits, and self-patching</p>
                 </div>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     class="arch-flow-arrow">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
                 <div class="arch-card arch-flow-node">
-                    <div class="arch-icon icon-amber">🌐</div>
-                    <h3>Preview Server</h3><span class="arch-port">:3001</span>
-                    <p>Hot-reloading edge router for AI site previews</p>
+                    <div class="arch-icon icon-amber">📊</div>
+                    <h3>Velocity Trade</h3>
+                    <p>TradingView MCP integration for algorithmic strategy deployment</p>
                 </div>
             </div>
 
             <div class="arch-card arch-flow-center">
                 <div class="arch-icon icon-purple">💻</div>
-                <h3>IDE Dashboard</h3><span class="arch-port">:3000</span>
+                <h3>Engineering IDE</h3><span class="arch-port">:3000</span>
                 <p>Next.js 16 Web IDE managing the full pipeline cluster</p>
             </div>
         </div>
@@ -407,7 +376,7 @@
     <section class="cta-section" id="cta">
         <div class="container">
             <h2>Ready to Build Your First Site?</h2>
-            <p>Start free with all 20+ blueprints and 500 tokens. No credit card required.</p>
+            <p>Start free with 100% custom builds and 500 tokens. No credit card required.</p>
             <div class="hero-actions">
                 <button class="btn-primary" id="cta-signup" onclick="openModal('signup')">Create Free Account</button>
                 <button class="btn-secondary" id="cta-chat" onclick="openChat()">Chat with Velocity AI</button>
@@ -475,7 +444,7 @@
                         <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
                         <path d="M12 16v-4M12 8h.01" />
                     </svg>
-                    <span>3-day free trial · All 20+ blueprints · 500 tokens · No credit card</span>
+                    <span>3-day free trial · Custom unique builds · 500 tokens · No credit card</span>
                 </div>
             </form>
             <div class="modal-footer">
@@ -506,14 +475,14 @@
         <div class="chat-messages" id="chat-messages">
             <div class="chat-msg bot">
                 <div class="msg-avatar">V</div>
-                <div class="msg-bubble">Hey! 👋 I'm the Velocity AI agent. I can help you plan your site, pick
-                    blueprints, or answer questions about the platform. What would you like to build?</div>
+                <div class="msg-bubble">Hey! 👋 I'm the Velocity AI agent. I can help you plan your site, generate
+                    custom unique designs, or answer questions about the platform. What would you like to build?</div>
             </div>
         </div>
         <div class="chat-suggestions" id="chat-suggestions">
             <button onclick="sendSuggestion('Build me a SaaS landing page')">SaaS Landing Page</button>
             <button onclick="sendSuggestion('I need an e-commerce site')">E-Commerce Site</button>
-            <button onclick="sendSuggestion('What blueprints are free?')">Free Blueprints?</button>
+            <button onclick="sendSuggestion('How unique are the generated sites?')">Custom Designs?</button>
         </div>
         <form class="chat-input" id="chat-form" onsubmit="sendMessage(event)">
             <button type="button" class="chat-extra-btn" id="chat-attach-btn" aria-label="Attach files"

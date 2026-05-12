@@ -119,7 +119,7 @@
 
   <!-- Quick Actions -->
   <div class="grid gap-4 md:grid-cols-3">
-    #set( $qa1Content = "<p class='text-sm text-muted-foreground mb-4'>Use an Industrial Blueprint to launch a new site with pre-built logic.</p><a href='/blueprints'>#button('Browse Blueprints', 'default', 'w-full', '')</a>" )
+    #set( $qa1Content = "<p class='text-sm text-muted-foreground mb-4'>Command the Velocity Swarm to launch a new fully custom site.</p><a href='/chat'>#button('Start Custom Build', 'default', 'w-full', '')</a>" )
     #card( "🚀 Launch New Site", "", $qa1Content, "" )
 
     #set( $qa2Content = "<p class='text-sm text-muted-foreground mb-4'>Chat with Avon to build, debug, or deploy your sites.</p><a href='/chat'>#button('Open Chat', 'outline', 'w-full', '')</a>" )

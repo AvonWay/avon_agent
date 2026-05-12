@@ -1,0 +1,28 @@
+//@version=6
+strategy("Forex BB + RSI Mean Reversion", overlay=true, initial_capital=10000)
+
+length = input.int(20, "BB Length")
+mult = input.float(2.0, "BB Mult")
+rsiLength = input.int(14, "RSI Length")
+
+[middle, upper, lower] = ta.bb(close, length, mult)
+rsi = ta.rsi(close, rsiLength)
+
+// Mean reversion: Price drops below lower band, RSI is oversold, implies a bounce
+longCond = close < lower and rsi < 30
+shortCond = close > upper and rsi > 70
+
+if (longCond)
+    strategy.entry("Long", strategy.long)
+if (shortCond)
+    strategy.entry("Short", strategy.short)
+
+// Exit when returning to the mean (middle band)
+if (ta.crossover(close, middle))
+    strategy.close("Long")
+if (ta.crossunder(close, middle))
+    strategy.close("Short")
+
+plot(upper, "Upper BB", color=color.blue)
+plot(lower, "Lower BB", color=color.blue)
+plot(middle, "Middle BB", color=color.orange, linewidth=2)

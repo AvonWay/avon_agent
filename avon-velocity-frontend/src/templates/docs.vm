@@ -47,9 +47,7 @@
                     <a href="/components" class="block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground">
                         Component Library
                     </a>
-                    <a href="/blueprints" class="block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground">
-                        Industrial Blueprints
-                    </a>
+
                     <a href="/chat" class="block px-3 py-2 text-sm rounded-lg transition-all hover:bg-muted text-muted-foreground hover:text-foreground">
                         Agent Chat
                     </a>
@@ -468,11 +466,7 @@ cd avon-velocity-frontend &amp;&amp; node server.js</pre></div></div>" )
                                     <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/dashboard</code></td>
                                     <td class="p-4 text-muted-foreground">Live node stats + recent deployments table</td>
                                 </tr>
-                                <tr class="border-b hover:bg-muted/50 transition-colors">
-                                    <td class="p-4 font-mono text-sm">blueprints.vm</td>
-                                    <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/blueprints</code></td>
-                                    <td class="p-4 text-muted-foreground">Industrial template marketplace</td>
-                                </tr>
+
                                 <tr class="border-b hover:bg-muted/50 transition-colors">
                                     <td class="p-4 font-mono text-sm">chat.vm</td>
                                     <td class="p-4"><code class="bg-muted px-1.5 py-0.5 rounded text-xs">/chat</code></td>
@@ -613,10 +607,10 @@ cd avon-velocity-frontend &amp;&amp; node server.js</pre></div></div>" )
                 </div>
 
                 <div class="grid gap-6 md:grid-cols-3 mb-8">
-                    #set( $agent1 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Drafts the architectural blueprint from the user prompt, determining page structure, data schema, and component composition.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Planning', 'default') #badge('Schema Design', 'outline')</div></div>" )
-                    #card( "🤖 Architect Agent", "Phase 1: Blueprint", $agent1, "" )
+                    #set( $agent1 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Drafts the custom architectural plan from the user prompt, determining page structure, data schema, and component composition.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Planning', 'default') #badge('Schema Design', 'outline')</div></div>" )
+                    #card( "🤖 Architect Agent", "Phase 1: Architecture", $agent1, "" )
 
-                    #set( $agent2 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Executes the build plan by synthesizing HTML, CSS, and JS from the Architect's blueprint. Uses templates and macros.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Code Generation', 'default') #badge('Template Merge', 'outline')</div></div>" )
+                    #set( $agent2 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Executes the build plan by synthesizing HTML, CSS, and JS from the Architect's structural plan. Uses templates and macros.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Code Generation', 'default') #badge('Template Merge', 'outline')</div></div>" )
                     #card( "👷 Builder Agent", "Phase 2: Construction", $agent2, "" )
 
                     #set( $agent3 = "<div class='space-y-3'><p class='text-sm text-muted-foreground'>Performs automated linting, accessibility checks, performance scoring, and security audits before deployment.</p><div class='flex flex-wrap gap-2 mt-4'>#badge('Security Audit', 'success') #badge('A11y Check', 'outline')</div></div>" )

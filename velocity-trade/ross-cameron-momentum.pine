@@ -1,0 +1,158 @@
+// This Pine Script™ is subject to the terms of the Mozilla Public License 2.0
+// © Ross Cameron "From $2K to $1M" Momentum Day Trading Strategy
+// DISCLAIMER: For educational purposes only. Not financial advice. Day trading is extremely risky.
+
+//@version=6
+strategy("Ross Cameron Momentum", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10, initial_capital=2000, commission_type=strategy.commission.percent, commission_value=0.1)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INPUTS
+// ══════════════════════════════════════════════════════════════════════════════
+
+// --- Momentum Filter ---
+gapPct          = input.float(5.0,   "Min Gap Up %",           minval=1.0,  step=0.5,  group="Gap & Go Filter")
+relVolMultiple  = input.float(2.0,   "Min Relative Volume (x)",minval=1.0,  step=0.5,  group="Gap & Go Filter")
+volAvgLen       = input.int(20,      "Volume Avg Length",       minval=5,               group="Gap & Go Filter")
+maxPrice        = input.float(20.0,  "Max Stock Price ($)",     minval=1.0,  step=1.0,  group="Gap & Go Filter")
+
+// --- Moving Averages ---
+ema9Len         = input.int(9,       "Fast EMA Length",         minval=1,               group="Moving Averages")
+ema20Len        = input.int(20,      "Slow EMA Length",         minval=1,               group="Moving Averages")
+
+// --- VWAP ---
+showVwap        = input.bool(true,   "Show VWAP",                                       group="VWAP")
+
+// --- Risk Management ---
+riskReward      = input.float(2.0,   "Reward:Risk Ratio",       minval=1.0, step=0.5,  group="Risk Management")
+stopAtrMult     = input.float(1.5,   "Stop Loss ATR Multiple",  minval=0.5, step=0.25, group="Risk Management")
+atrLen          = input.int(14,      "ATR Length",               minval=1,              group="Risk Management")
+maxDailyLoss    = input.float(5.0,   "Max Daily Loss %",        minval=1.0, step=0.5,  group="Risk Management")
+
+// --- Session Filter (Trade first 90 mins only) ---
+useSessionFilter = input.bool(true,  "Only Trade First 90 Min", group="Session Filter")
+sessionStart     = input.session("0930-1100", "Momentum Window", group="Session Filter")
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CALCULATIONS
+// ══════════════════════════════════════════════════════════════════════════════
+
+// --- EMAs ---
+ema9  = ta.ema(close, ema9Len)
+ema20 = ta.ema(close, ema20Len)
+
+// --- VWAP ---
+vwapValue = ta.vwap(hlc3)
+
+// --- ATR for Stop Loss ---
+atrValue = ta.atr(atrLen)
+
+// --- Gap Detection ---
+prevDayClose = request.security(syminfo.tickerid, "D", close[1], barmerge.gaps_off, barmerge.lookahead_on)
+gapPercent   = ((open - prevDayClose) / prevDayClose) * 100
+isGappingUp  = gapPercent >= gapPct
+
+// --- Relative Volume ---
+avgVol    = ta.sma(volume, volAvgLen)
+relVol    = volume / avgVol
+isHighVol = relVol >= relVolMultiple
+
+// --- Price Filter ---
+isPriceInRange = close <= maxPrice and close > 1.0
+
+// --- Session Filter ---
+inSession = useSessionFilter ? not na(time(timeframe.period, sessionStart)) : true
+
+// --- Bull Flag Pattern Detection ---
+// Look for: strong move up (pole) followed by tight consolidation (flag)
+poleLen    = 5
+flagLen    = 3
+poleHigh   = ta.highest(high, poleLen)[flagLen]
+poleLow    = ta.lowest(low, poleLen)[flagLen]
+poleRange  = poleHigh - poleLow
+flagHigh   = ta.highest(high, flagLen)
+flagLow    = ta.lowest(low, flagLen)
+flagRange  = flagHigh - flagLow
+
+// Bull flag: pole was strong (big range), flag is tight (small range), price near highs
+isBullFlag = poleRange > 0 and (flagRange / poleRange) < 0.5 and close > ema9
+
+// --- Flat Top Breakout Detection ---
+// Resistance tested 2+ times at similar level, then breakout
+resistanceLevel = ta.highest(high, 10)[1]
+nearResistance  = math.abs(high - resistanceLevel) / resistanceLevel < 0.005
+isFlatTopBreak  = close > resistanceLevel and close[1] <= resistanceLevel
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ENTRY CONDITIONS
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Core momentum conditions (Ross's checklist)
+momentumBase = isHighVol and isPriceInRange and inSession
+
+// Price above VWAP and EMAs (bullish bias)
+bullishBias = close > vwapValue and close > ema9 and ema9 > ema20
+
+// Entry Signal: Momentum + Bullish Bias + (Bull Flag OR Flat Top Breakout OR Gap)
+longEntry = momentumBase and bullishBias and (isBullFlag or isFlatTopBreak or isGappingUp)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STOP LOSS & TAKE PROFIT
+// ══════════════════════════════════════════════════════════════════════════════
+
+stopLoss   = close - (atrValue * stopAtrMult)
+takeProfit = close + (atrValue * stopAtrMult * riskReward)
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STRATEGY EXECUTION
+// ══════════════════════════════════════════════════════════════════════════════
+
+if longEntry and strategy.position_size == 0
+    strategy.entry("Momentum Long", strategy.long)
+    strategy.exit("TP/SL", "Momentum Long", stop=stopLoss, limit=takeProfit)
+
+// Close all positions at end of day (day trading)
+if ta.change(time("D")) != 0
+    strategy.close_all("EOD Close")
+
+// ══════════════════════════════════════════════════════════════════════════════
+// VISUALS
+// ══════════════════════════════════════════════════════════════════════════════
+
+// --- EMAs ---
+plot(ema9,  "9 EMA",  color=color.new(#00e5ff, 0), linewidth=2)
+plot(ema20, "20 EMA", color=color.new(#ff6d00, 0), linewidth=2)
+
+// --- VWAP ---
+plot(showVwap ? vwapValue : na, "VWAP", color=color.new(#aa00ff, 0), linewidth=2, style=plot.style_stepline)
+
+// --- Entry Signals ---
+plotshape(longEntry and strategy.position_size == 0, "🚀 Entry", shape.triangleup, location.belowbar, color.new(#00e676, 0), size=size.normal)
+
+// --- Stop & Target Lines ---
+plot(strategy.position_size > 0 ? stopLoss : na,   "Stop Loss",    color=color.new(#ff1744, 0), linewidth=1, style=plot.style_linebr)
+plot(strategy.position_size > 0 ? takeProfit : na,  "Take Profit",  color=color.new(#00e676, 0), linewidth=1, style=plot.style_linebr)
+
+// --- Background: In Session ---
+bgcolor(inSession ? color.new(#00e5ff, 95) : na, title="Momentum Window")
+
+// --- Background: High Relative Volume ---
+bgcolor(isHighVol ? color.new(#ffeb3b, 93) : na, title="High Rel Volume")
+
+// --- Info Table ---
+var table infoTable = table.new(position.top_right, 2, 7, bgcolor=color.new(#1a1a2e, 15), border_width=1, border_color=color.new(#ffffff, 80))
+
+if barstate.islast
+    table.cell(infoTable, 0, 0, "📊 ROSS CAMERON",   text_color=color.new(#00e5ff, 0), text_size=size.small)
+    table.cell(infoTable, 1, 0, "MOMENTUM SCANNER",   text_color=color.new(#00e5ff, 0), text_size=size.small)
+    table.cell(infoTable, 0, 1, "Gap %",              text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 1, 1, str.tostring(gapPercent, "#.##") + "%", text_color=isGappingUp ? color.lime : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 2, "Rel Volume",         text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 1, 2, str.tostring(relVol, "#.##") + "x",    text_color=isHighVol ? color.lime : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 3, "VWAP",               text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 1, 3, str.tostring(vwapValue, "#.##"),        text_color=close > vwapValue ? color.lime : color.red, text_size=size.tiny)
+    table.cell(infoTable, 0, 4, "Bull Flag",          text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 1, 4, isBullFlag ? "✅ YES" : "❌ NO",       text_color=isBullFlag ? color.lime : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 5, "Flat Top Break",     text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 1, 5, isFlatTopBreak ? "✅ YES" : "❌ NO",   text_color=isFlatTopBreak ? color.lime : color.gray, text_size=size.tiny)
+    table.cell(infoTable, 0, 6, "Session",            text_color=color.white, text_size=size.tiny)
+    table.cell(infoTable, 1, 6, inSession ? "🟢 LIVE" : "🔴 CLOSED",  text_color=inSession ? color.lime : color.red, text_size=size.tiny)

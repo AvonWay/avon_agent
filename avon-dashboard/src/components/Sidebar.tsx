@@ -13,7 +13,8 @@ import {
     LayoutDashboard, // New import
     Bot, // New import
     Users, // New import
-    Activity // New import
+    Activity, // Keep Activity for now
+    TrendingUp // New import
 } from 'lucide-react';
 
 const SidebarItem = ({ icon: Icon, label, active = false, onClick }: { icon: any, label: string, active?: boolean, onClick?: () => void }) => (
@@ -41,10 +42,11 @@ export default function Sidebar({ activeView, setActiveView }: { activeView: str
             </div>
 
             <nav className="flex-1 px-4 space-y-2">
-                <SidebarItem icon={LayoutDashboard} label={expanded ? "Nodes" : ""} active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
-                <SidebarItem icon={Bot} label={expanded ? "Velocity AI Builder" : ""} active={activeView === 'ai-builder'} onClick={() => setActiveView('ai-builder')} />
-                <SidebarItem icon={Users} label={expanded ? "Team" : ""} active={activeView === 'team'} onClick={() => setActiveView('team')} />
-                <SidebarItem icon={Activity} label={expanded ? "CI/CD Log" : ""} active={activeView === 'activity'} onClick={() => setActiveView('activity')} />
+                <SidebarItem icon={Bot} label={expanded ? "Chat Interface" : ""} active={activeView === 'chat'} onClick={() => setActiveView('chat')} />
+                <SidebarItem icon={LayoutDashboard} label={expanded ? "Artifacts" : ""} active={activeView === 'artifacts'} onClick={() => setActiveView('artifacts')} />
+                <SidebarItem icon={Activity} label={expanded ? "Agent Logs" : ""} active={activeView === 'logs'} onClick={() => setActiveView('logs')} />
+                <SidebarItem icon={TrendingUp} label={expanded ? "Velocity Trade" : ""} active={activeView === 'trade'} onClick={() => setActiveView('trade')} />
+                <SidebarItem icon={Users} label={expanded ? "Workspaces" : ""} active={activeView === 'workspaces'} onClick={() => setActiveView('workspaces')} />
             </nav>
 
             <div className="p-4 border-t border-white/5">

@@ -83,3 +83,6 @@ This styling rule is essential for maintaining a consistent visual identity acro
 
 - *   ACTION: Declare all functions using `const` and arrow function syntax because it ensures consistent lexical `this` binding and enhances readability.
 *   ACTION: Ensure all interactive elements (e.g., buttons) have an `aria-label` if their visual text content is not sufficiently descriptive because it improves accessibility for assistive technologies.
+
+- *   ACTION: Always define and use CSS custom properties (`--var`) for all foundational design tokens (colors, fonts, spacing, border-radius, shadows, and transitions) within the `:root` selector because it centralizes design variables, enhances consistency, simplifies global theme changes, and improves maintainability.
+*   ACTION: Consistently apply the `glassmorphism` utility class and incorporate `drop-shadow` or `box-shadow` CSS variables to interactive UI components (cards, buttons, navigation) because it establishes a cohesive, branded aesthetic and provides clear, animated visual feedback for user interactions.

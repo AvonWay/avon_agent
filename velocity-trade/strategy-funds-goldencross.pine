@@ -1,0 +1,24 @@
+//@version=6
+strategy("Mutual Fund Golden Cross", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100)
+
+// Index funds work best with long-term moving average crossovers
+fastLength = input.int(50, "Fast SMA (50)")
+slowLength = input.int(200, "Slow SMA (200)")
+
+fastSMA = ta.sma(close, fastLength)
+slowSMA = ta.sma(close, slowLength)
+
+// Golden Cross (50 crosses over 200) -> Bull Market
+longCondition = ta.crossover(fastSMA, slowSMA)
+// Death Cross (50 crosses under 200) -> Bear Market / Cash Position
+exitCondition = ta.crossunder(fastSMA, slowSMA)
+
+if (longCondition)
+    strategy.entry("Invest", strategy.long)
+if (exitCondition)
+    strategy.close("Invest")
+
+plot(fastSMA, "50 SMA", color=color.green, linewidth=2)
+plot(slowSMA, "200 SMA", color=color.red, linewidth=3)
+plotshape(longCondition, "Golden Cross", shape.triangleup, location.belowbar, color.new(color.green, 0), size=size.normal)
+plotshape(exitCondition, "Death Cross", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.normal)

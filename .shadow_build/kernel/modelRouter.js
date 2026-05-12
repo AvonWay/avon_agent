@@ -2,24 +2,21 @@
  * ============================================================
  *  kernel/modelRouter.js  — Velocity Intelligent Model Router
  *
+ *  BYOE (Bring Your Own Engine) Architecture
+ *
  *  Features:
- *  - Routes each role to its specialist model
+ *  - Routes each role to its specialist model via ProviderRegistry
+ *  - Session-aware context compression for mid-session switches
+ *  - JIT format adaptation per provider
  *  - Ensemble consensus for critical code review decisions
  *  - Automatic retry with fallback model on timeout/error
  *  - Streams support preserved
  * ============================================================
  */
 
-import { runOllama } from "../providers/ollama.js";
-import { runOpenAI } from "../providers/openai.js";
-import { runGemini } from "../providers/gemini.js";
+import { registry } from "./providerRegistry.js";
+import { compressor, FormatAdapter, getSession } from "./stateManager.js";
 import { MODEL_PROFILES } from "./config.js";
-
-const providers = {
-    ollama: runOllama,
-    openai: runOpenAI,
-    gemini: runGemini,
-};
 
 // Fallback chain: if primary model errors, try Avon_Agent (sole local model)
 const FALLBACK_CHAIN = [
@@ -28,6 +25,9 @@ const FALLBACK_CHAIN = [
 
 /**
  * Core model runner — routes profile → specialist model
+ * 
+ * Now uses the ProviderRegistry for dynamic provider resolution
+ * and the StateManager for context-aware session handling.
  */
 export async function runModel({
     profile = "standard",
@@ -36,7 +36,8 @@ export async function runModel({
     messages,
     system,
     stream = false,
-    timeoutMs = 1_200_000
+    timeoutMs = 1_200_000,
+    sessionId = null   // NEW: optional session for state tracking
 }) {
     const config = MODEL_PROFILES[profile] || MODEL_PROFILES.standard;
 
@@ -48,14 +49,76 @@ export async function runModel({
 
     console.log(`[Router] ${profile.padEnd(12)} → ${finalModel} (${finalProvider})`);
 
-    const runner = providers[finalProvider];
+    // ── Resolve runner from registry (with fallback to legacy map) ──
+    let runner;
+    const registeredProvider = registry.get(finalProvider);
+    if (registeredProvider) {
+        runner = registeredProvider.runner;
+    } else {
+        // Legacy fallback for unregistered providers
+        const legacyProviders = {
+            ollama: (await import('../providers/ollama.js')).runOllama,
+            openai: (await import('../providers/openai.js')).runOpenAI,
+            gemini: (await import('../providers/gemini.js')).runGemini,
+            anthropic: (await import('../providers/anthropic.js')).runAnthropic,
+        };
+        runner = legacyProviders[finalProvider];
+    }
+
     if (!runner) throw new Error(`Unknown provider: ${finalProvider}`);
 
+    // ── Session-aware context compression ──
+    let finalMessages = messages;
+    let finalSystem = system;
+
+    if (sessionId) {
+        const session = getSession(sessionId);
+
+        // If the engine changed, compress context for the new model
+        if (session.activeModel && session.activeModel !== finalModel) {
+            const compressed = compressor.compress(session, finalModel, system);
+            if (compressed.compressed) {
+                finalMessages = compressed.messages;
+                console.log(`[Router] 📦 Context compressed for ${finalModel} (${compressed.messages.length} msgs)`);
+            }
+        }
+
+        // Update session engine tracking
+        session.setEngine(finalProvider, finalModel);
+
+        // Apply JIT format adaptation
+        const adapted = FormatAdapter.adapt(finalMessages, finalProvider, finalSystem);
+        finalMessages = adapted.messages;
+        if (adapted.system) finalSystem = adapted.system;
+    }
+
+    // ── Execute with timeout ──
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-        return await runner({ model: finalModel, messages, system, stream, signal: controller.signal });
+        const result = await runner({
+            model: finalModel,
+            messages: finalMessages,
+            system: finalSystem,
+            stream,
+            signal: controller.signal
+        });
+
+        // Track in session if available
+        if (sessionId) {
+            const session = getSession(sessionId);
+            const userMsg = messages[messages.length - 1];
+            if (userMsg) session.addMessage(userMsg.role, userMsg.content);
+            if (result.message?.content) {
+                session.addMessage('assistant', result.message.content, {
+                    model: finalModel,
+                    provider: finalProvider
+                });
+            }
+        }
+
+        return result;
     } catch (err) {
         // If this was already a fallback or explicit model request, don't retry
         if (customModel || err.message === 'Request timed out') throw err;
@@ -66,14 +129,17 @@ export async function runModel({
             console.warn(`[Router] ⚡ Primary ${finalModel} failed (${err.message}). Falling back to local ${fallbackModel}...`);
             
             try {
-                // Fallback models are ALWAYS local (Ollama) in the current architecture
                 const fController = new AbortController();
                 const fTimeout = setTimeout(() => fController.abort(), timeoutMs);
                 
-                const result = await runOllama({ // Force Ollama for Avon_Agent fallback
+                // Get Ollama runner from registry
+                const ollamaRunner = registry.get('ollama')?.runner;
+                const fallbackRunner = ollamaRunner || (await import('../providers/ollama.js')).runOllama;
+
+                const result = await fallbackRunner({
                     model: fallbackModel, 
-                    messages, 
-                    system, 
+                    messages: finalMessages || messages, 
+                    system: finalSystem || system, 
                     stream,
                     signal: fController.signal
                 });

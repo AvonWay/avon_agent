@@ -186,3 +186,93 @@ export const publishFile = async (token: string, path: string) => {
     });
     return res.json();
 };
+
+// ═══════════════════════════════════════════════════════
+//  ENGINE MANAGEMENT API — BYOE (Bring Your Own Engine)
+// ═══════════════════════════════════════════════════════
+
+/** Get full engine status (providers, sessions) */
+export const fetchEngineStatus = async () => {
+    const res = await fetch(`${API_URL}/engine/status`);
+    return res.json();
+};
+
+/** List all registered providers */
+export const fetchEngineProviders = async () => {
+    const res = await fetch(`${API_URL}/engine/providers`);
+    return res.json();
+};
+
+/** Probe all providers for health (Ollama, APIs) */
+export const probeEngine = async () => {
+    const res = await fetch(`${API_URL}/engine/probe`);
+    return res.json();
+};
+
+/** Switch engine mid-session */
+export const switchEngine = async (token: string, sessionId: string, provider: string, model: string) => {
+    const res = await fetch(`${API_URL}/engine/switch`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ sessionId, provider, model })
+    });
+    return res.json();
+};
+
+/** Save user engine configuration */
+export const configureEngine = async (token: string, config: {
+    defaultProvider?: string;
+    defaultModel?: string;
+    taskRouting?: Record<string, string>;
+    localEndpoint?: string;
+    customEndpoint?: { id?: string; name?: string; endpoint: string; models?: string[]; apiKey?: string };
+}) => {
+    const res = await fetch(`${API_URL}/engine/configure`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(config)
+    });
+    return res.json();
+};
+
+/** Register a new custom provider */
+export const registerProvider = async (token: string, provider: {
+    id?: string;
+    name?: string;
+    endpoint: string;
+    models?: string[];
+    apiKey?: string;
+}) => {
+    const res = await fetch(`${API_URL}/engine/register`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(provider)
+    });
+    return res.json();
+};
+
+/** Unregister a provider */
+export const unregisterProvider = async (token: string, providerId: string) => {
+    const res = await fetch(`${API_URL}/engine/provider/${providerId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+};
+
+/** Get session state snapshot */
+export const fetchSession = async (token: string, sessionId: string) => {
+    const res = await fetch(`${API_URL}/engine/session/${sessionId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+};

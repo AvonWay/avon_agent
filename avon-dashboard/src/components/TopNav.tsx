@@ -1,40 +1,16 @@
 "use client";
 
 import React from 'react';
-import { Bell, Search, User, Cpu, ChevronDown } from 'lucide-react';
-
-const AVAILABLE_MODELS = [
-    {
-        id: "velocity",
-        name: "Velocity (Local)",
-        provider: "ollama",
-        model: "Velocity:latest",
-        locked: true
-    }
-];
-
-function ModelDropdown() {
-    return (
-        <select
-            aria-label="Select AI Model"
-            title="Select AI Model"
-            className="text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700"
-        >
-            {AVAILABLE_MODELS.map((m) => (
-                <option key={m.id} value={m.model}>{m.name}</option>
-            ))}
-        </select>
-    );
-}
+import { Bell, Search, User, Cpu, ChevronDown, Code } from 'lucide-react';
 
 export default function TopNav() {
     return (
         <div className="h-16 bg-white border-b border-gray-100 px-8 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-6 text-sm">
                 <div className="flex items-center gap-4 text-gray-500">
-                    <span className="hover:text-primary cursor-pointer">Websites</span>
+                    <span className="hover:text-primary cursor-pointer font-bold tracking-wide">VELOCITY SWARM</span>
                     <span className="text-gray-300">/</span>
-                    <span className="text-gray-900 font-medium">Dashboard</span>
+                    <span className="text-gray-900 font-medium">Chat Interface</span>
                 </div>
 
                 <div className="h-4 w-px bg-gray-200 mx-2"></div>
@@ -63,16 +39,35 @@ export default function TopNav() {
                     />
                 </div>
 
-                {/* Model Selector: only shows dropdown if multiple models exist */}
-                {AVAILABLE_MODELS.length > 1 ? (
-                    <ModelDropdown />
-                ) : (
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium">
-                        <Cpu size={14} />
-                        <span>{AVAILABLE_MODELS[0].name}</span>
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                {/* Model Selector: showing agnostic engine status */}
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-tighter border border-blue-100 shadow-sm">
+                        <Cpu size={12} className="text-blue-600" />
+                        <span>Agnostic Engine</span>
+                        <div className="flex gap-1">
+                            <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                            <span className="w-1 h-1 bg-indigo-400 rounded-full animate-pulse"></span>
+                        </div>
                     </div>
-                )}
+                    
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-[10px] font-black uppercase tracking-tighter border border-emerald-100 shadow-sm cursor-pointer hover:bg-emerald-100 transition-colors">
+                        <TrendingUp size={12} className="text-emerald-600" />
+                        <span>Trade Live</span>
+                        <span className="relative flex h-1.5 w-1.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-[10px] font-black uppercase tracking-tighter border border-amber-100 shadow-sm cursor-pointer hover:bg-amber-100 transition-colors">
+                        <Code size={12} className="text-amber-600" />
+                        <span>OpenCode</span>
+                        <div className="flex items-center gap-1">
+                            <span className="w-1 h-1 bg-amber-400 rounded-full"></span>
+                            <span className="px-1 bg-amber-100 text-amber-600 rounded text-[8px]">LOCAL</span>
+                        </div>
+                    </div>
+                </div>
 
                 <button
                     aria-label="Notifications"
@@ -96,4 +91,12 @@ export default function TopNav() {
         </div>
     );
 }
+
+// Helper icons
+const TrendingUp = ({ size, className }: { size?: number, className?: string }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+        <polyline points="17 6 23 6 23 12"></polyline>
+    </svg>
+);
 

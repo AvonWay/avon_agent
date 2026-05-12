@@ -34,7 +34,22 @@
         "CG-003": "CodeGemma",
         "LM-001": "Llama/Phi-4",
         "LM-002": "Llama/Phi-4",
-        "LM-003": "Llama/Phi-4"
+        "LM-003": "Llama/Phi-4",
+        "OC-001": "OpenCode (Qwen-2.5-Coder)"
     },
-    "evolution_history": []
+    "evolution_history": [
+        {
+            "timestamp": "2026-05-11T18:46:00Z",
+            "type": "agent_integration",
+            "agent": "OpenCode",
+            "details": "Registered autonomous terminal agent for local file/shell operations."
+        },
+        {
+            "timestamp": "2026-05-11T18:46:30Z",
+            "type": "site_build",
+            "project": "Velocity Industrial Storefront",
+            "status": "completed",
+            "pages": ["index.html", "products.html", "cart.html"]
+        }
+    ]
 }

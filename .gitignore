@@ -17,6 +17,8 @@ node_modules/
 out/
 dist/
 build/
+.shadow_build/
+previews/
 *.tsbuildinfo
 
 # ── Debug & Logs ─────────────────────────────────────────────
@@ -46,3 +48,4 @@ qr_code_output.txt
 # ── WhatsApp Web JS (browser session — contains secrets) ─────
 .wwebjs_auth/
 .wwebjs_cache/
+scratch/

@@ -34,7 +34,8 @@ const HAS_OPENAI = !!process.env.OPENAI_API_KEY;
 const IS_REMOTE = process.env.NODE_ENV === 'production' || process.env.REMOTE_DEPLOY === 'true';
 
 // ─── Three-tier intelligence ────────────────────────────────
-const CLOUD = HAS_GEMINI ? 'gemini' : (HAS_OPENAI ? 'openai' : 'ollama');
+// ─── Three-tier intelligence ────────────────────────────────
+const CLOUD = 'ollama'; // Bypassing Gemini due to project access denial
 
 const LOCAL = 'ollama'; // Avon_Agent — sole local model
 
@@ -42,7 +43,7 @@ const LOCAL = 'ollama'; // Avon_Agent — sole local model
 const STRATEGIST_MODEL = HAS_GEMINI ? 'gemini-2.5-pro' : 'gpt-4o';
 // Tier 2: Flash for fast execution tasks  
 const WORKHORSE_MODEL  = HAS_GEMINI ? 'gemini-2.5-flash' : 'gpt-4o-mini';
-const LOCAL_MODEL = 'Avon_Agent';
+const LOCAL_MODEL = 'qwen2.5-coder:7b';
 
 /**
  * MODEL PROFILES — Three-Tier Intelligence
@@ -175,6 +176,11 @@ export const MODEL_PROFILES = {
         model: process.env.MODEL_RESEARCHER
             || (CLOUD !== 'ollama' ? WORKHORSE_MODEL : LOCAL_MODEL),
         description: 'TIER 2 — Researcher: knowledge distillation and technical analysis'
+    },
+    coder: {
+        provider: LOCAL,
+        model: process.env.MODEL_CODER || 'qwen2.5-coder:7b',
+        description: 'TIER 3 — OpenCode: Autonomous terminal agent for local file/shell operations'
     }
 };
 

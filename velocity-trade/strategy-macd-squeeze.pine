@@ -1,0 +1,34 @@
+//@version=6
+strategy("Volatility Squeeze Breakout", overlay=false, initial_capital=5000)
+
+// Bollinger Bands
+bbLen = 20
+bbMult = 2.0
+[bbMiddle, bbUpper, bbLower] = ta.bb(close, bbLen, bbMult)
+
+// Keltner Channels
+kcLen = 20
+kcMult = 1.5
+kcMiddle = ta.sma(close, kcLen)
+range_ema = ta.ema(high - low, kcLen)
+kcUpper = kcMiddle + range_ema * kcMult
+kcLower = kcMiddle - range_ema * kcMult
+
+// Squeeze is ON when BB is completely inside Keltner Channel
+squeezeOn = (bbLower > kcLower) and (bbUpper < kcUpper)
+squeezeOff = (bbLower < kcLower) and (bbUpper > kcUpper)
+
+// Momentum using MACD
+[macdLine, signalLine, histLine] = ta.macd(close, 12, 26, 9)
+
+longCond = squeezeOff and squeezeOn[1] and histLine > 0
+shortCond = squeezeOff and squeezeOn[1] and histLine < 0
+
+if (longCond)
+    strategy.entry("Long", strategy.long)
+if (shortCond)
+    strategy.entry("Short", strategy.short)
+
+plotColor = squeezeOn ? color.red : color.green
+plot(histLine, "Momentum", color=color.blue, style=plot.style_columns)
+plotshape(squeezeOn, "Squeeze", shape.circle, location.bottom, color=color.red, size=size.tiny)

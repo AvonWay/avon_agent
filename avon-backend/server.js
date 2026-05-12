@@ -292,9 +292,53 @@ app.get('/api/public/sites/:id/:page', async (req, res) => {
     }
 });
 
+// --- PREVIEW FILE SERVER (serves built sites for in-dashboard iframe) ---
+app.get(['/api/preview/:buildDir', '/api/preview/:buildDir/:page'], async (req, res) => {
+    const { buildDir } = req.params;
+    const page = req.params.page || 'index.html';
+    // Sanitize inputs
+    if (!/^[\w\-. ]+$/.test(buildDir) || !/^[\w\-.]+\.(html|css|js)$/.test(page)) {
+        return res.status(400).json({ error: 'Invalid path' });
+    }
+    try {
+        const previewsRoot = path.resolve(__dirname, '..', 'previews');
+        const filePath = path.join(previewsRoot, buildDir, page);
+        // Prevent traversal
+        if (!filePath.startsWith(previewsRoot)) {
+            return res.status(403).json({ error: 'Path traversal detected' });
+        }
+        const exists = await fse.pathExists(filePath);
+        if (!exists) return res.status(404).json({ error: `File not found: ${buildDir}/${page}` });
+        const content = await fse.readFile(filePath, 'utf8');
+        const ext = path.extname(page).toLowerCase();
+        const mimeMap = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript' };
+        res.type(mimeMap[ext] || 'text/plain').send(content);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- LIST PREVIEW BUILDS (for the dashboard to discover completed builds) ---
+app.get('/api/preview', authenticateJWT, async (req, res) => {
+    try {
+        const previewsRoot = path.resolve(__dirname, '..', 'previews');
+        const items = await fse.readdir(previewsRoot, { withFileTypes: true });
+        const builds = items
+            .filter(item => item.isDirectory() && item.name.startsWith('build_'))
+            .map(item => ({
+                name: item.name,
+                previewUrl: `/api/preview/${encodeURIComponent(item.name)}/`
+            }));
+        res.json(builds);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // --- TERMINAL EXEC (DS-001: Allowlist + metacharacter guard) ---
 const TERMINAL_ALLOWED_COMMANDS = [
     'node --check',
+    'npm install',
     'npm run',
     'npm test',
     'npx tsc',
@@ -349,7 +393,23 @@ app.post('/api/terminal/exec', authenticateJWT, (req, res) => {
 
 // --- FS ---
 
-/** GET /api/fs/list — list a directory */
+// DS-004: Hide internal/sensitive files from the file explorer
+const FS_HIDDEN = new Set([
+    '.env', '.env.example', '.env.railway', '.git', '.github', '.gitignore',
+    '.velocity', '.velocity_constitution.json', '.vscode', '.wwebjs_auth',
+    '.wwebjs_cache', '.shadow_build', '.agent', '.antigravityignore',
+    'node_modules', 'package-lock.json',
+    'kernel', 'agents', 'providers', 'swarm', 'io', 'llm_c', 'memory',
+    'autoresearch_repo', 'avon_evolve.js', 'cli.js', 'main.js',
+    'whatsapp_bot.js', 'Modelfile', 'supabase_schema.sql',
+    'supabase_storage_setup.sql', 'reg.json', 'build_manifest.json',
+    'avon-backend', 'avon-dashboard', 'avon-velocity-frontend',
+    'app_v2_recovered.js', 'railway.json',
+    'PROJECT_CONSTITUTION.md', 'PROMPT_PLAN.md', 'VELOCITY_BLUEPRINT.md',
+    'ARCHITECTURE.md', 'Mission_Manifest.json', 'build_plan.md'
+]);
+
+/** GET /api/fs/list — list a directory (filtered for safety) */
 app.get('/api/fs/list', authenticateJWT, async (req, res) => {
     const queryPath = req.query.path || '.';
     try {
@@ -361,11 +421,15 @@ app.get('/api/fs/list', authenticateJWT, async (req, res) => {
         }
 
         const items = await fse.readdir(target, { withFileTypes: true });
-        const result = items.map(item => ({
-            name: item.name,
-            isDirectory: item.isDirectory(),
-            path: path.relative(root, path.join(target, item.name)).replace(/\\/g, '/')
-        }));
+        // Only filter at the root level; sub-directories are shown in full
+        const isRoot = path.normalize(target) === path.normalize(root);
+        const result = items
+            .filter(item => !isRoot || !FS_HIDDEN.has(item.name))
+            .map(item => ({
+                name: item.name,
+                isDirectory: item.isDirectory(),
+                path: path.relative(root, path.join(target, item.name)).replace(/\\/g, '/')
+            }));
         res.json(result);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -406,6 +470,7 @@ app.post('/api/fs/write', authenticateJWT, async (req, res) => {
 });
 
 /** POST /api/fs/publish — push a path to GitHub */
+/** POST /api/fs/publish — Render build and push to GitHub */
 app.post('/api/fs/publish', authenticateJWT, async (req, res) => {
     const { path: queryPath } = req.body;
     if (!queryPath) return res.status(400).json({ error: 'path is required' });
@@ -414,16 +479,39 @@ app.post('/api/fs/publish', authenticateJWT, async (req, res) => {
         const target = path.resolve(root, String(queryPath));
         if (!target.startsWith(root)) return res.status(403).json({ error: 'Out of bounds' });
 
+        // DS-005: Determine the actual project directory to publish
+        // If we are in previews/, publish the entire directory so links work.
+        let publishPath = queryPath;
+        let isPreview = false;
+        if (queryPath.startsWith('previews/')) {
+            const parts = queryPath.split('/');
+            if (parts.length > 1) {
+                publishPath = path.join(parts[0], parts[1]).replace(/\\/g, '/');
+                isPreview = true;
+            }
+        }
+
+        // 1. RENDER BUILD (High-Fidelity harding before live push)
+        if (isPreview) {
+            console.log(`🏗️ [Publish] Rendering final build for: ${publishPath}`);
+            try {
+                const { Supervisor } = await import('../agents/supervisor.js');
+                // Use a "Hardening" goal to ensure all links and assets are optimized
+                await Supervisor.execute(`Refine and optimize the industrial build in ${publishPath}. Ensure all page links work and styles are perfectly integrated.`);
+            } catch (err) {
+                console.warn(`⚠️ [Publish] Build hardening failed, proceeding with current files: ${err.message}`);
+            }
+        }
+
         // Git commands
-        // 1. Add
+        // 1. Add (use the determined publishPath to include all pages/assets)
         await new Promise((resolve, reject) => {
-            exec(`git add "${queryPath}"`, { cwd: root }, (err) => err ? reject(err) : resolve());
+            exec(`git add "${publishPath}"`, { cwd: root }, (err) => err ? reject(err) : resolve());
         });
         // 2. Commit
         await new Promise((resolve, reject) => {
-            exec(`git commit -m "chore: publish ${queryPath} at ${new Date().toISOString()}"`, { cwd: root }, (err) => {
-                // Ignore "nothing to commit" errors
-                resolve();
+            exec(`git commit -m "feat: publish ${publishPath} (full build) at ${new Date().toISOString()}"`, { cwd: root }, (err) => {
+                resolve(); // Ignore "nothing to commit"
             });
         });
         // 3. Push
@@ -440,7 +528,9 @@ app.post('/api/fs/publish', authenticateJWT, async (req, res) => {
 
         const repoName = 'avon_agent';
         const userName = 'avonway';
-        const liveUrl = `https://${userName}.github.io/${repoName}/${queryPath.replace(/\\/g, '/')}`;
+        // If it was a preview directory, point to index.html as the entry point
+        const entryPoint = isPreview ? `${publishPath}/index.html` : queryPath;
+        const liveUrl = `https://${userName}.github.io/${repoName}/${entryPoint.replace(/\\/g, '/')}`;
 
         res.json({ success: true, url: liveUrl });
     } catch (err) {
@@ -454,7 +544,6 @@ app.post('/api/chat', async (req, res) => {
     try {
         const { runModel } = await import('../kernel/modelRouter.js');
         const response = await runModel({
-            provider: 'ollama',
             model: model || 'Avon_Agent',
             profile: profile || 'standard',
             messages,
@@ -743,6 +832,176 @@ app.get('/monitor', (req, res) => {
     const monitorPath = path.resolve(__dirname, 'live-monitor.html');
     res.sendFile(monitorPath);
 });
+
+// ═══════════════════════════════════════════════════════════════
+//  ENGINE MANAGEMENT API — BYOE (Bring Your Own Engine)
+// ═══════════════════════════════════════════════════════════════
+
+/** GET /api/engine/status — Current engine state + available providers */
+app.get('/api/engine/status', async (req, res) => {
+    try {
+        const { registry } = await import('../kernel/providerRegistry.js');
+        const { listSessions } = await import('../kernel/stateManager.js');
+
+        const providers = registry.list();
+        const sessions = listSessions();
+
+        res.json({
+            providers,
+            activeSessions: sessions.length,
+            sessions: sessions.slice(0, 10), // Last 10 sessions
+            timestamp: new Date().toISOString()
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** GET /api/engine/providers — List all registered providers */
+app.get('/api/engine/providers', async (req, res) => {
+    try {
+        const { registry } = await import('../kernel/providerRegistry.js');
+        res.json(registry.list());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** GET /api/engine/probe — Live health check for local Ollama + all providers */
+app.get('/api/engine/probe', async (req, res) => {
+    try {
+        const { registry } = await import('../kernel/providerRegistry.js');
+        const health = await registry.healthCheck();
+        res.json(health);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** POST /api/engine/switch — Switch active provider mid-session */
+app.post('/api/engine/switch', authenticateJWT, async (req, res) => {
+    const { sessionId, provider, model } = req.body;
+    if (!provider || !model) {
+        return res.status(400).json({ error: 'provider and model are required' });
+    }
+
+    try {
+        const { registry } = await import('../kernel/providerRegistry.js');
+        const { getSession, compressor } = await import('../kernel/stateManager.js');
+
+        // Validate provider exists
+        const providerEntry = registry.get(provider);
+        if (!providerEntry) {
+            return res.status(404).json({ error: `Provider '${provider}' not registered` });
+        }
+
+        // Get or create session
+        const session = getSession(sessionId || `session_${Date.now()}`);
+        const previousEngine = { provider: session.activeProvider, model: session.activeModel };
+
+        // Perform context compression for the new model
+        const compressed = compressor.compress(session, model);
+
+        // Update session engine
+        session.setEngine(provider, model);
+
+        res.json({
+            success: true,
+            sessionId: session.sessionId,
+            previousEngine,
+            currentEngine: { provider, model },
+            contextCompressed: compressed.compressed,
+            messageCount: compressed.messages.length,
+            summary: compressed.summary
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** POST /api/engine/configure — Save user engine preferences */
+app.post('/api/engine/configure', authenticateJWT, async (req, res) => {
+    const { defaultProvider, defaultModel, taskRouting, localEndpoint, customEndpoint } = req.body;
+
+    try {
+        const { registry } = await import('../kernel/providerRegistry.js');
+
+        // Save user preferences
+        const userId = req.user.id;
+        registry.setUserPreferences(userId, {
+            defaultProvider,
+            defaultModel,
+            taskRouting,
+            localEndpoint
+        });
+
+        // If a custom endpoint was provided, register it
+        if (customEndpoint?.endpoint) {
+            registry.registerCustomEndpoint({
+                id: customEndpoint.id || `custom_${userId}`,
+                name: customEndpoint.name || `${userId}'s Custom Engine`,
+                endpoint: customEndpoint.endpoint,
+                models: customEndpoint.models || [],
+                apiKey: customEndpoint.apiKey
+            });
+        }
+
+        // If a custom Ollama endpoint was provided, update it
+        if (localEndpoint) {
+            const ollama = registry.get('ollama');
+            if (ollama) {
+                ollama.endpoint = localEndpoint;
+            }
+        }
+
+        res.json({
+            success: true,
+            preferences: registry.getUserPreferences(userId)
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** POST /api/engine/register — Register a new custom provider */
+app.post('/api/engine/register', authenticateJWT, async (req, res) => {
+    const { id, name, endpoint, models, apiKey } = req.body;
+    if (!endpoint) {
+        return res.status(400).json({ error: 'endpoint is required' });
+    }
+
+    try {
+        const { registry } = await import('../kernel/providerRegistry.js');
+        registry.registerCustomEndpoint({ id, name, endpoint, models, apiKey });
+        res.json({ success: true, providers: registry.list() });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** DELETE /api/engine/provider/:id — Unregister a provider */
+app.delete('/api/engine/provider/:id', authenticateJWT, async (req, res) => {
+    try {
+        const { registry } = await import('../kernel/providerRegistry.js');
+        const removed = registry.unregister(req.params.id);
+        res.json({ success: removed });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/** GET /api/engine/session/:id — Get session state snapshot */
+app.get('/api/engine/session/:id', authenticateJWT, async (req, res) => {
+    try {
+        const { getSession } = await import('../kernel/stateManager.js');
+        const session = getSession(req.params.id);
+        res.json(session.toSnapshot());
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════════
 
 app.listen(PORT, '0.0.0.0', async () => {
     console.log(`🚀 Avon Backend live at http://localhost:${PORT}`);
